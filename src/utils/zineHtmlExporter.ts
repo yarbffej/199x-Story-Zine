@@ -150,8 +150,8 @@ export async function exportStandaloneZineHtml(
   ) => {
     if (!gifData) return '';
     const mediaInner = gifData.startsWith('data:video/')
-      ? `<video src="${gifData}" autoplay loop muted playsinline class="w-full h-auto max-h-[520px] object-contain block"></video>`
-      : `<img src="${gifData}" alt="${escapeHtml(badge)}" class="w-full h-auto max-h-[520px] object-contain block" />`;
+      ? `<video src="${gifData}" autoplay loop muted playsinline class="w-full h-auto max-h-[640px] object-contain block"></video>`
+      : `<img src="${gifData}" alt="${escapeHtml(badge)}" class="w-full h-auto max-h-[640px] object-contain block" />`;
     return `
       <div style="transform: rotate(${rot});" class="relative pop-card th-surface p-4 flex flex-col justify-between hover:!rotate-0 transition-transform">
         <div class="washi-tape absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm -rotate-2"></div>
@@ -256,7 +256,7 @@ export async function exportStandaloneZineHtml(
 <body class="min-h-screen p-4 sm:p-8 lg:p-10">
   ${encodedAudio ? `<audio id="zineAudio" src="${encodedAudio}" autoplay loop></audio>` : ''}
 
-  <main class="max-w-7xl mx-auto space-y-10">
+  <main class="max-w-[1440px] mx-auto space-y-10">
     <!-- 1. HERO LEAD: 16:9 1080P CINEMA + DOCKED SPINNING VINYL BOOMBOX -->
     <section class="space-y-5">
       <div class="pop-card th-surface overflow-hidden">
@@ -339,16 +339,16 @@ export async function exportStandaloneZineHtml(
     </div>
 
     <!-- 4. SPREAD 01: ACT I + SHOT 01 + OPTIONAL STORY GIF #1 -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-      <article class="lg:col-span-6 pop-card p-6 sm:p-8" style="background:${expTheme.tile1}; color:${expTheme.ink}">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <article class="lg:col-span-5 pop-card p-6 sm:p-7" style="background:${expTheme.tile1}; color:${expTheme.ink}">
         <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">ACT 01 // THE SETUP</span>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">Entering ${escapeHtml(issue.location)}</h2>
         <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.sceneSetup)}</p>
       </article>
-      <div class="lg:col-span-6 space-y-6">
+      <div class="lg:col-span-7 space-y-6">
         ${
           encodedShots[0]
-            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[0])})" class="pop-card th-surface p-4 cursor-pointer">
+            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[0])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[0]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
                   <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popCyan}; color:${expTheme.popCyanInk}">🌍 IMAGE 01 // HERO ARRIVES</span>
@@ -362,11 +362,11 @@ export async function exportStandaloneZineHtml(
     </section>
 
     <!-- 5. SPREAD 02 (REVERSED): SHOT 02 + TILTED SHOT 03 (LEFT) × ACT II + GEAR NOTES (RIGHT) -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-      <div class="lg:col-span-6 space-y-5 order-2 lg:order-1">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-7 space-y-6 order-2 lg:order-1">
         ${
           encodedShots[1]
-            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[1])})" class="pop-card th-surface p-4 cursor-pointer lg:-rotate-[1deg] hover:rotate-0 transition-transform">
+            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[1])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer lg:-rotate-[1deg] hover:rotate-0 transition-transform">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[1]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
                   <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">👾 IMAGE 02 // BAD GUY VILLAIN REVEAL</span>
@@ -377,8 +377,8 @@ export async function exportStandaloneZineHtml(
         }
         ${
           encodedShots[2]
-            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[2])})" class="sm:w-11/12 sm:ml-auto pop-card th-surface p-3 cursor-pointer lg:rotate-[1.2deg] hover:rotate-0 transition-transform">
-                <div class="aspect-[16/9] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[2]}" class="w-full h-full object-cover" /></div>
+            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[2])})" class="w-full pop-card th-surface p-2.5 sm:p-3 cursor-pointer lg:rotate-[1.2deg] hover:rotate-0 transition-transform">
+                <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[2]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-2.5 flex justify-between items-center">
                   <span class="px-2.5 py-0.5 rounded-full border-2 th-border font-mono text-[11px] font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">⚡ IMAGE 03 // GOOD GUY VS. BAD GUY</span>
                   <span class="font-mono text-[11px] font-bold">2K ⤢</span>
@@ -387,8 +387,8 @@ export async function exportStandaloneZineHtml(
             : ''
         }
       </div>
-      <div class="lg:col-span-6 space-y-6 order-1 lg:order-2">
-        <article class="pop-card p-6 sm:p-8" style="background:${expTheme.tile2}; color:${expTheme.ink}">
+      <div class="lg:col-span-5 space-y-6 order-1 lg:order-2">
+        <article class="pop-card p-6 sm:p-7" style="background:${expTheme.tile2}; color:${expTheme.ink}">
           <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">ACT 02 // KINETIC CLASH</span>
           <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">${escapeHtml(issue.synergy)}</h2>
           <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.intervention)}</p>
@@ -403,16 +403,16 @@ export async function exportStandaloneZineHtml(
     </section>
 
     <!-- 6. SPREAD 03: ACT III (LEFT) + SHOT 04 & OPTIONAL STORY GIF #2 (RIGHT) -->
-    <section class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-      <article class="lg:col-span-6 pop-card p-6 sm:p-8" style="background:${expTheme.tile3}; color:${expTheme.ink}">
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <article class="lg:col-span-5 pop-card p-6 sm:p-7" style="background:${expTheme.tile3}; color:${expTheme.ink}">
         <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">ACT 03 // THE AFTERMATH</span>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">Suburban Stillness Restored</h2>
         <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.aftermath)}</p>
       </article>
-      <div class="lg:col-span-6 space-y-6">
+      <div class="lg:col-span-7 space-y-6">
         ${
           encodedShots[3]
-            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[3])})" class="pop-card th-surface p-4 cursor-pointer">
+            ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[3])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[3]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
                   <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">🌅 IMAGE 04 // ACT III AFTERMATH</span>
@@ -577,7 +577,7 @@ export async function exportStandaloneZineHtml(
 
   <!-- 2K LIGHTBOX MODAL -->
   <div id="lightbox" onclick="closeLb()" class="fixed inset-0 z-50 hidden bg-[#121212]/90 items-center justify-center p-4 sm:p-8">
-    <div onclick="event.stopPropagation()" class="max-w-6xl w-full pop-card th-surface p-4 space-y-3">
+    <div onclick="event.stopPropagation()" class="max-w-[94vw] w-full pop-card th-surface p-4 space-y-3">
       <div class="flex justify-between items-center">
         <span id="lbTitle" class="px-3.5 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">SHOT</span>
         <div class="flex gap-2">
@@ -587,7 +587,7 @@ export async function exportStandaloneZineHtml(
         </div>
       </div>
       <div class="rounded-xl border-[3px] th-border bg-[#121212] flex justify-center overflow-hidden">
-        <img id="lbImg" src="" class="max-h-[78vh] w-auto object-contain" />
+        <img id="lbImg" src="" class="max-h-[86vh] w-auto object-contain" />
       </div>
     </div>
   </div>

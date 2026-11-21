@@ -700,7 +700,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
 
         <div
           onClick={() => !loopUrl && !readerMode && onClickUploadSlot?.(slotKey)}
-          className={`relative w-full rounded-2xl border-[3px] theme-border bg-[#121212] overflow-hidden flex items-center justify-center min-h-[200px] ${
+          className={`relative w-full rounded-2xl border-[3px] theme-border bg-[#121212] overflow-hidden flex items-center justify-center min-h-[260px] ${
             !loopUrl && !readerMode ? 'cursor-pointer' : ''
           }`}
         >
@@ -712,13 +712,13 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                 loop
                 muted
                 playsInline
-                className="w-full h-auto max-h-[520px] object-contain block"
+                className="w-full h-auto max-h-[640px] object-contain block"
               />
             ) : (
               <img
                 src={loopUrl}
                 alt={badgeLabel}
-                className="w-full h-auto max-h-[520px] object-contain block"
+                className="w-full h-auto max-h-[640px] object-contain block"
               />
             )
           ) : (
@@ -782,9 +782,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
           if (f) onDropSlotFile(slotKey, f);
         }}
         style={{ backgroundColor: isHover ? zTheme.tile1 : zTheme.surfaceBg }}
-        className={`relative pop-card ${src ? 'pop-card-lift' : ''} ${
-          compact ? 'sm:w-11/12 sm:ml-auto p-3' : 'p-3 sm:p-4'
-        } ${tiltClass} hover:rotate-0 transition-transform`}
+        className={`relative pop-card w-full ${src ? 'pop-card-lift' : ''} p-2.5 sm:p-3 ${tiltClass} hover:rotate-0 transition-transform`}
       >
         {compact && (
           <div className="washi-tape absolute -top-3 left-8 w-24 h-5 rounded-sm -rotate-2 z-20 pointer-events-none" />
@@ -794,9 +792,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
             if (src) openShotInLightbox(slotIdx);
             else if (!readerMode) onClickUploadSlot?.(slotKey);
           }}
-          className={`${
-            compact ? 'aspect-[16/9]' : 'aspect-[16/10]'
-          } rounded-xl border-[2.5px] theme-border overflow-hidden bg-[#121212] flex items-center justify-center cursor-pointer`}
+          className="aspect-[16/10] w-full rounded-xl border-[2.5px] theme-border overflow-hidden bg-[#121212] flex items-center justify-center cursor-pointer"
         >
           {src ? (
             <img
@@ -990,7 +986,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
       </div>
 
       {/* ==================== MAIN ZINE PLAYGROUND CANVAS ==================== */}
-      <div className="p-3.5 sm:p-8 lg:p-10 space-y-8 sm:space-y-10 halftone-dots">
+      <div className="p-3 sm:p-6 lg:p-7 space-y-8 sm:space-y-10 halftone-dots">
         {/* ==================== 2. TOP HERO LEAD (FULL 12-COLUMN WIDTH): 16:9 1080P CINEMA + DOCKED BOOMBOX ==================== */}
         <section className="space-y-5">
           <div
@@ -1522,9 +1518,9 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
         {/* ==================== 5. 3-ACT STORY SPREADS + 2 STORY GIFS + 4 IMAGES FOLLOWING THE STORY ==================== */}
         <div className="space-y-12">
           {/* ---------- SPREAD 01: ACT 01 PROSE (LEFT) + GIF 01 & IMAGE 01 (RIGHT) ---------- */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <article
-              className="lg:col-span-6 pop-card p-6 sm:p-8 relative overflow-hidden"
+              className="lg:col-span-5 pop-card p-6 sm:p-7 relative overflow-hidden"
               style={{ backgroundColor: zTheme.tile1, color: zTheme.ink }}
             >
               <div className="flex items-center justify-between mb-3">
@@ -1550,7 +1546,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
               </p>
             </article>
 
-            <div className="lg:col-span-6 space-y-6">
+            <div className="lg:col-span-7 space-y-6">
               {renderShotPolaroid(
                 0,
                 zTheme.popCyan,
@@ -1573,8 +1569,8 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
           </section>
 
           {/* ---------- SPREAD 02 (REVERSED): IMAGE 02 + TILTED IMAGE 03 (LEFT) × ACT 02 PROSE & GEAR NOTES (RIGHT) ---------- */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-            <div className="lg:col-span-6 space-y-5 order-2 lg:order-1">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-7 space-y-6 order-2 lg:order-1">
               {renderShotPolaroid(
                 1,
                 zTheme.popPink,
@@ -1591,7 +1587,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
               )}
             </div>
 
-            <div className="lg:col-span-6 space-y-6 order-1 lg:order-2">
+            <div className="lg:col-span-5 space-y-6 order-1 lg:order-2">
               <article
                 className="pop-card p-6 sm:p-8"
                 style={{ backgroundColor: zTheme.tile2, color: zTheme.ink }}
@@ -1662,8 +1658,8 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
           </section>
 
           {/* ---------- SPREAD 03: ACT 03 PROSE + WAVE TOY (LEFT) × GIF 02 & IMAGE 04 (RIGHT) ---------- */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
-            <div className="lg:col-span-6 space-y-6">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-5 space-y-6">
               <article
                 className="pop-card p-6 sm:p-8"
                 style={{ backgroundColor: zTheme.tile3, color: zTheme.ink }}
@@ -1720,7 +1716,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
               </div>
             </div>
 
-            <div className="lg:col-span-6 space-y-6">
+            <div className="lg:col-span-7 space-y-6">
               {renderShotPolaroid(
                 3,
                 zTheme.popLime,
@@ -2018,7 +2014,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
           <div
             onClick={(e) => e.stopPropagation()}
             style={{ backgroundColor: zTheme.surfaceBg, color: zTheme.ink }}
-            className="relative max-w-6xl w-full pop-card p-3 sm:p-5 space-y-3"
+            className="relative max-w-[94vw] w-full pop-card p-3 sm:p-5 space-y-3"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span
@@ -2084,7 +2080,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
               <img
                 src={presentShots[lightboxPos].url}
                 alt="2K Lightbox Plate"
-                className="max-h-[78vh] w-auto object-contain"
+                className="max-h-[86vh] w-auto object-contain"
               />
             </div>
           </div>

@@ -70,7 +70,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
           color: uiTheme.headerInk,
         }}
       >
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-2">
           {activeIssue !== null && openIndex !== null ? (
             <>
               <button
@@ -191,7 +191,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
         </div>
 
         {/* Horizontal Backdrop Theme Strip */}
-        <div className="max-w-5xl mx-auto flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 no-scrollbar">
+        <div className="max-w-[1400px] mx-auto flex items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 no-scrollbar">
           {STUDIO_UI_THEMES.map((th) => {
             const selected = th.id === uiTheme.id;
             return (
@@ -218,7 +218,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3.5 pt-5">
+      <main className="max-w-[1400px] mx-auto px-3 sm:px-5 pt-5">
         {activeIssue ? (
           <ZineIssueView
             issue={{
