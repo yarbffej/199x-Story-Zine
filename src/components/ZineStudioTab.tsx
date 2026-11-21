@@ -26,6 +26,7 @@ import {
   ZineIssueData,
   ZineActs,
   STORYBOARD_VISUAL_STYLES,
+  STORYBOARD_STORY_ARCS,
   buildZineIssueFromEncounter,
   buildLongForm3ActChronicle,
   parsePasted3ActStory,
@@ -101,6 +102,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [isComposingAudio, setIsComposingAudio] = useState(false);
   const [synthStyleIdx, setSynthStyleIdx] = useState<number>(0);
   const [visualStyleOverride, setVisualStyleOverride] = useState<string | undefined>(undefined);
+  const [storyArcOverride, setStoryArcOverride] = useState<string | undefined>(undefined);
   const [isSavingShelf, setIsSavingShelf] = useState(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -192,6 +194,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     editingRecordIdRef.current = undefined;
     setEditingRecordId(undefined);
     setVisualStyleOverride(undefined);
+    setStoryArcOverride(undefined);
     setIssueNumber(shelfRecords.length + 1);
     setZinePaletteId(getZinePalette(encounter.card_theme).finishId);
     setActs(buildLongForm3ActChronicle(encounter));
@@ -248,6 +251,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       cardImageUrl: shotUrls[2] || shotUrls[1] || shotUrls[0],
       cardVideoUrl: videoUrl,
       visualStyleIdOverride: visualStyleOverride,
+      storyArcIdOverride: storyArcOverride,
     });
     if (editingRecordId) built.id = editingRecordId;
     built.zinePaletteId = zinePaletteId;
@@ -266,6 +270,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     editingRecordId,
     zinePaletteId,
     visualStyleOverride,
+    storyArcOverride,
   ]);
 
   useEffect(() => {
@@ -1785,6 +1790,52 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                       title="Cycle to next visual medium (updates Step 1, Step 2 GIFs & Step 3 Videos)"
                     >
                       ↻ Style
+                    </button>
+                  </div>
+
+                  {/* 10-Arc 4-Panel Storyboard Action Picker (Chase, Zero-G, Portal Hop, Truce, Switch Flip, etc.) */}
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      aria-label="4-scene storyboard action arc for this Zine"
+                      value={liveIssue.prompts.resolvedStoryArcId}
+                      onChange={(e) => {
+                        playZineBlip(860);
+                        setStoryArcOverride(e.target.value);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.inputBg,
+                        color: uiTheme.ink,
+                      }}
+                      className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
+                      title="Auto-rotates across 10 completely different 4-panel story sequences (Chase & Trap, Zero-G Floating Chaos, Dimension Portal Hop, Harmonic Truce, etc.)!"
+                    >
+                      {STORYBOARD_STORY_ARCS.map((arc) => (
+                        <option key={arc.id} value={arc.id}>
+                          {arc.emoji} {arc.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playZineBlip(900);
+                        const idx = STORYBOARD_STORY_ARCS.findIndex(
+                          (a) => a.id === liveIssue.prompts.resolvedStoryArcId
+                        );
+                        const next =
+                          STORYBOARD_STORY_ARCS[
+                            (idx + 1) % STORYBOARD_STORY_ARCS.length
+                          ];
+                        setStoryArcOverride(next.id);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105"
+                      title="Cycle to a completely different 4-panel scene sequence"
+                    >
+                      ↻ Scenes
                     </button>
                   </div>
 
