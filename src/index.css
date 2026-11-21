@@ -1,0 +1,333 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .crt-scanlines {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%, 
+      rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+  
+  .crt-flicker {
+    animation: crtFlicker 0.15s infinite;
+  }
+
+  .prism-box-sheen {
+    animation: prismSheen 3s ease-in-out infinite;
+  }
+}
+
+@keyframes prismSheen {
+  0% {
+    box-shadow: 0 0 35px rgba(255, 0, 127, 0.65), 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(255, 230, 0, 0.35);
+  }
+  33% {
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.75), 0 0 25px rgba(57, 255, 20, 0.55), inset 0 0 25px rgba(189, 0, 255, 0.45);
+  }
+  66% {
+    box-shadow: 0 0 38px rgba(255, 230, 0, 0.7), 0 0 22px rgba(255, 0, 127, 0.6), inset 0 0 20px rgba(0, 240, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 35px rgba(255, 0, 127, 0.65), 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 20px rgba(255, 230, 0, 0.35);
+  }
+}
+
+@keyframes crtFlicker {
+  0% { opacity: 0.99; }
+  50% { opacity: 1; }
+  100% { opacity: 0.985; }
+}
+
+:root {
+  --ui-bg: #09090b;
+  --ui-middle-bg: #18181b;
+  --ui-surface: #18181b;
+  --ui-surface-elevated: #27272a;
+  --ui-tile-1: #FFF9C4;
+  --ui-tile-2: #FFE4F0;
+  --ui-tile-3: #E0F7FA;
+  --ui-tile-4: #ECFCCB;
+  --ui-border: #121212;
+  --ui-shadow: #121212;
+  --ui-ink: #121212;
+  --ui-muted: #525252;
+}
+
+.font-display {
+  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-zine-sans {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono-zine {
+  font-family: 'Space Mono', monospace;
+}
+
+.theme-border {
+  border-color: var(--ui-border, #121212) !important;
+}
+
+.pop-card {
+  border: 3px solid var(--ui-border, #121212);
+  box-shadow: 6px 6px 0px var(--ui-shadow, #121212);
+  border-radius: 20px;
+}
+
+.pop-card-lift {
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.pop-card-lift:hover {
+  transform: translate(-2px, -3px);
+  box-shadow: 8px 9px 0px var(--ui-shadow, #121212);
+}
+
+.pop-btn {
+  border: 2.5px solid var(--ui-border, #121212);
+  box-shadow: 4px 4px 0px var(--ui-shadow, #121212);
+  border-radius: 14px;
+  transition: all 0.12s ease;
+}
+.pop-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--ui-shadow, #121212);
+}
+.pop-btn:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px var(--ui-shadow, #121212);
+}
+.pop-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.washi-tape {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 230, 0, 0.92),
+    rgba(255, 230, 0, 0.92) 8px,
+    rgba(255, 255, 255, 0.88) 8px,
+    rgba(255, 255, 255, 0.88) 16px
+  );
+  border: 2px solid var(--ui-border, #121212);
+}
+
+.halftone-dots {
+  background-image: radial-gradient(var(--ui-dot-grid, rgba(18, 18, 18, 0.08)) 1.3px, transparent 1.3px);
+  background-size: 18px 18px;
+}
+
+@keyframes zineMarquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-zine-marquee {
+  display: flex;
+  width: max-content;
+  animation: zineMarquee 26s linear infinite;
+}
+
+@keyframes vinylSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-vinyl-spin {
+  animation: vinylSpin 4s linear infinite;
+}
+
+@keyframes zineTensionDrift {
+  0%   { transform: scale(1.03) translate(0%, 0%); filter: contrast(1.04) saturate(1.08); }
+  50%  { transform: scale(1.11) translate(-1.8%, -1.2%); filter: contrast(1.12) saturate(1.22); }
+  100% { transform: scale(1.03) translate(0%, 0%); filter: contrast(1.04) saturate(1.08); }
+}
+
+@keyframes zineAftermathFloat {
+  0%   { transform: scale(1.02) translate(0%, 0%); filter: brightness(1) saturate(1.08); }
+  50%  { transform: scale(1.08) translate(1.4%, -1%); filter: brightness(1.08) saturate(1.24); }
+  100% { transform: scale(1.02) translate(0%, 0%); filter: brightness(1) saturate(1.08); }
+}
+
+@keyframes zinePrismSweep {
+  0%   { transform: translateX(-120%) skewX(-20deg); opacity: 0.25; }
+  50%  { opacity: 0.55; }
+  100% { transform: translateX(220%) skewX(-20deg); opacity: 0.25; }
+}
+
+@keyframes zineNeonPulse {
+  0%, 100% { opacity: 0.12; }
+  45%      { opacity: 0.34; }
+  50%      { opacity: 0.08; }
+  75%      { opacity: 0.28; }
+}
+
+.zine-motion-tension {
+  animation: zineTensionDrift 7.5s ease-in-out infinite;
+}
+
+.zine-motion-aftermath {
+  animation: zineAftermathFloat 9s ease-in-out infinite;
+}
+
+.zine-prism-sheen {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.22) 30%,
+    rgba(255, 42, 133, 0.28) 50%,
+    rgba(255, 230, 0, 0.22) 70%,
+    transparent 100%
+  );
+  animation: zinePrismSweep 5.5s ease-in-out infinite;
+}
+
+.zine-neon-flicker-overlay {
+  background: radial-gradient(circle at 50% 45%, rgba(255, 42, 133, 0.25), rgba(0, 240, 255, 0.14) 55%, transparent 80%);
+  animation: zineNeonPulse 3.6s ease-in-out infinite;
+}
+
+/* ==================== DISC-GOLF-STYLE HOLOGRAPHIC FOIL CARD FRAMES ==================== */
+@keyframes holoRainbowShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Style A: "Sugar High" Crushed-Glitter & Swirl Prismatic Foil Border */
+.holo-frame-glitter {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.9) 0px, transparent 2.5px),
+    radial-gradient(circle at 82% 14%, rgba(255, 230, 0, 0.95) 0px, transparent 3px),
+    radial-gradient(circle at 64% 78%, rgba(0, 240, 255, 0.9) 0px, transparent 2.5px),
+    radial-gradient(circle at 26% 86%, rgba(255, 0, 140, 0.9) 0px, transparent 3px),
+    radial-gradient(circle at 90% 55%, rgba(255, 255, 255, 0.9) 0px, transparent 2px),
+    repeating-conic-gradient(
+      from 15deg at 50% 50%,
+      #ff2a85 0deg,
+      #ffe600 45deg,
+      #00f0ff 90deg,
+      #b8ff00 135deg,
+      #a855f7 180deg,
+      #ff2a85 225deg,
+      #ffe600 270deg,
+      #00f0ff 315deg,
+      #ff2a85 360deg
+    );
+  background-size: 38px 38px, 44px 44px, 34px 34px, 48px 48px, 30px 30px, 240% 240%;
+  animation: holoRainbowShift 7s ease-in-out infinite;
+}
+
+/* Style B: "Halo Silver" Brushed Metallic Prismatic Foil Border */
+.holo-frame-silver {
+  background: linear-gradient(
+    125deg,
+    #d4d4d8 0%,
+    #ffffff 12%,
+    #7dd3fc 24%,
+    #f9a8d4 36%,
+    #fef08a 48%,
+    #a5f3fc 60%,
+    #e4e4e7 72%,
+    #c084fc 84%,
+    #f4f4f5 100%
+  );
+  background-size: 260% 260%;
+  animation: holoRainbowShift 6s ease-in-out infinite;
+}
+
+/* Style C: "Cracked Prism" Cosmic Rainbow Foil Border */
+.holo-frame-prism {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.35) 0px,
+      rgba(255, 255, 255, 0.35) 2px,
+      transparent 2px,
+      transparent 10px
+    ),
+    linear-gradient(
+      115deg,
+      #00f0ff 0%,
+      #ff0099 25%,
+      #ffe600 50%,
+      #39ff14 75%,
+      #7b00ff 100%
+    );
+  background-size: 100% 100%, 280% 280%;
+  animation: holoRainbowShift 5.5s ease-in-out infinite;
+}
+
+.holo-foil-pill {
+  background: linear-gradient(
+    115deg,
+    #cbd5e1 0%,
+    #ffffff 22%,
+    #93c5fd 42%,
+    #f9a8d4 62%,
+    #fde047 82%,
+    #e2e8f0 100%
+  );
+  background-size: 220% 220%;
+  animation: holoRainbowShift 5s ease-in-out infinite;
+}
+
+.arcade-gold-text {
+  background: linear-gradient(180deg, #fff6a8 0%, #facc15 48%, #ef4444 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.85));
+}
+
+.silver-bevel-text {
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 45%, #818cf8 78%, #f8fafc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.9));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f293d;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Print styling for full binder pages */
+@media print {
+  @page {
+    size: portrait;
+    margin: 0.5cm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  header, footer, nav, #app-header, .crt-scanlines {
+    display: none !important;
+  }
+  #printable-binder-sheet-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  #printable-binder-sheet-modal-backdrop button,
+  #printable-binder-sheet-modal-backdrop select,
+  #printable-binder-sheet-modal-backdrop .absolute {
+    display: none !important;
+  }
+}
