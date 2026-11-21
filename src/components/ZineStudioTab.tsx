@@ -1285,7 +1285,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Copy <strong>1 prompt</strong> into Gemini → get <strong>1 cohesive 4-panel image</strong> (same hero &amp; villain!) → drop it here. We slice all 4 distinct shots with zero repeats!
+                    Copy <strong>1 Flow-safe prompt</strong> into Google Flow / Gemini → get <strong>1 cohesive 4-panel image</strong> → drop it here. <em>Tip: click <strong>+</strong> for a fresh Flow chat if an older prompt was flagged.</em>
                   </p>
                 </div>
 
