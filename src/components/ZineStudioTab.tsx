@@ -25,6 +25,7 @@ import { CombatEncounter } from '../types';
 import {
   ZineIssueData,
   ZineActs,
+  STORYBOARD_VISUAL_STYLES,
   buildZineIssueFromEncounter,
   buildLongForm3ActChronicle,
   parsePasted3ActStory,
@@ -99,6 +100,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [isSlicingSheet, setIsSlicingSheet] = useState(false);
   const [isComposingAudio, setIsComposingAudio] = useState(false);
   const [synthStyleIdx, setSynthStyleIdx] = useState<number>(0);
+  const [visualStyleOverride, setVisualStyleOverride] = useState<string | undefined>(undefined);
   const [isSavingShelf, setIsSavingShelf] = useState(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -189,6 +191,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
 
     editingRecordIdRef.current = undefined;
     setEditingRecordId(undefined);
+    setVisualStyleOverride(undefined);
     setIssueNumber(shelfRecords.length + 1);
     setZinePaletteId(getZinePalette(encounter.card_theme).finishId);
     setActs(buildLongForm3ActChronicle(encounter));
@@ -244,6 +247,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       audioTitle,
       cardImageUrl: shotUrls[2] || shotUrls[1] || shotUrls[0],
       cardVideoUrl: videoUrl,
+      visualStyleIdOverride: visualStyleOverride,
     });
     if (editingRecordId) built.id = editingRecordId;
     built.zinePaletteId = zinePaletteId;
@@ -261,6 +265,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     audioTitle,
     editingRecordId,
     zinePaletteId,
+    visualStyleOverride,
   ]);
 
   useEffect(() => {
@@ -1737,6 +1742,52 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                 </div>
 
                 <div className="space-y-2.5">
+                  {/* 12-Medium Visual Style Picker (Film, Claymation, Oil, 3D CGI, Flash Photo, Risograph, etc.) */}
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      aria-label="Visual art medium for this Zine"
+                      value={liveIssue.prompts.resolvedVisualStyleId}
+                      onChange={(e) => {
+                        playZineBlip(860);
+                        setVisualStyleOverride(e.target.value);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.inputBg,
+                        color: uiTheme.ink,
+                      }}
+                      className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
+                      title="Auto-rotates across 12 completely different mediums (35mm Film, Claymation, Oil Painting, 1997 3D CGI, Flash Photo, Risograph, etc.) — pick any style anytime!"
+                    >
+                      {STORYBOARD_VISUAL_STYLES.map((st) => (
+                        <option key={st.id} value={st.id}>
+                          {st.emoji} {st.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playZineBlip(900);
+                        const idx = STORYBOARD_VISUAL_STYLES.findIndex(
+                          (s) => s.id === liveIssue.prompts.resolvedVisualStyleId
+                        );
+                        const next =
+                          STORYBOARD_VISUAL_STYLES[
+                            (idx + 1) % STORYBOARD_VISUAL_STYLES.length
+                          ];
+                        setVisualStyleOverride(next.id);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105"
+                      title="Cycle to next visual medium (updates Step 1, Step 2 GIFs & Step 3 Videos)"
+                    >
+                      ↻ Style
+                    </button>
+                  </div>
+
                   <button
                     type="button"
                     onClick={() =>
