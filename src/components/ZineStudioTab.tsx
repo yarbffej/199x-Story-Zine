@@ -1308,11 +1308,38 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                   >
                     {copiedKey === 'master-2x2' ? (
                       <>
-                        <Check className="w-4 h-4" /> Copied! Paste Once in Gemini
+                        <Check className="w-4 h-4" /> Copied! Paste Once in Gemini / Flow
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4" /> Copy Master 4-Panel Prompt
+                        <Copy className="w-4 h-4" /> Copy Master 4-Panel Prompt (Policy-Safe)
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopyPrompt(
+                        'master-2x2-safe',
+                        liveIssue.prompts.masterStoryboardUltraSafePrompt
+                      )
+                    }
+                    style={{
+                      backgroundColor:
+                        copiedKey === 'master-2x2-safe' ? '#10B981' : uiTheme.inputBg,
+                      color:
+                        copiedKey === 'master-2x2-safe' ? '#04130D' : uiTheme.ink,
+                    }}
+                    className="w-full px-3 py-1.5 rounded-lg border-2 theme-border font-mono-zine font-bold text-[10px] uppercase flex items-center justify-center gap-1.5 cursor-pointer hover:brightness-105 transition-all"
+                  >
+                    {copiedKey === 'master-2x2-safe' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" /> Copied Ultra-Safe Backup Prompt!
+                      </>
+                    ) : (
+                      <>
+                        <span>🛡️ Blocked in Flow? Copy Ultra-Safe 4-Panel Backup</span>
                       </>
                     )}
                   </button>

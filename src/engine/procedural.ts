@@ -8,6 +8,7 @@ import {
 import { THEME_SETS, MUTABLE_ECHO_THEME_SETS, getThemeSetById, isMutableEchoTheme } from '../data/themeSets';
 import { retroOptionManager } from '../utils/shuffleBag';
 import { generateDynamicVideoPrompts } from './choreography';
+import { sanitizeVisualPromptText } from './zineEngine';
 
 let finishRotationCursor = 0;
 let themeSetRotationCursor = 0;
@@ -202,9 +203,9 @@ export function generateProceduralEncounter(
     card_foil_rarity: foilRarity,
     card_theme: cardTheme,
     card_type: cardType,
-    visual_generation_prompt: visualPrompt,
-    video_generation_prompt: videoPrompt,
-    flow_video_prompt: flowPrompt,
+    visual_generation_prompt: sanitizeVisualPromptText(visualPrompt),
+    video_generation_prompt: sanitizeVisualPromptText(videoPrompt),
+    flow_video_prompt: sanitizeVisualPromptText(flowPrompt),
     grounded_ending_type: rolledEnding,
     theme_set_id: themeDef.id,
     theme_set_name: themeDef.name,
