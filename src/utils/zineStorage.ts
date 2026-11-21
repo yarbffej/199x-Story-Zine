@@ -66,14 +66,14 @@ export async function saveZineIssueToShelf(params: {
   const db = await initZineDB();
   const all = await db.getAll(ZINE_STORE);
 
-  const normTitle = (params.title || params.encounter.entity_name || '').trim().toLowerCase();
-  const existing = params.id
-    ? all.find((r) => r.id === params.id)
-    : all.find((r) => r.title.trim().toLowerCase() === normTitle);
+  // Only update an existing shelf record when an explicit record ID is provided.
+  // Never overwrite a different zine issue just because two spins share a hero/title name!
+  const existing = params.id ? all.find((r) => r.id === params.id) : undefined;
 
   const maxIssueNum = all.reduce((max, r) => Math.max(max, r.issueNumber || 0), 0);
-  const assignedIssueNum =
-    params.issueNumber || existing?.issueNumber || maxIssueNum + 1;
+  const assignedIssueNum = existing
+    ? existing.issueNumber
+    : maxIssueNum + 1;
 
   const record: ZineShelfRecord = {
     id:

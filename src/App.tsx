@@ -528,15 +528,30 @@ export default function App() {
   // Always start out with the Zine Creator unless Pocket Reader is explicitly opened
   const showPocketReader = readerOverride === 'force-reader';
 
+  const handleLoadShelfEncounter = (savedEncounter: CombatEncounter) => {
+    dispatchCardFinishChange(savedEncounter.card_theme);
+    if (savedEncounter.theme_set_id) setActiveThemeId(savedEncounter.theme_set_id);
+    setCurrentEncounter(savedEncounter);
+    if (savedEncounter.location) setLocation(savedEncounter.location);
+    if (savedEncounter.anomaly_name) {
+      setAnomaly(savedEncounter.anomaly_name);
+    } else if (savedEncounter.card_type === 'bad_guy') {
+      setAnomaly(savedEncounter.entity_name);
+    }
+    if (savedEncounter.featured_character) setCharacter(savedEncounter.featured_character);
+    if (savedEncounter.protagonist_loadout) {
+      setImprovisedGear(
+        `${savedEncounter.protagonist_loadout.nostalgia_artifact} + ${savedEncounter.protagonist_loadout.improvised_weapon}`
+      );
+    }
+    if (savedEncounter.visual_style) setArtStyle(savedEncounter.visual_style);
+  };
+
   // Build combined issues rack for Pocket Zine Reader (saved shelf + live current encounter if not already saved)
   const pocketReaderIssues: ZineIssueData[] = React.useMemo(() => {
     const activeDraft =
       liveZineDraft || buildZineIssueFromEncounter(currentEncounter, shelfRecords.length + 1);
-    const alreadySaved = hydratedShelfIssues.some(
-      (s) =>
-        s.id === activeDraft.id ||
-        s.title.trim().toLowerCase() === activeDraft.title.trim().toLowerCase()
-    );
+    const alreadySaved = hydratedShelfIssues.some((s) => s.id === activeDraft.id);
     return alreadySaved
       ? hydratedShelfIssues
       : [activeDraft, ...hydratedShelfIssues];
@@ -758,6 +773,7 @@ export default function App() {
             onRefreshShelf={refreshZineShelf}
             onOpenPocketReader={() => setReaderOverride('force-reader')}
             onLiveDraftChange={setLiveZineDraft}
+            onLoadShelfEncounter={handleLoadShelfEncounter}
             activeSubTab={viewMode === 'shelf' ? 'shelf' : 'builder'}
             onSubTabChange={(sub) => setViewMode(sub === 'shelf' ? 'shelf' : 'zine')}
           />

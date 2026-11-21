@@ -51,6 +51,7 @@ interface ZineStudioTabProps {
   onRefreshShelf: () => Promise<void>;
   onOpenPocketReader: () => void;
   onLiveDraftChange?: (draft: ZineIssueData) => void;
+  onLoadShelfEncounter?: (encounter: CombatEncounter) => void;
   activeSubTab?: 'builder' | 'shelf';
   onSubTabChange?: (tab: 'builder' | 'shelf') => void;
 }
@@ -63,6 +64,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   onRefreshShelf,
   onOpenPocketReader,
   onLiveDraftChange,
+  onLoadShelfEncounter,
   activeSubTab,
   onSubTabChange,
 }) => {
@@ -90,6 +92,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
 
   // Active Issue Editable State
   const [editingRecordId, setEditingRecordId] = useState<string | undefined>(undefined);
+  const editingRecordIdRef = useRef<string | undefined>(undefined);
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const skipNextAutoSaveRef = useRef<boolean>(false);
   const [issueNumber, setIssueNumber] = useState<number>(
     encounter.card_number || shelfRecords.length + 1
   );
@@ -157,8 +162,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     if (prevEncounterRef.current === encounter) return;
     prevEncounterRef.current = encounter;
 
+    editingRecordIdRef.current = undefined;
     setEditingRecordId(undefined);
-    setIssueNumber(encounter.card_number || shelfRecords.length + 1);
+    setIssueNumber(shelfRecords.length + 1);
     setZinePaletteId(getZinePalette(encounter.card_theme).finishId);
     setActs(buildLongForm3ActChronicle(encounter));
     setAudioTitle(
@@ -464,35 +470,106 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     flashBanner('✓ Pasted 3-Act Chronicle applied to Zine Spreads!');
   };
 
+  const persistCurrentDraftToShelf = useCallback(
+    (opts?: { silent?: boolean }) => {
+      const task = saveQueueRef.current.then(async () => {
+        if (!opts?.silent) setIsSavingShelf(true);
+        try {
+          const saved = await saveZineIssueToShelf({
+            id: editingRecordIdRef.current,
+            issueNumber,
+            title: encounter.entity_name,
+            zinePaletteId,
+            encounter,
+            acts,
+            audioTitle,
+            videoBlob,
+            outroVideoBlob,
+            shotBlobs,
+            gif1Blob,
+            gif1IsVideo,
+            gif2Blob,
+            gif2IsVideo,
+            audioBlob,
+          });
+          editingRecordIdRef.current = saved.id;
+          setEditingRecordId(saved.id);
+          setIssueNumber(saved.issueNumber);
+          await onRefreshShelf();
+          if (opts?.silent) {
+            flashBanner(
+              `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf`
+            );
+          } else {
+            flashBanner(
+              `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf!`
+            );
+          }
+        } catch (err) {
+          console.error('Zine Shelf save failed:', err);
+          flashBanner('⚠ Browser storage full or blocked — use Save for Drive (.zine.json)!');
+        } finally {
+          if (!opts?.silent) setIsSavingShelf(false);
+        }
+      });
+      saveQueueRef.current = task.catch(() => {});
+      return task;
+    },
+    [
+      issueNumber,
+      encounter,
+      zinePaletteId,
+      acts,
+      audioTitle,
+      videoBlob,
+      outroVideoBlob,
+      shotBlobs,
+      gif1Blob,
+      gif1IsVideo,
+      gif2Blob,
+      gif2IsVideo,
+      audioBlob,
+      onRefreshShelf,
+    ]
+  );
+
+  // Auto-save to Zine Shelf automatically whenever user drops/generates any media!
+  const hasAnyMediaLoaded = Boolean(
+    videoBlob ||
+      outroVideoBlob ||
+      shotBlobs.some(Boolean) ||
+      gif1Blob ||
+      gif2Blob ||
+      audioBlob
+  );
+
+  useEffect(() => {
+    if (!hasAnyMediaLoaded) return;
+    if (skipNextAutoSaveRef.current) {
+      skipNextAutoSaveRef.current = false;
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void persistCurrentDraftToShelf({ silent: true });
+    }, 650);
+    return () => window.clearTimeout(timer);
+  }, [
+    hasAnyMediaLoaded,
+    videoBlob,
+    outroVideoBlob,
+    shotBlobs,
+    gif1Blob,
+    gif2Blob,
+    audioBlob,
+    acts,
+    zinePaletteId,
+    persistCurrentDraftToShelf,
+  ]);
+
   const handleSaveIssueToShelf = async () => {
     if (isSavingShelf) return;
     playZineResonanceChime();
-    setIsSavingShelf(true);
-    try {
-      const saved = await saveZineIssueToShelf({
-        id: editingRecordId,
-        issueNumber,
-        title: encounter.entity_name,
-        zinePaletteId,
-        encounter,
-        acts,
-        audioTitle,
-        videoBlob,
-        outroVideoBlob,
-        shotBlobs,
-        gif1Blob,
-        gif1IsVideo,
-        gif2Blob,
-        gif2IsVideo,
-        audioBlob,
-      });
-      setEditingRecordId(saved.id);
-      setIssueNumber(saved.issueNumber);
-      await onRefreshShelf();
-      flashBanner(`✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf!`);
-    } finally {
-      setIsSavingShelf(false);
-    }
+    await persistCurrentDraftToShelf({ silent: false });
   };
 
   const handleExportForDrive = async () => {
@@ -630,6 +707,12 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     if (gif1Url) URL.revokeObjectURL(gif1Url.split('#')[0]);
     if (gif2Url) URL.revokeObjectURL(gif2Url.split('#')[0]);
     if (audioUrl) URL.revokeObjectURL(audioUrl);
+
+    // Sync encounter back to App WITHOUT triggering the new-roll reset effect!
+    prevEncounterRef.current = rec.encounter;
+    skipNextAutoSaveRef.current = true;
+    editingRecordIdRef.current = rec.id;
+    onLoadShelfEncounter?.(rec.encounter);
 
     setEditingRecordId(rec.id);
     setIssueNumber(rec.issueNumber);
@@ -1039,17 +1122,39 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                 Click any saved issue cover to open it in the live Zine viewer, swap media, or export a standalone .HTML file.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setSubTab('builder')}
-              style={{
-                backgroundColor: uiTheme.accent1,
-                color: uiTheme.accent1Ink,
-              }}
-              className="pop-btn px-4 py-2 font-mono-zine text-xs font-bold uppercase cursor-pointer"
-            >
-              ← Back to Live Issue Builder
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => drivePackInputRef.current?.click()}
+                style={{
+                  backgroundColor: uiTheme.accent3,
+                  color: uiTheme.accent3Ink,
+                }}
+                className="pop-btn px-3.5 py-2 font-mono-zine text-xs font-bold uppercase flex items-center gap-1.5 cursor-pointer"
+                title="Import a saved .zine.json pack from Google Drive or another browser"
+              >
+                <FolderOpen className="w-4 h-4" />
+                <span>Import Drive Zine (.json)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSubTab('builder')}
+                style={{
+                  backgroundColor: uiTheme.accent1,
+                  color: uiTheme.accent1Ink,
+                }}
+                className="pop-btn px-4 py-2 font-mono-zine text-xs font-bold uppercase cursor-pointer"
+              >
+                ← Back to Live Issue Builder
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{ backgroundColor: uiTheme.inputBg, color: uiTheme.mutedInk }}
+            className="px-3.5 py-2 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-semibold"
+          >
+            💾 <strong>Auto-Save On:</strong> Every Zine you drop media into now saves automatically here in this browser ({typeof window !== 'undefined' ? window.location.host : 'this site'}). Want to carry zines between desktop, localhost, and phone? Click <strong>Save for Drive</strong> to export a <code>.zine.json</code> pack!
           </div>
 
           {shelfRecords.length === 0 ? (
@@ -1185,6 +1290,32 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         <button
                           type="button"
                           onClick={() =>
+                            void exportZineIssueForDrive(hydrated, {
+                              videoBlob: rec.videoBlob,
+                              outroVideoBlob: rec.outroVideoBlob,
+                              shotBlobs: rec.shotBlobs,
+                              gif1Blob: rec.gif1Blob,
+                              gif1IsVideo: rec.gif1IsVideo,
+                              gif2Blob: rec.gif2Blob,
+                              gif2IsVideo: rec.gif2IsVideo,
+                              audioBlob: rec.audioBlob,
+                            })
+                          }
+                          style={{
+                            backgroundColor: uiTheme.accent1,
+                            color: uiTheme.accent1Ink,
+                          }}
+                          className="pop-btn px-2.5 py-2 font-mono-zine text-[10px] font-bold uppercase cursor-pointer"
+                          title="Export portable .zine.json pack for Google Drive / mobile"
+                        >
+                          Drive
+                        </button>
+                      )}
+
+                      {hydrated && (
+                        <button
+                          type="button"
+                          onClick={() =>
                             exportStandaloneZineHtml(hydrated, undefined, uiTheme)
                           }
                           style={{
@@ -1203,6 +1334,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         onClick={async () => {
                           await deleteZineShelfIssue(rec.id);
                           if (editingRecordId === rec.id) {
+                            editingRecordIdRef.current = undefined;
                             setEditingRecordId(undefined);
                           }
                           await onRefreshShelf();
