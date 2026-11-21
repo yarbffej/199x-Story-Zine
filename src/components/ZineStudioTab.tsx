@@ -219,10 +219,17 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     setAudioUrl(undefined);
   }, [encounter]);
 
-  const flashBanner = (msg: string) => {
+  const bannerTimerRef = useRef<number | null>(null);
+  const flashBanner = useCallback((msg: string) => {
     setStatusBanner(msg);
-    window.setTimeout(() => setStatusBanner(null), 3500);
-  };
+    if (bannerTimerRef.current !== null) {
+      window.clearTimeout(bannerTimerRef.current);
+    }
+    bannerTimerRef.current = window.setTimeout(() => {
+      setStatusBanner(null);
+      bannerTimerRef.current = null;
+    }, 3200);
+  }, []);
 
   // Assemble live ZineIssueData
   const liveIssue: ZineIssueData = React.useMemo(() => {
@@ -1031,7 +1038,21 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   };
 
   return (
-    <div className="space-y-6 font-zine-sans">
+    <div className="space-y-6 font-zine-sans" style={{ overflowAnchor: 'none' }}>
+      {/* Floating Zero-Layout-Shift Status Toast (never pushes the page up/down!) */}
+      {statusBanner && (
+        <div
+          style={{
+            backgroundColor: uiTheme.accent4,
+            color: uiTheme.accent4Ink,
+            boxShadow: '4px 4px 0px #121212',
+          }}
+          className="fixed bottom-5 right-5 z-50 max-w-sm px-4 py-2.5 rounded-2xl border-[3px] theme-border font-mono-zine text-xs font-extrabold pointer-events-none"
+        >
+          {statusBanner}
+        </div>
+      )}
+
       {/* Hidden File Inputs */}
       <input
         ref={batchInputRef}
@@ -1193,18 +1214,6 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {statusBanner && (
-            <span
-              style={{
-                backgroundColor: uiTheme.accent4,
-                color: uiTheme.accent4Ink,
-              }}
-              className="px-3 py-1.5 rounded-full border-2 theme-border font-mono-zine text-xs font-bold"
-            >
-              {statusBanner}
-            </span>
-          )}
-
           {folderSyncSupported && (
             <button
               type="button"
@@ -1286,15 +1295,15 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
               backgroundColor: uiTheme.accent4,
               color: uiTheme.accent4Ink,
             }}
-            className="pop-btn px-4 py-2 font-display font-extrabold text-xs sm:text-sm uppercase flex items-center gap-2 cursor-pointer"
+            className="pop-btn px-4 py-2 min-w-[168px] font-display font-extrabold text-xs sm:text-sm uppercase flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 shrink-0" />
             <span>
               {isSavingShelf
                 ? 'Saving...'
                 : editingRecordId
-                ? 'Update Shelf Issue'
-                : 'Save Issue to Zine Shelf'}
+                ? '✓ Saved (Update)'
+                : 'Save to Shelf'}
             </span>
           </button>
         </div>
@@ -1813,8 +1822,8 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                           : 'Drop Your 1 Storyboard Image Here'}
                       </span>
                     </div>
-                    <div className="flex items-center justify-center gap-1.5 text-[10px] font-mono-zine opacity-75">
-                      {['Act I', 'Villain', 'Clash', 'Aftermath'].map((lbl, i) => (
+                    <div className="flex items-center justify-center gap-1 text-[10px] font-mono-zine opacity-80 whitespace-nowrap overflow-hidden">
+                      {['Act I', 'Villain', 'Clash', 'End'].map((lbl, i) => (
                         <span
                           key={lbl}
                           className={`px-1.5 py-0.5 rounded border ${
@@ -1823,7 +1832,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                               : 'border-current opacity-60'
                           }`}
                         >
-                          {shotUrls[i] ? `✓ ${lbl}` : lbl}
+                          {shotUrls[i] ? `✓${lbl}` : lbl}
                         </span>
                       ))}
                     </div>
@@ -2134,16 +2143,16 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         ? uiTheme.tile2
                         : uiTheme.inputBg,
                     }}
-                    className="p-2.5 rounded-xl border-2 border-dashed theme-border cursor-pointer font-mono-zine text-[10px] font-bold uppercase flex flex-wrap items-center justify-center gap-2 hover:brightness-105"
+                    className="p-2.5 rounded-xl border-2 border-dashed theme-border cursor-pointer font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden hover:brightness-105"
                     title="Drop Video 1 (.mp4), Finale Video 2 (.mp4), or custom .mp3 here"
                   >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Drop MP4 Videos / MP3</span>
+                    <Upload className="w-3.5 h-3.5 shrink-0" />
+                    <span>Drop MP4 / MP3</span>
                     <span className={videoUrl ? 'text-emerald-400' : 'opacity-60'}>
-                      {videoUrl ? '✓ Vid 1' : 'Vid 1'}
+                      {videoUrl ? '✓V1' : 'V1'}
                     </span>
                     <span className={outroVideoUrl ? 'text-emerald-400' : 'opacity-60'}>
-                      {outroVideoUrl ? '✓ Finale' : 'Finale'}
+                      {outroVideoUrl ? '✓V2' : 'V2'}
                     </span>
                   </div>
                 </div>
