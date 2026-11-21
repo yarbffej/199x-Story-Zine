@@ -80,7 +80,7 @@ const BRAND_FREE_REPLACEMENTS: Array<[RegExp, string]> = [
   // Retail, tech, toy & food trademarks
   [/\bKB\s*Toys\b|\bK&B\b/gi, 'retro mall toy depot'],
   [/\bBlockbuster\b/gi, 'midnight video rental outlet'],
-  [/\bChuck\s*E\.?\s*Cheese(?:'s)?\b|\bChuck's\b/gi, 'animatronic pizza arcade'],
+  [/\bChuck\s*E\.?\s*Cheese(?:'s)?\b|\bChuck's(?:\s+Animatronic\s+Pizza)?\b/gi, 'animatronic pizza arcade'],
   [/\bLA\s+Gear\b/gi, 'neon light-up high-top'],
   [/\bWalkman\b/gi, 'portable cassette player'],
   [/\bDiscman\b/gi, 'portable anti-skip CD player'],
@@ -182,7 +182,7 @@ const VISUAL_POLICY_SAFE_REPLACEMENTS: Array<[RegExp, string]> = [
   [/\bvenom\b|\bpoisoned\b/gi, 'luminescent fizz'],
   [/\bcrime\s+scenes?\b/gi, 'mystery clue scenes'],
   [/\blethal\b/gi, 'high-voltage'],
-  [/\bskeleton\b|\bskulls?\b|\bcoffin\b|\bgravestone\b/gi, 'glowing prism hologram'],
+  [/\bskeleton\b|\bskulls?\b|\bcoffin\b|\bgravestone(?:\s+hologram)?\b/gi, 'glowing prism hologram'],
   [/\bripping\s+through\b|\btearing\b/gi, 'emerging dramatically through'],
   [/\bblasting\b|\bblast\b/gi, 'projecting a dazzling beam'],
   [/\bexplosions?\b|\bexplosive\b/gi, 'radiant burst of sparks'],
@@ -504,65 +504,156 @@ function toVisualSafeRetroGadget(rawProp: string, fallbackIndex: number = 0): st
   return /^a[n]?\s+/i.test(lower) ? lower : `a retro ${lower}`;
 }
 
-function toVisualSafeSetting(rawLocation: string): string {
-  const loc = (rawLocation || '').toLowerCase();
-  if (/(arcade|coin-op|pinball|skeeball|redemption|fighting game|game cage)/i.test(loc)) {
-    return 'a vibrant neon-lit 1990s retro arcade hall lined with glowing game cabinets';
-  }
-  if (/(roller rink|laser tag|bowling|blacklight)/i.test(loc)) {
-    return 'a glowing blacklight 1990s roller rink and neon lounge with geometric carpet';
-  }
-  if (/(video|vhs|cinema|drive-in|projection|darkroom|photo|cassette|record|music|comic|bookstore)/i.test(loc)) {
-    return 'a glowing 1990s retro video, music, and comic shop filled with colorful displays';
-  }
-  if (/(food court|diner|pizza|buffet|soft-serve|bakery|cafeteria|yogurt|concession|soda|luncheonette|snack bar|drive-thru|slushie|ice cream)/i.test(loc)) {
-    return 'a chrome-and-neon 1990s retro mall food court diner at dusk';
-  }
-  if (/(computer|software|electronics|soldering|library|microfiche|shareware|control room|equipment room|tv|broadcast|radio tower)/i.test(loc)) {
-    return 'a glowing 1990s retro electronics and computer workshop filled with humming CRT monitors';
-  }
-  if (/(waterpark|pool|car wash|greenhouse|rainforest|fountain|moat|ice arena|drain|stormwater)/i.test(loc)) {
-    return 'a misty neon-lit 1990s indoor tropical fountain atrium with shimmering tile reflections';
-  }
-  if (/(cul-de-sac|skatepark|parking lot|rooftop|backyard|quarry|highway|driveway|batting cage|trampoline|miniature golf|storm cellar)/i.test(loc)) {
-    return 'a twilight 1990s suburban neon plaza and rain-slicked avenue under glowing streetlamps';
-  }
-  return 'a vibrant neon-lit 1990s suburban shopping mall atrium with glowing glass storefronts';
+function toVisualSafeLocationDetail(rawLocation: string): string {
+  const cleaned = sanitizeVisualPromptText(rawLocation || 'retro 1990s suburban arcade plaza');
+  const lowerFirst = cleaned.charAt(0).toLowerCase() + cleaned.slice(1);
+  return /^(a|an|the)\s+/i.test(lowerFirst) ? lowerFirst : `a 1990s ${lowerFirst}`;
 }
 
 function toVisualSafeCreatureDescription(
   rawAnomaly: string,
   morphologyId: string
 ): string {
-  const lower = (rawAnomaly || '').toLowerCase();
+  const cleanedName = sanitizeVisualPromptText(rawAnomaly || 'cosmic crystal guardian');
+  const lower = cleanedName.toLowerCase();
   const seed = hashString(lower || 'cosmic-creature');
   const glowPalette = pickSeeded(
     [
-      'luminous cyan and hot-magenta neon light bands',
-      'shimmering ultraviolet-purple and electric-aqua crystal accents',
+      'luminous cyan and hot-magenta neon energy lines',
+      'shimmering ultraviolet-purple and electric-aqua crystal highlights',
       'glowing amber-gold and neon-teal starlight rings',
-      'iridescent turquoise and prism-pink geometric highlights',
+      'iridescent lime-green and coral-pink glowing contours',
+      'warm molten-orange and cobalt-blue prismatic accents',
     ],
     seed,
     4
   );
 
   if (/(robot|toy|animatronic|automaton|vending|claw|jukebox|rewinder|drone|pinsetter)/i.test(lower) || morphologyId === 'mechanical_automaton') {
-    return `a whimsical towering 1990s retro sci-fi robot creature built from colorful vintage cassette decks, chrome dials, and ${glowPalette}`;
+    return `"${cleanedName}", an imaginative towering 1990s retro sci-fi robot-automaton built from chunky vintage hardware, chrome dials, glowing glass screens, and ${glowPalette}`;
   }
   if (/(slime|ooze|slushie|soda|gum|candy|pizza|gel|gak|syrup|cream)/i.test(lower) || morphologyId === 'slime_ooze') {
-    return `a whimsical towering translucent neon-jelly crystal creature swirling with sparkling soda bubbles and ${glowPalette}`;
+    return `"${cleanedName}", a whimsical towering translucent jelly-and-crystal retro sci-fi creature swirling with fizzy bubbles and ${glowPalette}`;
   }
-  if (/(modem|crt|tv|vhs|video|floppy|cd|cable|pixel|hologram|phone|stereogram|glitch|microchip|keyboard|console|pet)/i.test(lower) || morphologyId === 'cyber_signal') {
-    return `a whimsical glowing 1990s holographic television-prism creature made of floating retro CRT glass, neon pixel waves, and ${glowPalette}`;
+  if (/(modem|crt|tv|video|floppy|cd|cable|pixel|hologram|phone|stereogram|glitch|microchip|keyboard|console|pet)/i.test(lower) || morphologyId === 'cyber_signal') {
+    return `"${cleanedName}", a quirky glowing 1990s holographic electronics creature made of floating vintage CRT screens, pixel waves, tangled retro cords, and ${glowPalette}`;
   }
-  if (/(ribbon|cord|serpent|boa|tentacle|hose|wire|cable|tape)/i.test(lower) || morphologyId === 'serpent_constricter') {
-    return `a whimsical soaring neon serpent creature woven from shimmering iridescent cassette tape ribbons and ${glowPalette}`;
+  if (/(ribbon|cord|serpent|boa|tentacle|hose|wire|tape)/i.test(lower) || morphologyId === 'serpent_constricter') {
+    return `"${cleanedName}", a sweeping serpentine retro sci-fi creature woven from iridescent floating magnetic tape ribbons, neon coils, and ${glowPalette}`;
   }
-  if (/(swarm|cluster|token|figurine|plush|pogs?|slammer|marionette)/i.test(lower) || morphologyId === 'swarm_cluster') {
-    return `a whimsical floating constellation creature formed by orbiting 1990s holographic prisms, shiny brass tokens, and ${glowPalette}`;
+  if (/(swarm|cluster|token|figurine|plush|slammer|marionette|doll|shark|unicorn)/i.test(lower) || morphologyId === 'swarm_cluster') {
+    return `"${cleanedName}", a fantastical floating 1990s retro-toy cosmic entity surrounded by orbiting holographic prisms and ${glowPalette}`;
   }
-  return `a whimsical towering 1990s cosmic comic-book crystal guardian creature made of translucent retro glass prisms, chrome rings, and ${glowPalette}`;
+  return `"${cleanedName}", a towering imaginative 1990s cosmic comic-book creature made of translucent vintage plastic, chrome rings, geometric prisms, and ${glowPalette}`;
+}
+
+interface StoryboardArtPalette {
+  id: string;
+  medium: string;
+  colors: string;
+}
+
+const STORYBOARD_ART_PALETTES: StoryboardArtPalette[] = [
+  {
+    id: 'indie-watercolor',
+    medium: '1990s hand-inked Western indie graphic novel watercolor and gouache art with crisp ink lines',
+    colors: 'electric cyan, hot magenta, and warm amber neon lighting',
+  },
+  {
+    id: '16bit-boxart',
+    medium: 'lush 1990s 16-bit painted cartridge box-art illustration with rich airbrushed shading and dramatic brushwork',
+    colors: 'deep cobalt blue, blazing sunset tangerine, and shimmering laser gold',
+  },
+  {
+    id: '90s-cel-series',
+    medium: 'sleek 1990s animated adventure TV series cel-shaded art on rich painted gouache backgrounds',
+    colors: 'dramatic ruby crimson skies, deep midnight indigo shadows, and bright golden rim-light',
+  },
+  {
+    id: 'skate-screenprint',
+    medium: 'bold 1990s skate-deck screenprint comic art with tactile halftone dots and expressive thick contour inks',
+    colors: 'vibrant acid-lime green, hot coral orange, and ultraviolet purple pop-art contrast',
+  },
+  {
+    id: 'pastel-vapor-gouache',
+    medium: 'warm sun-washed 1990s retro mall gouache illustration with painterly reflections and clean inkwork',
+    colors: 'sunset peach, turquoise chrome, soft lavender mist, and golden hour sunbeams',
+  },
+  {
+    id: 'emerald-noir-wash',
+    medium: 'atmospheric 1990s midnight pulp graphic novel ink-wash illustration with sweeping shadow shapes',
+    colors: 'glowing emerald CRT phosphor green, warm sodium-amber streetlights, and cool slate blue',
+  },
+  {
+    id: 'scifi-paperback-airbrush',
+    medium: 'classic 1990s sci-fi paperback cover painted illustration with metallic chrome specular highlights',
+    colors: 'cosmic amethyst violet, liquid silver chrome, and radiant starlight gold',
+  },
+  {
+    id: 'saturday-adventure-comic',
+    medium: 'energetic 1990s Saturday-morning adventure comic book illustration with dynamic action ink hatching',
+    colors: 'vibrant royal blue, marigold yellow, bright turquoise, and ruby-red highlights',
+  },
+];
+
+const STORYBOARD_ATMOSPHERES: string[] = [
+  'warm golden-hour late-afternoon sunlight slanting dramatically through dust motes and retro fixtures',
+  'crisp violet twilight dusk as colorful vintage signs and lamps flicker brightly to life',
+  'hazy pastel sunset glow with long geometric shadows and shimmering iridescent air',
+  'clear starry deep-cobalt night sky with swirling aurora-like cosmic ribbons overhead',
+  'bright retro indoor neon haze with glowing ceiling fixtures and floating starlight sparkles',
+  'misty post-rain evening air with colorful neon signage gleaming across damp surfaces',
+];
+
+interface StoryboardPlan {
+  paletteIdx: number;
+  atmoIdx: number;
+  p1Idx: number;
+  p2Idx: number;
+  p3Idx: number;
+  p4Idx: number;
+  gif1Idx: number;
+  gif2Idx: number;
+}
+
+const storyboardPlanCache = new Map<string, StoryboardPlan>();
+const recentStoryboardPlans: StoryboardPlan[] = [];
+
+function pickFreshIndex(length: number, seed: number, offset: number, avoid: number[]): number {
+  const base = Math.abs(seed + offset * 97) % length;
+  for (let step = 0; step < length; step++) {
+    const candidate = (base + step) % length;
+    if (!avoid.includes(candidate)) return candidate;
+  }
+  return base;
+}
+
+function getNonRepeatingStoryboardPlan(signature: string): StoryboardPlan {
+  const cached = storyboardPlanCache.get(signature);
+  if (cached) return cached;
+
+  const seed = hashString(signature);
+  const recentWindow = recentStoryboardPlans.slice(-3);
+
+  const plan: StoryboardPlan = {
+    paletteIdx: pickFreshIndex(STORYBOARD_ART_PALETTES.length, seed, 1, recentWindow.map((p) => p.paletteIdx)),
+    atmoIdx: pickFreshIndex(STORYBOARD_ATMOSPHERES.length, seed, 2, recentWindow.map((p) => p.atmoIdx)),
+    p1Idx: pickFreshIndex(8, seed, 3, recentWindow.map((p) => p.p1Idx)),
+    p2Idx: pickFreshIndex(7, seed, 4, recentWindow.map((p) => p.p2Idx)),
+    p3Idx: pickFreshIndex(8, seed, 5, recentWindow.map((p) => p.p3Idx)),
+    p4Idx: pickFreshIndex(7, seed, 6, recentWindow.map((p) => p.p4Idx)),
+    gif1Idx: pickFreshIndex(4, seed, 7, recentWindow.map((p) => p.gif1Idx)),
+    gif2Idx: pickFreshIndex(4, seed, 8, recentWindow.map((p) => p.gif2Idx)),
+  };
+
+  storyboardPlanCache.set(signature, plan);
+  if (storyboardPlanCache.size > 60) {
+    const firstKey = storyboardPlanCache.keys().next().value;
+    if (firstKey) storyboardPlanCache.delete(firstKey);
+  }
+  recentStoryboardPlans.push(plan);
+  if (recentStoryboardPlans.length > 6) recentStoryboardPlans.shift();
+  return plan;
 }
 
 export function compile199xZinePrompts(
@@ -585,8 +676,8 @@ export function compile199xZinePrompts(
     encounter.protagonist_loadout?.weird_synergy_effect || 'rainbow prism resonance'
   );
 
-  // Clean natural visual descriptions that pass Google Flow / Nano Banana 2.1 & Veo cleanly
-  const safeSetting = toVisualSafeSetting(rawLocation);
+  // Preserve unique sanitized location & creature specifics while ensuring Flow / Nano Banana policy safety
+  const locationVisual = toVisualSafeLocationDetail(rawLocation);
   const safeGadget1 = toVisualSafeRetroGadget(rawArtifact, 1);
   const safeGadget2 = toVisualSafeRetroGadget(rawWeapon, 2);
   const location = sanitizeVisualPromptText(rawLocation);
@@ -614,42 +705,136 @@ export function compile199xZinePrompts(
   const lightingClean = sanitizeVisualPromptText(environment.lightingCue);
   const leadAudioClean = sanitizeVisualPromptText(leadPreset.audio);
 
-  const flowArtStyle =
-    'vibrant 1990s hand-inked Western indie graphic novel watercolor and gouache illustration with bold ink contours, rich cyan, magenta, and amber neon lighting, clean borderless artwork, and blank surfaces with no words or lettering';
+  const planSignature = `${rawLocation}|${rawAnomaly}|${rawChar}|${rawWeapon}|${rawArtifact}|${encounter.visual_style || ''}|${encounter.card_theme || ''}`;
+  const plan = getNonRepeatingStoryboardPlan(planSignature);
+  const palette = STORYBOARD_ART_PALETTES[plan.paletteIdx];
+  const atmosphere = STORYBOARD_ATMOSPHERES[plan.atmoIdx];
 
-  // 1. Image 01 (Act 01 Opening)
+  const flowArtStyle = `${palette.medium} with ${palette.colors}, borderless edge-to-edge comic art, and blank visual surfaces with no words or lettering`;
+
+  // 8 COMPLETELY DIFFERENT PANEL 1 OPENINGS (no more identical glass-doorway opening!)
+  const panel1Openings = [
+    `High bird's-eye diagonal view looking down across ${locationVisual} bathed in ${atmosphere}, showing the hero hurrying into view from the lower corner while inspecting ${safeGadget1}.`,
+    `Over-the-shoulder tracking angle from behind the hero peeking around a retro display corner into ${locationVisual} under ${atmosphere}, watching small everyday objects begin floating upward in cosmic sparkles.`,
+    `Dynamic low-angle side view capturing the hero arriving mid-stride into ${locationVisual} backlit by vibrant glowing fixtures and ${atmosphere}, carrying ${safeGadget1} and ${safeGadget2}.`,
+    `Sweeping wide vanishing-point interior panorama stretching deep down ${locationVisual} under ${atmosphere}, with the hero standing small in the right foreground holding ${safeGadget1} as distant lights bend into glowing geometric arcs.`,
+    `Medium floor-level discovery shot inside ${locationVisual} under ${atmosphere}, showing the hero kneeling in the foreground examining a shimmering neon ripple across the surface while calibrating ${safeGadget1} and ${safeGadget2}.`,
+    `Elevated balcony or mezzanine lookdown across ${locationVisual} bathed in ${atmosphere}, capturing the hero leaning over a railing as swirling prisms bloom across the far end of the scene below.`,
+    `Artful curved-glass reflection composition capturing the hero reflected vividly in a glossy chrome display or polished window inside ${locationVisual} under ${atmosphere}, with swirling cosmic light rising behind them.`,
+    `Wide exterior approach outside the colorful retro facade of ${locationVisual} under ${atmosphere}, as the hero arrives carrying ${safeGadget1} and ${safeGadget2}.`,
+  ];
+
+  // 7 COMPLETELY DIFFERENT PANEL 2 CREATURE REVEALS
+  const panel2Reveals = [
+    `Dramatic upward worm's-eye angle looking straight toward the high ceiling and overhead fixtures of ${locationVisual} as only the cosmic creature descends magnificently from swirling geometric starlight.`,
+    `Layered foreground framing peering between silhouetted retro fixtures inside ${locationVisual}, revealing only the towering cosmic creature rising in radiant glowing mist across the mid-ground.`,
+    `Extreme tight macro portrait focusing dramatically on the cosmic creature's glowing core and head crackling with iridescent prism arcs inside ${locationVisual}.`,
+    `Dynamic floor-level vortex reveal inside ${locationVisual} as only the cosmic creature bursts upward out of a swirling concentric ring of glowing neon light on the ground.`,
+    `Colossal rim-lit silhouette shot showing only the cosmic creature towering dramatically against a brilliant glowing wall of retro lights and cosmic mist inside ${locationVisual}.`,
+    `Curved wide-lens interior panorama inside ${locationVisual} showing only the cosmic creature coiling and hovering playfully around the scene's central retro landmark in sparkling light ribbons.`,
+    `Surreal portal breakthrough showing only the cosmic creature stepping straight out of a glowing retro monitor wall or reflective surface inside ${locationVisual} in a burst of neon prism sparkles.`,
+  ];
+
+  // 8 COMPLETELY DIFFERENT PANEL 3 SHOWDOWN CHOREOGRAPHIES (no more identical horizontal left-to-right laser!)
+  const panel3Showdowns: Array<{ panel: string; videoBeat1: string; videoBeat2: string }> = [
+    {
+      panel: `Mid-air comic-book action splash inside ${locationVisual}: the hero leaps dynamically from the upper-right over a foreground obstacle, channeling a blazing downward circular prism shockwave from ${safeGadget1} and ${safeGadget2} around the cosmic creature below.`,
+      videoBeat1: `the hero vaults athletically over a retro fixture from the upper-right while charging ${safeGadget1} and ${safeGadget2} as the cosmic creature surges beneath`,
+      videoBeat2: `a dazzling downward circular shockwave of glowing prism waves blooms across the floor, lifting the cosmic creature in a radiant swirl of comic starlight`,
+    },
+    {
+      panel: `Dramatic 3/4 diagonal depth showdown inside ${locationVisual}: the cosmic creature rushes forward from the deep background while the hero slides sharply toward the foreground raising a huge shimmering geometric rainbow shield projected from ${safeGadget1} and ${safeGadget2}.`,
+      videoBeat1: `the cosmic creature sweeps forward from the deep background while the hero drops into a kinetic diagonal slide toward the camera`,
+      videoBeat2: `a towering translucent geometric rainbow prism barrier erupts from ${safeGadget1} and ${safeGadget2}, deflecting cascading waves of colorful cosmic sparks`,
+    },
+    {
+      panel: `High overhead bird's-eye comic action splash looking straight down into ${locationVisual} as the hero dashes in a glowing circular arc around the cosmic creature, weaving luminous neon starlight ribbons into a swirling vortex around it.`,
+      videoBeat1: `from a sweeping overhead angle, the hero sprints in a glowing trail around the cosmic creature activating ${safeGadget1} and ${safeGadget2}`,
+      videoBeat2: `luminous spiraling ribbons of iridescent neon light tighten around the creature in a whirlwind of floating comic sparkles`,
+    },
+    {
+      panel: `Over-the-creature's-shoulder dramatic perspective inside ${locationVisual}: framed past the towering glowing shoulder of the cosmic creature in the foreground, the hero vaults straight toward the camera wrapped in a radiant aura from ${safeGadget1} and ${safeGadget2}.`,
+      videoBeat1: `from behind the towering cosmic creature's glowing silhouette, the camera tracks the hero sprinting and leaping straight forward through neon mist`,
+      videoBeat2: `the hero snaps ${safeGadget1} and ${safeGadget2} together mid-air, unleashing a sweeping crescent wave of shimmering starlight across the room`,
+    },
+    {
+      panel: `Tall vertical upward comic action shot inside ${locationVisual}: the hero braces firmly near the bottom foreground projecting twin swirling upward energy filaments from ${safeGadget1} and ${safeGadget2} to lasso and steady the hovering cosmic creature high above.`,
+      videoBeat1: `the camera tilts sharply upward as the hero anchors firmly below and launches twin luminous energy ribbons from ${safeGadget1} and ${safeGadget2}`,
+      videoBeat2: `the swirling starlight tethers loop cleanly around the hovering cosmic creature above, scattering cascades of bright prism sparks downward`,
+    },
+    {
+      panel: `Kinetic side-scrolling motion-blur comic panel inside ${locationVisual}: the hero slides low across the floor underneath the cosmic creature's sweeping glowing neon wave while ricocheting a brilliant prism pulse off the walls.`,
+      videoBeat1: `in a fast lateral tracking shot, the hero slides low beneath an arching neon wave cast by the cosmic creature`,
+      videoBeat2: `a bright glowing prism orb launched from ${safeGadget1} and ${safeGadget2} ricochets off two glowing walls in sparkling geometric trails straight back toward the creature`,
+    },
+    {
+      panel: `Symmetrical centered comic-book nova splash inside ${locationVisual}: the hero stands boldly dead-center releasing an enormous expanding circular starburst halo of rainbow energy from ${safeGadget1} and ${safeGadget2} that ripples outward across the cosmic creature's swirling light.`,
+      videoBeat1: `centered dramatically in the room, the hero holds ${safeGadget1} and ${safeGadget2} overhead as vibrant neon rings orbit around them`,
+      videoBeat2: `a monumental symmetrical starburst halo of rainbow starlight expands outward across the entire room in sparkling comic rays`,
+    },
+    {
+      panel: `Wide low-angle comic-book face-off inside ${locationVisual} with the hero braced on the left projecting a vibrant rainbow beam from ${safeGadget1} and ${safeGadget2} straight across toward the cosmic creature on the right amidst bright golden sparkles.`,
+      videoBeat1: `the camera glides behind the hero bracing on the left as ${heroLock.pronounSubj} connects ${safeGadget1} and ${safeGadget2} while the creature advances on the right`,
+      videoBeat2: `a blazing linear beam of rainbow starlight streams across the room, gently pushing the glowing creature back in a colorful shower of comic sparkles`,
+    },
+  ];
+
+  // 7 COMPLETELY DIFFERENT PANEL 4 AFTERMATH / SOUVENIR ENDINGS (no more identical tile flat-lay!)
+  const panel4Aftermaths = [
+    `Peaceful wide rear-angle departing silhouette: the hero strolls calmly away down the quiet glowing path of ${locationVisual}, holding up a single shimmering blank rainbow holographic card to catch the calm light.`,
+    `Shallow-depth eye-level still life atop a vintage counter or ledge inside ${locationVisual}: ${safeGadget1} cools gently beside three upright shimmering blank rainbow holographic foil cards leaning against a retro prop as pastel sparkles fade in the background.`,
+    `Warm cinematic medium close-up of the hero's hands tucking three glowing blank rainbow holographic trading cards neatly into ${heroLock.pronounPoss} 1990s jacket pocket while calm light settles across ${locationVisual} behind.`,
+    `Low ground-level angle skimming across a glossy reflective surface or calm evening puddle inside ${locationVisual}, showing a single gleaming blank rainbow holographic card glowing softly amid settled iridescent stardust.`,
+    `Angled 3/4 warm still-life vignette resting atop a vintage crate or console inside ${locationVisual}, displaying ${safeGadget1} and ${safeGadget2} alongside three fanned blank rainbow holographic foil cards in soft rising wisps of pastel mist.`,
+    `Calm relaxed side-profile closing frame of the hero leaning peacefully against a glowing doorway frame at ${locationVisual}, smiling softly as the final iridescent cosmic sparkles drift away into the sky.`,
+    `Clean 90-degree top-down overhead flat-lay still life on scuffed retro tiles inside ${locationVisual} showing ${safeGadget1}, ${safeGadget2}, gleaming brass arcade tokens, and three blank shimmering rainbow holographic foil trading cards.`,
+  ];
+
+  // 4 DISTINCT CUTAWAY GIF #1 & #2 SCENES
+  const gif1Cutaways = [
+    `a glowing vintage 1990s CRT monitor beside ${safeGadget1} on a shelf as colorful radar waveforms ripple across the glass screen and tiny golden starlight sparkles flicker along the chrome edges`,
+    `an extreme macro view of ${safeGadget1}'s translucent plastic casing and analog indicator dials lighting up in rhythmic rainbow pulses while colorful neon reflections sweep across the polished counter`,
+    `a row of vintage 1990s neon wall lamps and hanging plastic price tags inside ${locationVisual} gently swaying and shimmering in slow-motion anti-gravity ripples`,
+    `a glossy puddle or waxed floor reflection inside ${locationVisual} rippling outward in concentric glowing rings of cyan and magenta starlight beneath flickering retro fixtures`,
+  ];
+
+  const gif2Cutaways = [
+    `looking straight up at the glowing ceiling lights of ${locationVisual} as a shimmering violet starlight portal softly closes overhead, drifting slow sparkling motes downward through neon mist`,
+    `a peaceful wide close-up of three gleaming blank rainbow holographic trading cards rotating gently in a soft halo of floating pastel sparkles atop a retro counter`,
+    `an atmospheric low pan across settling iridescent stardust and drifting wisps of warm amber and cyan mist swirling slowly past retro fixtures inside ${locationVisual}`,
+    `a calm window view looking out from ${locationVisual} as colorful cosmic aurora ribbons fade smoothly into a peaceful twilight sky`,
+  ];
+
+  const chosenP1 = panel1Openings[plan.p1Idx];
+  const chosenP2 = panel2Reveals[plan.p2Idx];
+  const chosenP3 = panel3Showdowns[plan.p3Idx];
+  const chosenP4 = panel4Aftermaths[plan.p4Idx];
+
+  // 1-4 Individual Shot Prompts (synced to the same unique storyboard plan)
   const shot01WideArchitecture = sanitizeVisualPromptText(
-    `A 16:9 widescreen architectural comic-book illustration in ${flowArtStyle}. Wide exterior view outside the rain-slicked glowing glass entrance doors of ${safeSetting} on a colorful evening, as ${heroLock.lockedSheet} opens the entrance door holding ${safeGadget1} and ${safeGadget2}.`
+    `A 16:9 widescreen comic-book illustration in ${flowArtStyle}. Hero: ${heroLock.lockedSheet}. ${chosenP1}`
   );
-
-  // 2. Image 02 (Act 01->02 Reveal)
   const shot02AnomalyPortrait = sanitizeVisualPromptText(
-    `A 16:9 widescreen close-up comic-book creature illustration in ${flowArtStyle}. Inside the neon-lit aisles of ${safeSetting}, ${safeCreature} materializes playfully out of swirling cyan and violet starlight, casting glowing rainbow reflections across the tiles.`
+    `A 16:9 widescreen comic-book illustration in ${flowArtStyle}. Cosmic creature: ${safeCreature}. ${chosenP2}`
   );
-
-  // 3. Image 03 (Act 02 Showdown)
   const shot03LowAngleAction = sanitizeVisualPromptText(
-    `A 16:9 widescreen low-angle sci-fi comic-book illustration in ${flowArtStyle}. Inside the main floor of ${safeSetting}, ${heroLock.lockedSheet} stands braced on the left connecting ${safeGadget1} and ${safeGadget2} to project a shimmering rainbow-cyan beam of cosmic starlight toward ${safeCreature} on the right amidst bright golden comic sparkles.`
+    `A 16:9 widescreen comic-book action splash in ${flowArtStyle}. Hero: ${heroLock.lockedSheet}. Cosmic creature: ${safeCreature}. ${chosenP3.panel}`
   );
-
-  // 4. Image 04 (Act 03 Aftermath)
   const shot04TabletopGearFlatlay = sanitizeVisualPromptText(
-    `A 16:9 widescreen top-down overhead flat-lay still-life illustration in ${flowArtStyle}. Resting neatly on scuffed retro checkered floor tiles inside ${safeSetting} are ${safeGadget1}, ${safeGadget2}, gleaming brass arcade tokens, and three blank shimmering rainbow holographic foil trading cards arranged cleanly as a peaceful tabletop still life.`
+    `A 16:9 widescreen closing comic-book illustration in ${flowArtStyle}. Hero: ${heroLock.lockedSheet}. ${chosenP4}`
   );
 
-  // 5. Story GIF #1 (Act 01 Cutaway Loop)
+  // 5-6 Standalone GIF Prompts
   const gif01Act1TensionLoop = sanitizeVisualPromptText(
-    `A 4-second seamless 16:9 animated comic-book loop at 24fps in ${flowArtStyle}. Close-up of a glowing 1990s retro CRT monitor beside ${safeGadget1} as bright cyan and magenta waveforms ripple across the screen and tiny rainbow sparkles dance along the chrome trim in a smooth continuous loop.`
+    `A 4-second seamless 16:9 animated comic-book loop at 24fps in ${flowArtStyle}. Close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx]} in a smooth continuous loop.`
   );
-
-  // 6. Story GIF #2 (Act 03 Cutaway Loop)
   const gif02Act3AftermathLoop = sanitizeVisualPromptText(
-    `A 4-second seamless 16:9 animated comic-book loop at 24fps in ${flowArtStyle}. Upward view toward the glowing neon ceiling lights of ${safeSetting} as a swirling violet starlight portal softly closes overhead, drifting shimmering cyan and gold glitter motes lazily downward in a peaceful continuous loop.`
+    `A 4-second seamless 16:9 animated comic-book loop at 24fps in ${flowArtStyle}. Atmospheric closing cutaway: ${gif2Cutaways[plan.gif2Idx]} in a calm continuous loop.`
   );
 
   // 7. Lead 16:9 Hero Cinema Video Prompt
   const leadVideo16x9 = sanitizeVisualPromptText(
-    `A 4-second 16:9 animated 1990s sci-fi comic-book clip at 24fps in ${flowArtStyle}. Inside ${safeSetting} under ${lightingClean}, ${heroLock.lockedSheet} stands on the left projecting a bright rainbow-cyan beam of cosmic starlight from ${safeGadget1} and ${safeGadget2} across the room toward ${safeCreature} on the right, sending sparkling neon prism trails floating through the air as both hold a dramatic comic-book pose. Audio: ${leadAudioClean}`
+    `A 4-second 16:9 animated 1990s sci-fi comic-book clip at 24fps in ${flowArtStyle}. Inside ${locationVisual} under ${lightingClean}, featuring ${heroLock.lockedSheet} and ${safeCreature}: ${chosenP3.videoBeat1}; then ${chosenP3.videoBeat2} as both hold a crisp comic-book pose. Audio: ${leadAudioClean}`
   );
 
   // 8. Story-Synced 3-Act Synth Soundtrack Prompt
@@ -668,46 +853,48 @@ export function compile199xZinePrompts(
 - Status Debuff: ${encounter.status_affliction}
 Keep 100% authentic 1990s suburban details, tactile hardware physics, and a grounded, definitive Act 03 resolution where a holographic trading card crystallizes in the aftermath.`;
 
-  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL STORYBOARD SHEET (Concise Google Flow / Nano Banana 2.1 native phrasing!)
+  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL STORYBOARD SHEET (Unique per-issue art style, atmosphere, and 4 fresh angles!)
   const masterStoryboard2x2Prompt = sanitizeVisualPromptText(
-`A 16:9 four-panel 2x2 comic-book storyboard grid painted in vibrant 1990s hand-inked watercolor and gouache art with cyan, magenta, and amber neon lighting, borderless edge-to-edge panels, and blank visual surfaces with no lettering.
+`A 16:9 four-panel 2x2 comic-book storyboard grid painted in ${flowArtStyle}, divided cleanly into two equal columns and two equal rows.
 
-Setting: ${safeSetting}. Hero across all panels: ${heroLock.lockedSheet}. Cosmic creature: ${safeCreature}.
+Setting: ${locationVisual} with ${atmosphere}. Hero across all panels: ${heroLock.lockedSheet}. Cosmic creature: ${safeCreature}.
 
-Top-left panel: Wide exterior evening view outside the rain-slicked glowing glass entrance doors as the hero opens the door holding ${safeGadget1} and ${safeGadget2}.
-Top-right panel: Tight interior close-up inside the glowing neon aisles featuring only the whimsical cosmic creature emerging brightly from swirling cyan and violet starlight.
-Bottom-left panel: Dynamic low-angle comic splash inside the main floor with the same hero braced on the left projecting a shimmering rainbow-cyan beam of cosmic starlight from both retro gadgets toward the glowing creature on the right amidst bright golden sparkles.
-Bottom-right panel: Top-down overhead flat-lay still life on scuffed checkered tiles showing ${safeGadget1}, ${safeGadget2}, gleaming brass arcade tokens, and three blank shimmering rainbow holographic foil trading cards arranged neatly on the floor.`
+Top-left panel: ${chosenP1}
+Top-right panel: ${chosenP2}
+Bottom-left panel: ${chosenP3.panel}
+Bottom-right panel: ${chosenP4}`
   );
 
-  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (short, ultra-friendly 4-panel Flow/Nano Banana prompt)
+  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (also uses the unique art palette & 4 fresh angles!)
   const masterStoryboardUltraSafePrompt = sanitizeVisualPromptText(
-`A 16:9 four-panel 2x2 comic-book illustration grid painted in colorful 1990s hand-inked watercolor and gouache style with bright cyan, magenta, and amber neon lighting and purely visual borderless panels with blank surfaces.
+`A 16:9 four-panel 2x2 comic-book illustration grid painted in ${flowArtStyle}.
 
-Top-left panel: Wide exterior evening view of a glowing 1990s retro arcade plaza storefront as ${heroLock.lockedSheet} opens the glass entrance door carrying a glowing neon scanner.
-Top-right panel: Colorful interior close-up of a friendly towering glowing crystal-and-neon retro sci-fi robot floating in swirling purple starlight inside the arcade.
-Bottom-left panel: Wide low-angle comic-book scene inside the neon arcade showing the same hero on the left beaming a shimmering rainbow prism light from a retro handheld gadget toward the glowing crystal robot on the right in a shower of golden stars.
-Bottom-right panel: Top-down overhead still-life flat-lay on checkered floor tiles showing retro neon gadgets, shiny gold arcade tokens, and three blank shimmering rainbow holographic trading cards.`
+Hero across all panels: ${heroLock.lockedSheet}. Friendly glowing retro sci-fi creature: a whimsical towering neon crystal-and-chrome robot floating in swirling starlight.
+
+Top-left panel: ${panel1Openings[(plan.p1Idx + 2) % panel1Openings.length].replace(locationVisual, 'a vibrant 1990s retro neon plaza')}
+Top-right panel: ${panel2Reveals[(plan.p2Idx + 2) % panel2Reveals.length].replace(locationVisual, 'the colorful retro hall')}
+Bottom-left panel: ${panel3Showdowns[(plan.p3Idx + 2) % panel3Showdowns.length].panel.replace(locationVisual, 'the glowing retro hall')}
+Bottom-right panel: ${panel4Aftermaths[(plan.p4Idx + 2) % panel4Aftermaths.length].replace(locationVisual, 'the calm retro plaza')}`
   );
 
-  // 0B. SAME-CHAT GIF #1 FOLLOW-UP (BRAND-NEW CUTAWAY SCENE — NEVER REPEATS PANEL 1!)
+  // 0B. SAME-CHAT GIF #1 FOLLOW-UP (BRAND-NEW CUTAWAY SCENE)
   const sameChatGif1FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same 1990s hand-inked watercolor comic style and neon color palette as the storyboard above, create a 4-second seamless 16:9 animated looping clip showing a brand-new close-up cutaway scene: a glowing vintage 1990s CRT monitor beside ${safeGadget1} on a shelf as colorful cyan and magenta radar waves ripple across the screen and tiny golden starlight sparkles flicker along the chrome edges in a smooth continuous loop.`
+    `In the exact same ${palette.medium} and ${palette.colors} color palette as the storyboard above, create a 4-second seamless 16:9 animated looping clip showing a brand-new close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx]} in a smooth continuous loop.`
   );
 
-  // 0C. SAME-CHAT GIF #2 FOLLOW-UP (BRAND-NEW CUTAWAY SCENE — NEVER REPEATS PANEL 4!)
+  // 0C. SAME-CHAT GIF #2 FOLLOW-UP (BRAND-NEW CUTAWAY SCENE)
   const sameChatGif2FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same 1990s hand-inked watercolor comic style and neon lighting as the storyboard above, create a 4-second seamless 16:9 animated looping clip showing a brand-new upward cutaway view: looking up at the glowing fluorescent ceiling lights of ${safeSetting} as a shimmering violet starlight portal softly closes overhead, letting slow glowing cyan and gold light motes drift downward through neon mist in a calm continuous loop.`
+    `In the exact same ${palette.medium} and ${palette.colors} lighting as the storyboard above, create a 4-second seamless 16:9 animated looping clip showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx]} in a calm continuous loop.`
   );
 
-  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II CLIMAX SHOWDOWN!)
+  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II CLIMAX SHOWDOWN MATCHING PANEL 3!)
   const sameChatVideoFollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same 1990s hand-inked watercolor comic style, lighting, hero outfit, and cosmic creature design from the bottom-left panel above, create an 8-second 16:9 animated comic-book clip inside ${safeSetting} with no dialogue. First three seconds: the camera glides behind the ${heroLock.genderNoun} hero as ${heroLock.pronounSubj} braces on the left and activates ${safeGadget1} and ${safeGadget2} while the glowing cosmic creature floats forward on the right. Middle three seconds: a dazzling rainbow-cyan beam of cosmic starlight streams across the room, gently pushing the glowing creature back in a colorful shower of sparkling prism stars. Final two seconds: the glowing sparkles settle as both hold a dramatic, steady comic-book standoff pose. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and neon hum.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, hero outfit, and cosmic creature design from the bottom-left panel above, create an 8-second 16:9 animated comic-book clip inside ${locationVisual} with no dialogue. First three seconds: ${chosenP3.videoBeat1}. Middle three seconds: ${chosenP3.videoBeat2}. Final two seconds: the glowing sparkles settle cleanly as both hold a dramatic, steady comic-book standoff pose. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and retro ambient hum.`
   );
 
   // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING / VICTORY OUTRO THAT CLOSES THE TALE!)
   const sameChatOutroVideoPrompt = sanitizeVisualPromptText(
-    `In the exact same 1990s hand-inked watercolor comic style, lighting, and hero outfit from the storyboard above, create an 8-second 16:9 closing finale animated clip inside ${safeSetting} with no dialogue. First three seconds: the glowing cosmic creature shimmers and gently dissolves upward into ribbons of cyan, gold, and magenta holographic light as the neon room returns to peaceful calm. Middle three seconds: those shimmering light ribbons drift down onto the checkered tiles beside the hero's sneakers and crystallize into three gleaming blank rainbow holographic trading cards. Final two seconds: the ${heroLock.genderNoun} hero stoops, picks up the sparkling holographic cards, and walks calmly out through the glowing glass exit doors into the misty 1990s twilight. Audio: sweeping crystalline chimes, gentle card sparkle, soft sneaker footsteps, and warm nostalgic 1990s synth pads fading out.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, and hero outfit from the storyboard above, create an 8-second 16:9 closing finale animated clip inside ${locationVisual} with no dialogue. First three seconds: the glowing cosmic creature shimmers and dissolves peacefully upward into swirling ribbons of holographic rainbow light as ${locationVisual} returns to calm stillness. Middle three seconds: those shimmering light ribbons drift downward and crystallize into three gleaming blank rainbow holographic trading cards resting beside the hero. Final two seconds: the ${heroLock.genderNoun} hero pockets the sparkling holographic cards with a relaxed smile and strolls peacefully away as the ambient glow fades warmly. Audio: sweeping crystalline chimes, gentle card shimmer, soft sneaker footsteps, and warm nostalgic 1990s synth pads fading out.`
   );
 
   return {

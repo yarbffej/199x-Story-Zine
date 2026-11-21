@@ -74,7 +74,7 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
   anomaly,
   improvisedGear,
   character,
-  heroLocked = true,
+  heroLocked = false,
   onToggleHeroLocked,
   onSwapHero,
   onSwapVillain,
@@ -268,12 +268,12 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
                 }`}
                 title={
                   heroLocked
-                    ? 'Hero is LOCKED across stories so your protagonist stays the same. Click to unlock.'
-                    : 'Hero rolls randomly each story. Click to lock this hero.'
+                    ? 'Hero is PINNED across spins for a recurring sequel series. Click to roll a fresh hero each spin.'
+                    : 'Rolls a fresh hero on every spin (while keeping them consistent across all panels inside each zine). Click to pin.'
                 }
               >
                 {heroLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-                <span>{heroLocked ? 'Pinned' : 'Unlocked'}</span>
+                <span>{heroLocked ? 'Pinned' : 'New / Spin'}</span>
               </button>
             )}
             {onSwapHero && (

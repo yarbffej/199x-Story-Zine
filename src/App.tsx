@@ -28,24 +28,30 @@ import {
 import { Dices, FolderArchive, Film, CheckSquare, BookOpen } from 'lucide-react';
 
 export default function App() {
-  const [location, setLocation] = useState<string>("K&B Novelty Depot clearance aisle at 8:59 PM");
-  const [anomaly, setAnomaly] = useState<string>("Sentient Fun-Pack Slime");
-  const [improvisedGear, setImprovisedGear] = useState<string>("Light-Up Athletic Sneakers + Rusty Garden Pruning Shears");
-  const [character, setCharacter] = useState<string>(() => retroOptionManager.rollCharacter());
-  const [heroLocked, setHeroLocked] = useState<boolean>(true);
-  const [artStyle, setArtStyle] = useState<string>("90s Dark Horse indie graphic novel ink-and-watercolor illustration");
+  const [initialBootRoll] = useState(() => ({
+    location: retroOptionManager.rollLocation(),
+    anomaly: retroOptionManager.rollAnomaly(),
+    gear: retroOptionManager.rollGear(),
+    character: retroOptionManager.rollCharacter(),
+    artStyle: retroOptionManager.rollArtStyle(),
+  }));
+  const [location, setLocation] = useState<string>(initialBootRoll.location);
+  const [anomaly, setAnomaly] = useState<string>(initialBootRoll.anomaly);
+  const [improvisedGear, setImprovisedGear] = useState<string>(initialBootRoll.gear);
+  const [character, setCharacter] = useState<string>(initialBootRoll.character);
+  const [heroLocked, setHeroLocked] = useState<boolean>(false);
+  const [artStyle, setArtStyle] = useState<string>(initialBootRoll.artStyle);
   const [activeUniverse, setActiveUniverse] = useState<UniverseId>('199x');
   const [activeThemeId, setActiveThemeId] = useState<string>('all');
 
   // Active encounter state
   const [currentEncounter, setCurrentEncounter] = useState<CombatEncounter>(() => {
-    const initChar = retroOptionManager.rollCharacter();
     return generateProceduralEncounter({
-      location: "K&B Novelty Depot clearance aisle at 8:59 PM",
-      anomaly: "Sentient Fun-Pack Slime",
-      improvised_gear: "Light-Up Athletic Sneakers + Rusty Garden Pruning Shears",
-      character: initChar,
-      art_style: "90s Dark Horse indie graphic novel ink-and-watercolor illustration"
+      location: initialBootRoll.location,
+      anomaly: initialBootRoll.anomaly,
+      improvised_gear: initialBootRoll.gear,
+      character: initialBootRoll.character,
+      art_style: initialBootRoll.artStyle
     });
   });
 
