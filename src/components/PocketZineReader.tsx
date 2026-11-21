@@ -15,7 +15,7 @@ import { StudioUiTheme, STUDIO_UI_THEMES } from '../data/uiThemes';
 import { getZinePalette, ZinePaletteId } from '../data/zinePalettes';
 import { ZineIssueView } from './ZineIssueView';
 import { playZineBlip, playZineResonanceChime } from '../utils/audio';
-import { importZineIssueFromDriveFile } from '../utils/zineStorage';
+import { importZineFilesFromDrive } from '../utils/zineStorage';
 
 interface PocketZineReaderProps {
   issues: ZineIssueData[];
@@ -36,12 +36,14 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
   const [localPalettes, setLocalPalettes] = useState<Record<string, ZinePaletteId>>({});
   const driveInputRef = useRef<HTMLInputElement>(null);
 
-  const handleOpenDriveZine = async (file: File) => {
+  const handleOpenDriveZines = async (files: FileList | File[]) => {
     try {
       playZineResonanceChime();
-      await importZineIssueFromDriveFile(file);
+      await importZineFilesFromDrive(files);
       await onRefreshShelf?.();
-      setOpenIndex(0);
+      if (files.length === 1 && !files[0].name.endsWith('.zineshelf.json')) {
+        setOpenIndex(0);
+      }
     } catch {
       // ignore invalid file
     }
@@ -149,10 +151,11 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
                 <input
                   ref={driveInputRef}
                   type="file"
-                  accept=".json,application/json"
+                  multiple
+                  accept=".json,.zine.json,.zineshelf.json,application/json"
                   className="hidden"
                   onChange={(e) => {
-                    if (e.target.files?.[0]) void handleOpenDriveZine(e.target.files[0]);
+                    if (e.target.files?.length) void handleOpenDriveZines(e.target.files);
                     e.target.value = '';
                   }}
                 />

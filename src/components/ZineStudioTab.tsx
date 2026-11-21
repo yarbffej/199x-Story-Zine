@@ -16,6 +16,10 @@ import {
   FileText,
   Download,
   FolderOpen,
+  FolderSync,
+  RefreshCw,
+  Package,
+  X,
 } from 'lucide-react';
 import { CombatEncounter } from '../types';
 import {
@@ -32,8 +36,20 @@ import {
   saveZineIssueToShelf,
   deleteZineShelfIssue,
   exportZineIssueForDrive,
-  importZineIssueFromDriveFile,
+  exportEntireZineShelfForDrive,
+  importZineFilesFromDrive,
 } from '../utils/zineStorage';
+import {
+  SyncDirHandle,
+  isFolderSyncSupported,
+  getSavedSyncFolderHandle,
+  getSyncFolderPermissionState,
+  pickAndSaveSyncFolder,
+  disconnectSyncFolder,
+  syncShelfWithFolder,
+  pushSingleRecordToConnectedFolder,
+  removeRecordFromConnectedFolder,
+} from '../utils/zineFolderSync';
 import { exportStandaloneZineHtml } from '../utils/zineHtmlExporter';
 import { slice2x2StoryboardInto4Shots } from '../utils/storyboardSlicer';
 import {
@@ -89,6 +105,15 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [isSheetDragOver, setIsSheetDragOver] = useState(false);
   const [isStep2GifDragOver, setIsStep2GifDragOver] = useState(false);
   const [isStep3DragOver, setIsStep3DragOver] = useState(false);
+  const [isShelfDragOver, setIsShelfDragOver] = useState(false);
+  const [isExportingShelf, setIsExportingShelf] = useState(false);
+
+  // Shared Folder Sync state (Chrome / Antigravity Chromium File System Access API)
+  const folderSyncSupported = isFolderSyncSupported();
+  const [syncFolderHandle, setSyncFolderHandle] = useState<SyncDirHandle | null>(null);
+  const [syncFolderNeedsGrant, setSyncFolderNeedsGrant] = useState<boolean>(false);
+  const [isSyncingFolder, setIsSyncingFolder] = useState<boolean>(false);
+  const [lastSyncNote, setLastSyncNote] = useState<string | null>(null);
 
   // Active Issue Editable State
   const [editingRecordId, setEditingRecordId] = useState<string | undefined>(undefined);
@@ -495,14 +520,19 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
           editingRecordIdRef.current = saved.id;
           setEditingRecordId(saved.id);
           setIssueNumber(saved.issueNumber);
+          const pushedToFolder = await pushSingleRecordToConnectedFolder(saved);
           await onRefreshShelf();
           if (opts?.silent) {
             flashBanner(
-              `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf`
+              pushedToFolder
+                ? `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Shelf & Sync Folder`
+                : `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf`
             );
           } else {
             flashBanner(
-              `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf!`
+              pushedToFolder
+                ? `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Shelf & Sync Folder!`
+                : `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf!`
             );
           }
         } catch (err) {
@@ -589,16 +619,150 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     flashBanner('✓ Downloaded .zine.json — drop into Google Drive to open on mobile!');
   };
 
-  const handleImportDriveFile = async (file: File) => {
+  const runFolderSync = useCallback(
+    async (
+      handle: SyncDirHandle,
+      opts?: { requestPermission?: boolean; quiet?: boolean }
+    ) => {
+      if (isSyncingFolder) return;
+      setIsSyncingFolder(true);
+      try {
+        const res = await syncShelfWithFolder(handle, {
+          requestPermission: opts?.requestPermission,
+        });
+        if (res.needsPermission) {
+          setSyncFolderNeedsGrant(true);
+          if (!opts?.quiet) {
+            flashBanner(`Click "Sync ${res.folderName}" to allow folder access`);
+          }
+          return;
+        }
+        setSyncFolderNeedsGrant(false);
+        await onRefreshShelf();
+        const summary =
+          res.pulled > 0 || res.pushed > 0
+            ? `Synced "${res.folderName}" (↓ ${res.pulled} pulled, ↑ ${res.pushed} pushed)`
+            : `In sync with "${res.folderName}" (${res.total} issues)`;
+        setLastSyncNote(summary);
+        if (!opts?.quiet || res.pulled > 0) {
+          flashBanner(`✓ ${summary}`);
+        }
+      } catch (err) {
+        console.warn('Folder sync warning:', err);
+        if (!opts?.quiet) {
+          flashBanner('⚠ Could not sync folder — try reconnecting');
+        }
+      } finally {
+        setIsSyncingFolder(false);
+      }
+    },
+    [isSyncingFolder, onRefreshShelf]
+  );
+
+  // Restore saved Sync Folder handle on mount & auto-sync on window focus!
+  useEffect(() => {
+    if (!folderSyncSupported) return;
+    let cancelled = false;
+
+    const init = async () => {
+      const savedHandle = await getSavedSyncFolderHandle();
+      if (cancelled || !savedHandle) return;
+      setSyncFolderHandle(savedHandle);
+      const perm = await getSyncFolderPermissionState(savedHandle);
+      if (perm === 'granted') {
+        setSyncFolderNeedsGrant(false);
+        await runFolderSync(savedHandle, { requestPermission: false, quiet: true });
+      } else {
+        setSyncFolderNeedsGrant(true);
+      }
+    };
+    void init();
+
+    const handleWindowFocus = async () => {
+      const savedHandle = await getSavedSyncFolderHandle();
+      if (!savedHandle) return;
+      const perm = await getSyncFolderPermissionState(savedHandle);
+      if (perm === 'granted') {
+        await runFolderSync(savedHandle, { requestPermission: false, quiet: true });
+      }
+    };
+    window.addEventListener('focus', handleWindowFocus);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [folderSyncSupported]);
+
+  const handleConnectOrSyncFolder = async () => {
+    playZineBlip(880);
+    try {
+      if (syncFolderHandle) {
+        await runFolderSync(syncFolderHandle, { requestPermission: true });
+        return;
+      }
+      const picked = await pickAndSaveSyncFolder();
+      if (!picked) return;
+      setSyncFolderHandle(picked);
+      setSyncFolderNeedsGrant(false);
+      playZineResonanceChime();
+      await runFolderSync(picked, { requestPermission: true });
+    } catch {
+      flashBanner('⚠ Folder picker was blocked or unsupported here');
+    }
+  };
+
+  const handleDisconnectSyncFolder = async () => {
+    playZineBlip(620);
+    await disconnectSyncFolder();
+    setSyncFolderHandle(null);
+    setSyncFolderNeedsGrant(false);
+    setLastSyncNote(null);
+    flashBanner('Disconnected shared sync folder');
+  };
+
+  const handleExportWholeShelf = async () => {
+    if (isExportingShelf) return;
+    playZineBlip(880);
+    setIsExportingShelf(true);
+    try {
+      flashBanner('Packing entire Zine Shelf into 1 file...');
+      const count = await exportEntireZineShelfForDrive();
+      if (count === 0) {
+        flashBanner('No saved zines on Shelf yet to export');
+      } else {
+        playZineResonanceChime();
+        flashBanner(`✓ Exported all ${count} Zine(s) as 1 .zineshelf.json file!`);
+      }
+    } catch {
+      flashBanner('⚠ Failed to export Zine Shelf bundle');
+    } finally {
+      setIsExportingShelf(false);
+    }
+  };
+
+  const handleImportDriveFiles = async (files: FileList | File[]) => {
+    if (!files || files.length === 0) return;
     try {
       playZineResonanceChime();
-      flashBanner('Importing Zine Pack from Google Drive / Files...');
-      const rec = await importZineIssueFromDriveFile(file);
+      flashBanner('Importing Zine file(s) onto Shelf...');
+      const res = await importZineFilesFromDrive(files);
       await onRefreshShelf();
-      handleLoadShelfRecordIntoBuilder(rec);
-      flashBanner(`✓ Loaded Issue #${String(rec.issueNumber).padStart(2, '0')} from Drive Pack!`);
+      // Also push any newly imported zines to connected sync folder if active
+      for (const rec of res.records) {
+        void pushSingleRecordToConnectedFolder(rec);
+      }
+      if (res.records.length === 1 && subTab === 'builder') {
+        handleLoadShelfRecordIntoBuilder(res.records[0]);
+      }
+      const parts: string[] = [];
+      if (res.importedCount > 0) parts.push(`${res.importedCount} added`);
+      if (res.updatedCount > 0) parts.push(`${res.updatedCount} updated`);
+      if (res.skippedCount > 0 && parts.length === 0) {
+        parts.push(`${res.skippedCount} already up to date`);
+      }
+      flashBanner(`✓ Zine Shelf synced (${parts.join(', ')})!`);
     } catch {
-      flashBanner('⚠ Could not read .zine.json file');
+      flashBanner('⚠ Could not read .zine.json / .zineshelf.json file');
     }
   };
 
@@ -883,10 +1047,11 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       <input
         ref={drivePackInputRef}
         type="file"
-        accept=".json,application/json"
+        multiple
+        accept=".json,.zine.json,.zineshelf.json,application/json"
         className="hidden"
         onChange={(e) => {
-          if (e.target.files?.[0]) void handleImportDriveFile(e.target.files[0]);
+          if (e.target.files?.length) void handleImportDriveFiles(e.target.files);
           e.target.value = '';
         }}
       />
@@ -1040,6 +1205,37 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             </span>
           )}
 
+          {folderSyncSupported && (
+            <button
+              type="button"
+              onClick={() => void handleConnectOrSyncFolder()}
+              disabled={isSyncingFolder}
+              style={{
+                backgroundColor: syncFolderHandle && !syncFolderNeedsGrant ? '#10B981' : uiTheme.accent2,
+                color: syncFolderHandle && !syncFolderNeedsGrant ? '#04130D' : uiTheme.accent2Ink,
+              }}
+              className="pop-btn px-3 py-2 font-mono-zine text-xs font-bold uppercase flex items-center gap-1.5 cursor-pointer"
+              title={
+                syncFolderHandle
+                  ? `Sync Zine Shelf with shared folder "${syncFolderHandle.name}"`
+                  : 'Connect one shared folder (e.g. Google Drive / Documents) so Chrome & Antigravity stay in sync automatically'
+              }
+            >
+              {isSyncingFolder ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <FolderSync className="w-3.5 h-3.5" />
+              )}
+              <span>
+                {syncFolderHandle
+                  ? syncFolderNeedsGrant
+                    ? `Sync "${syncFolderHandle.name}"`
+                    : `✓ "${syncFolderHandle.name}"`
+                  : 'Sync Folder'}
+              </span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => void handleExportForDrive()}
@@ -1107,8 +1303,24 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       {subTab === 'shelf' ? (
         /* ==================== ZINE SHELF COVER RACK ==================== */
         <section
-          style={{ backgroundColor: uiTheme.middleBg, color: uiTheme.ink }}
-          className="pop-card p-5 sm:p-8 space-y-6"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsShelfDragOver(true);
+          }}
+          onDragLeave={() => setIsShelfDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsShelfDragOver(false);
+            if (e.dataTransfer.files?.length) {
+              void handleImportDriveFiles(e.dataTransfer.files);
+            }
+          }}
+          style={{
+            backgroundColor: uiTheme.middleBg,
+            color: uiTheme.ink,
+            outline: isShelfDragOver ? `4px dashed ${uiTheme.accent1}` : undefined,
+          }}
+          className="pop-card p-5 sm:p-8 space-y-6 transition-all"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -1119,23 +1331,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                 style={{ color: uiTheme.mutedInk }}
                 className="text-xs sm:text-sm font-semibold mt-1"
               >
-                Click any saved issue cover to open it in the live Zine viewer, swap media, or export a standalone .HTML file.
+                Click any saved cover to open it, or connect one shared Mac / Google Drive folder so Chrome &amp; Antigravity share the exact same shelf automatically.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => drivePackInputRef.current?.click()}
-                style={{
-                  backgroundColor: uiTheme.accent3,
-                  color: uiTheme.accent3Ink,
-                }}
-                className="pop-btn px-3.5 py-2 font-mono-zine text-xs font-bold uppercase flex items-center gap-1.5 cursor-pointer"
-                title="Import a saved .zine.json pack from Google Drive or another browser"
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span>Import Drive Zine (.json)</span>
-              </button>
               <button
                 type="button"
                 onClick={() => setSubTab('builder')}
@@ -1150,11 +1349,117 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             </div>
           </div>
 
+          {/* SHARED FOLDER AUTO-SYNC + WHOLE-SHELF BACKUP BAR */}
           <div
-            style={{ backgroundColor: uiTheme.inputBg, color: uiTheme.mutedInk }}
-            className="px-3.5 py-2 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-semibold"
+            style={{ backgroundColor: uiTheme.surfaceBg }}
+            className="pop-card p-4 space-y-3"
           >
-            💾 <strong>Auto-Save On:</strong> Every Zine you drop media into now saves automatically here in this browser ({typeof window !== 'undefined' ? window.location.host : 'this site'}). Want to carry zines between desktop, localhost, and phone? Click <strong>Save for Drive</strong> to export a <code>.zine.json</code> pack!
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex flex-wrap items-center gap-2">
+                {folderSyncSupported && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void handleConnectOrSyncFolder()}
+                      disabled={isSyncingFolder}
+                      style={{
+                        backgroundColor:
+                          syncFolderHandle && !syncFolderNeedsGrant
+                            ? '#10B981'
+                            : uiTheme.accent2,
+                        color:
+                          syncFolderHandle && !syncFolderNeedsGrant
+                            ? '#04130D'
+                            : uiTheme.accent2Ink,
+                      }}
+                      className="pop-btn px-3.5 py-2 font-display font-extrabold text-xs uppercase flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {isSyncingFolder ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <FolderSync className="w-4 h-4" />
+                      )}
+                      <span>
+                        {syncFolderHandle
+                          ? syncFolderNeedsGrant
+                            ? `Authorize & Sync "${syncFolderHandle.name}"`
+                            : `Sync Folder Now ("${syncFolderHandle.name}")`
+                          : 'Connect Shared Sync Folder (Chrome ↔ Antigravity)'}
+                      </span>
+                    </button>
+
+                    {syncFolderHandle && (
+                      <button
+                        type="button"
+                        onClick={() => void handleDisconnectSyncFolder()}
+                        style={{
+                          backgroundColor: uiTheme.surfaceElevated,
+                          color: uiTheme.mutedInk,
+                        }}
+                        className="pop-btn p-2 cursor-pointer"
+                        title="Disconnect shared sync folder"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => void handleExportWholeShelf()}
+                  disabled={isExportingShelf || shelfRecords.length === 0}
+                  style={{
+                    backgroundColor: uiTheme.accent4,
+                    color: uiTheme.accent4Ink,
+                  }}
+                  className="pop-btn px-3.5 py-2 font-mono-zine text-xs font-bold uppercase flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Download EVERY saved Zine on your Shelf in one .zineshelf.json file (great for Google Drive & phone!)"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>
+                    {isExportingShelf
+                      ? 'Packing Shelf...'
+                      : `Export Whole Shelf (${shelfRecords.length})`}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => drivePackInputRef.current?.click()}
+                  style={{
+                    backgroundColor: uiTheme.accent3,
+                    color: uiTheme.accent3Ink,
+                  }}
+                  className="pop-btn px-3.5 py-2 font-mono-zine text-xs font-bold uppercase flex items-center gap-1.5 cursor-pointer"
+                  title="Import one or multiple .zine.json files OR a .zineshelf.json whole-shelf bundle"
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  <span>Import Zine(s) / Shelf</span>
+                </button>
+              </div>
+
+              {lastSyncNote && (
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-mono-zine text-[11px] font-bold">
+                  ✓ {lastSyncNote}
+                </span>
+              )}
+            </div>
+
+            <p
+              style={{ color: uiTheme.mutedInk }}
+              className="font-mono-zine text-[11px] leading-relaxed"
+            >
+              {syncFolderHandle ? (
+                <>
+                  🔗 Linked to <strong>{syncFolderHandle.name}</strong> — every Zine you save writes straight into that folder and auto-pulls whenever you switch back to this tab. Pick the same folder in Chrome &amp; Antigravity for instant 2-way sync!
+                </>
+              ) : (
+                <>
+                  💡 <strong>Tip:</strong> Click <strong>Connect Shared Sync Folder</strong> in both Chrome and Antigravity and pick the <strong>same folder</strong> (e.g. a <code>199X-Zines</code> folder inside Google Drive or Documents) — all zines sync automatically in both directions! You can also drag &amp; drop <code>.zine.json</code> or <code>.zineshelf.json</code> files right onto this shelf.
+                </>
+              )}
+            </p>
           </div>
 
           {shelfRecords.length === 0 ? (
@@ -1333,6 +1638,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         type="button"
                         onClick={async () => {
                           await deleteZineShelfIssue(rec.id);
+                          await removeRecordFromConnectedFolder(rec.id);
                           if (editingRecordId === rec.id) {
                             editingRecordIdRef.current = undefined;
                             setEditingRecordId(undefined);

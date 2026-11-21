@@ -178,8 +178,11 @@ export function hydrateZineRecord(record: ZineShelfRecord): HydratedZineShelfIss
   };
 }
 
-interface PortableZinePackV1 {
+export interface PortableZinePackV1 {
   format: '199x-zine-pack-v1';
+  id?: string;
+  createdAt?: number;
+  updatedAt?: number;
   exportedAt: number;
   issueNumber: number;
   title: string;
@@ -197,6 +200,12 @@ interface PortableZinePackV1 {
     gif2IsVideo?: boolean;
     audioDataUri?: string | null;
   };
+}
+
+export interface PortableZineShelfBundleV1 {
+  format: '199x-zine-shelf-bundle-v1';
+  exportedAt: number;
+  issues: PortableZinePackV1[];
 }
 
 async function blobOrUrlToDataUri(blob?: Blob, fallbackUrl?: string): Promise<string | null> {
@@ -229,6 +238,120 @@ async function dataUriToBlob(dataUri?: string | null): Promise<Blob | undefined>
   } catch {
     return undefined;
   }
+}
+
+export async function serializeShelfRecordToPack(
+  record: ZineShelfRecord
+): Promise<PortableZinePackV1> {
+  const videoDataUri = await blobOrUrlToDataUri(record.videoBlob);
+  const outroVideoDataUri = await blobOrUrlToDataUri(record.outroVideoBlob);
+  const shotDataUris: (string | null)[] = [null, null, null, null];
+  for (let i = 0; i < 4; i++) {
+    shotDataUris[i] = await blobOrUrlToDataUri(record.shotBlobs?.[i]);
+  }
+  const gif1DataUri = await blobOrUrlToDataUri(record.gif1Blob);
+  const gif2DataUri = await blobOrUrlToDataUri(record.gif2Blob);
+  const audioDataUri = await blobOrUrlToDataUri(record.audioBlob);
+
+  return {
+    format: '199x-zine-pack-v1',
+    id: record.id,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+    exportedAt: Date.now(),
+    issueNumber: record.issueNumber,
+    title: record.title,
+    zinePaletteId: record.zinePaletteId,
+    encounter: record.encounter,
+    acts: record.acts,
+    audioTitle: record.audioTitle,
+    media: {
+      videoDataUri,
+      outroVideoDataUri,
+      shotDataUris,
+      gif1DataUri,
+      gif1IsVideo: Boolean(
+        record.gif1IsVideo || record.gif1Blob?.type.startsWith('video/')
+      ),
+      gif2DataUri,
+      gif2IsVideo: Boolean(
+        record.gif2IsVideo || record.gif2Blob?.type.startsWith('video/')
+      ),
+      audioDataUri,
+    },
+  };
+}
+
+/**
+ * Upserts a PortableZinePackV1 into IndexedDB without duplicating an already-present issue.
+ */
+export async function upsertZinePackToShelf(
+  pack: PortableZinePackV1
+): Promise<{ record: ZineShelfRecord; status: 'imported' | 'updated' | 'skipped' }> {
+  const db = await initZineDB();
+  const all = await db.getAll(ZINE_STORE);
+
+  // Match by exact record id if present, or fallback to exact legacy createdAt/exportedAt + title
+  const existing = pack.id
+    ? all.find((r) => r.id === pack.id)
+    : all.find(
+        (r) =>
+          r.title.trim().toLowerCase() === (pack.title || '').trim().toLowerCase() &&
+          (r.encounter?.location || '') === (pack.encounter?.location || '') &&
+          Math.abs((r.createdAt || 0) - (pack.createdAt || pack.exportedAt || 0)) < 60_000
+      );
+
+  const incomingUpdated = pack.updatedAt || pack.exportedAt || Date.now();
+  if (existing && (existing.updatedAt || 0) >= incomingUpdated) {
+    return { record: existing, status: 'skipped' };
+  }
+
+  const videoBlob = await dataUriToBlob(pack.media?.videoDataUri);
+  const outroVideoBlob = await dataUriToBlob(pack.media?.outroVideoDataUri);
+  const s0 = await dataUriToBlob(pack.media?.shotDataUris?.[0]);
+  const s1 = await dataUriToBlob(pack.media?.shotDataUris?.[1]);
+  const s2 = await dataUriToBlob(pack.media?.shotDataUris?.[2]);
+  const s3 = await dataUriToBlob(pack.media?.shotDataUris?.[3]);
+  const gif1Blob = await dataUriToBlob(pack.media?.gif1DataUri);
+  const gif2Blob = await dataUriToBlob(pack.media?.gif2DataUri);
+  const audioBlob = await dataUriToBlob(pack.media?.audioDataUri);
+
+  const maxIssueNum = all.reduce((max, r) => Math.max(max, r.issueNumber || 0), 0);
+  const assignedIssueNum = existing ? existing.issueNumber : maxIssueNum + 1;
+
+  const record: ZineShelfRecord = {
+    id:
+      existing?.id ||
+      pack.id ||
+      `zine-issue-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    issueNumber: assignedIssueNum,
+    createdAt: existing?.createdAt || pack.createdAt || pack.exportedAt || Date.now(),
+    updatedAt: incomingUpdated,
+    title: pack.title || pack.encounter.entity_name || `199X Issue #${assignedIssueNum}`,
+    zinePaletteId: pack.zinePaletteId,
+    encounter: {
+      ...pack.encounter,
+      card_number: pack.encounter.card_number || assignedIssueNum,
+    },
+    acts: pack.acts,
+    audioTitle: pack.audioTitle || existing?.audioTitle,
+    videoBlob: videoBlob ?? existing?.videoBlob,
+    outroVideoBlob: outroVideoBlob ?? existing?.outroVideoBlob,
+    shotBlobs: [
+      s0 ?? existing?.shotBlobs?.[0],
+      s1 ?? existing?.shotBlobs?.[1],
+      s2 ?? existing?.shotBlobs?.[2],
+      s3 ?? existing?.shotBlobs?.[3],
+    ],
+    gif1Blob: gif1Blob ?? existing?.gif1Blob,
+    gif1IsVideo: pack.media?.gif1IsVideo ?? existing?.gif1IsVideo,
+    gif2Blob: gif2Blob ?? existing?.gif2Blob,
+    gif2IsVideo: pack.media?.gif2IsVideo ?? existing?.gif2IsVideo,
+    audioBlob: audioBlob ?? existing?.audioBlob,
+  };
+
+  await db.put(ZINE_STORE, record);
+  return { record, status: existing ? 'updated' : 'imported' };
 }
 
 /**
@@ -266,6 +389,8 @@ export async function exportZineIssueForDrive(
 
   const pack: PortableZinePackV1 = {
     format: '199x-zine-pack-v1',
+    id: issue.id,
+    updatedAt: Date.now(),
     exportedAt: Date.now(),
     issueNumber: issue.issueNumber,
     title: issue.title,
@@ -305,41 +430,99 @@ export async function exportZineIssueForDrive(
 }
 
 /**
- * Imports a `.zine.json` file picked from Google Drive / Files directly into IndexedDB Zine Shelf.
+ * Exports EVERY saved Zine Issue on the Shelf into ONE portable `.zineshelf.json` bundle.
+ */
+export async function exportEntireZineShelfForDrive(): Promise<number> {
+  const all = await getAllZineShelfRecords();
+  if (!all.length) return 0;
+
+  const issues: PortableZinePackV1[] = [];
+  for (const rec of all) {
+    issues.push(await serializeShelfRecordToPack(rec));
+  }
+
+  const bundle: PortableZineShelfBundleV1 = {
+    format: '199x-zine-shelf-bundle-v1',
+    exportedAt: Date.now(),
+    issues,
+  };
+
+  const jsonBlob = new Blob([JSON.stringify(bundle)], {
+    type: 'application/json;charset=utf-8',
+  });
+  const dlUrl = URL.createObjectURL(jsonBlob);
+  const link = document.createElement('a');
+  link.href = dlUrl;
+  link.download = `199X_FULL_ZINE_SHELF_${all.length}_ISSUES.zineshelf.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.setTimeout(() => URL.revokeObjectURL(dlUrl), 5000);
+  return all.length;
+}
+
+/**
+ * Imports one or more `.zine.json` or `.zineshelf.json` files into IndexedDB Zine Shelf.
+ */
+export async function importZineFilesFromDrive(
+  files: FileList | File[]
+): Promise<{
+  importedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  records: ZineShelfRecord[];
+}> {
+  const list = Array.from(files);
+  let importedCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+  const records: ZineShelfRecord[] = [];
+
+  for (const file of list) {
+    const rawText = await file.text();
+    const parsed = JSON.parse(rawText) as PortableZinePackV1 | PortableZineShelfBundleV1;
+
+    if (
+      parsed &&
+      parsed.format === '199x-zine-shelf-bundle-v1' &&
+      Array.isArray(parsed.issues)
+    ) {
+      for (const issuePack of parsed.issues) {
+        if (issuePack?.format === '199x-zine-pack-v1' && issuePack.encounter) {
+          const res = await upsertZinePackToShelf(issuePack);
+          records.push(res.record);
+          if (res.status === 'imported') importedCount++;
+          else if (res.status === 'updated') updatedCount++;
+          else skippedCount++;
+        }
+      }
+    } else if (
+      parsed &&
+      parsed.format === '199x-zine-pack-v1' &&
+      parsed.encounter
+    ) {
+      const res = await upsertZinePackToShelf(parsed);
+      records.push(res.record);
+      if (res.status === 'imported') importedCount++;
+      else if (res.status === 'updated') updatedCount++;
+      else skippedCount++;
+    } else {
+      throw new Error(`Not a valid 199X .zine.json or .zineshelf.json file: ${file.name}`);
+    }
+  }
+
+  return { importedCount, updatedCount, skippedCount, records };
+}
+
+/**
+ * Imports a single `.zine.json` file picked from Google Drive / Files directly into IndexedDB Zine Shelf.
  */
 export async function importZineIssueFromDriveFile(
   file: File
 ): Promise<ZineShelfRecord> {
-  const rawText = await file.text();
-  const parsed = JSON.parse(rawText) as PortableZinePackV1;
-  if (!parsed || parsed.format !== '199x-zine-pack-v1' || !parsed.encounter) {
-    throw new Error('Not a valid 199X .zine.json pack file');
+  const result = await importZineFilesFromDrive([file]);
+  if (!result.records.length) {
+    throw new Error('No zine issue found in file');
   }
-
-  const videoBlob = await dataUriToBlob(parsed.media?.videoDataUri);
-  const outroVideoBlob = await dataUriToBlob(parsed.media?.outroVideoDataUri);
-  const s0 = await dataUriToBlob(parsed.media?.shotDataUris?.[0]);
-  const s1 = await dataUriToBlob(parsed.media?.shotDataUris?.[1]);
-  const s2 = await dataUriToBlob(parsed.media?.shotDataUris?.[2]);
-  const s3 = await dataUriToBlob(parsed.media?.shotDataUris?.[3]);
-  const gif1Blob = await dataUriToBlob(parsed.media?.gif1DataUri);
-  const gif2Blob = await dataUriToBlob(parsed.media?.gif2DataUri);
-  const audioBlob = await dataUriToBlob(parsed.media?.audioDataUri);
-
-  return await saveZineIssueToShelf({
-    issueNumber: parsed.issueNumber,
-    title: parsed.title,
-    zinePaletteId: parsed.zinePaletteId,
-    encounter: parsed.encounter,
-    acts: parsed.acts,
-    audioTitle: parsed.audioTitle,
-    videoBlob,
-    outroVideoBlob,
-    shotBlobs: [s0, s1, s2, s3],
-    gif1Blob,
-    gif1IsVideo: parsed.media?.gif1IsVideo,
-    gif2Blob,
-    gif2IsVideo: parsed.media?.gif2IsVideo,
-    audioBlob,
-  });
+  return result.records[0];
 }
