@@ -341,7 +341,7 @@ export async function exportStandaloneZineHtml(
     <!-- 4. SPREAD 01: ACT I + SHOT 01 + OPTIONAL STORY GIF #1 -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       <article class="lg:col-span-5 pop-card p-6 sm:p-7" style="background:${expTheme.tile1}; color:${expTheme.ink}">
-        <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">ACT 01 // THE SETUP</span>
+        <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">ACT 01 // SOMETHING WEIRD</span>
         <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">Entering ${escapeHtml(issue.location)}</h2>
         <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.sceneSetup)}</p>
       </article>
@@ -389,7 +389,7 @@ export async function exportStandaloneZineHtml(
       </div>
       <div class="lg:col-span-5 space-y-6 order-1 lg:order-2">
         <article class="pop-card p-6 sm:p-7" style="background:${expTheme.tile2}; color:${expTheme.ink}">
-          <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">ACT 02 // KINETIC CLASH</span>
+          <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">ACT 02 // THE BIG SHOWDOWN</span>
           <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">${escapeHtml(issue.synergy)}</h2>
           <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.intervention)}</p>
         </article>
@@ -405,8 +405,8 @@ export async function exportStandaloneZineHtml(
     <!-- 6. SPREAD 03: ACT III (LEFT) + SHOT 04 & OPTIONAL STORY GIF #2 (RIGHT) -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       <article class="lg:col-span-5 pop-card p-6 sm:p-7" style="background:${expTheme.tile3}; color:${expTheme.ink}">
-        <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">ACT 03 // THE AFTERMATH</span>
-        <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">Suburban Stillness Restored</h2>
+        <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">ACT 03 // THE TWIST ENDING</span>
+        <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">Wait... Is It Really Over?</h2>
         <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.aftermath)}</p>
       </article>
       <div class="lg:col-span-7 space-y-6">

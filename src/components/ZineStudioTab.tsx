@@ -477,10 +477,14 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     await handleCopyPrompt('all-8', bundle);
   };
 
+  const storyRemixCountRef = useRef<number>(0);
+
   const handleAiRemixStory = async () => {
     if (isAiExpanding) return;
     playZineBlip(840);
     setIsAiExpanding(true);
+    storyRemixCountRef.current += 1;
+    const remixIdx = storyRemixCountRef.current;
     try {
       const res = await fetch('/api/zine-story', {
         method: 'POST',
@@ -495,13 +499,18 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             intervention: data.intervention,
             aftermath: data.aftermath,
           });
-          flashBanner('✓ Expanded 3-Act Chronicle (~950 words)!');
+          flashBanner('✓ Remixed Goosebumps-Style 3-Act Story!');
+        } else {
+          setActs(buildLongForm3ActChronicle(encounter, undefined, remixIdx));
+          flashBanner('✓ Remixed Goosebumps-Style 3-Act Story!');
         }
       } else {
-        setActs(buildLongForm3ActChronicle(encounter));
+        setActs(buildLongForm3ActChronicle(encounter, undefined, remixIdx));
+        flashBanner('✓ Remixed Goosebumps-Style 3-Act Story!');
       }
     } catch {
-      setActs(buildLongForm3ActChronicle(encounter));
+      setActs(buildLongForm3ActChronicle(encounter, undefined, remixIdx));
+      flashBanner('✓ Remixed Goosebumps-Style 3-Act Story!');
     } finally {
       setIsAiExpanding(false);
     }

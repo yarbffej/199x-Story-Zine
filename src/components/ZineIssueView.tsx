@@ -1532,7 +1532,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                     boxShadow: '2px 2px 0 var(--ui-border)',
                   }}
                 >
-                  ACT 01 // THE SETUP
+                  ACT 01 // SOMETHING WEIRD
                 </span>
                 <span className="font-display text-5xl font-extrabold opacity-20 select-none">
                   01
@@ -1601,7 +1601,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                       boxShadow: '2px 2px 0 var(--ui-border)',
                     }}
                   >
-                    ACT 02 // KINETIC CLASH
+                    ACT 02 // THE BIG SHOWDOWN
                   </span>
                   <span className="font-display text-5xl font-extrabold opacity-20 select-none">
                     02
@@ -1673,14 +1673,14 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                       boxShadow: '2px 2px 0 var(--ui-border)',
                     }}
                   >
-                    ACT 03 // THE AFTERMATH
+                    ACT 03 // THE TWIST ENDING
                   </span>
                   <span className="font-display text-5xl font-extrabold opacity-20 select-none">
                     03
                   </span>
                 </div>
                 <h2 className="font-display text-2xl sm:text-3xl font-extrabold uppercase leading-tight mb-4">
-                  The Quiet Aftermath
+                  Wait... Is It Really Over?
                 </h2>
                 <p className="text-base sm:text-[17px] leading-[1.75] font-medium opacity-95 whitespace-pre-line">
                   {issue.acts.aftermath}

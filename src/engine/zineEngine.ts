@@ -278,81 +278,278 @@ function pickSeeded<T>(arr: T[], seed: number, offset: number = 0): T {
   return arr[Math.abs(seed + offset * 31) % arr.length];
 }
 
+function toGoosebumpsFeeling(rawAffliction: string): string {
+  const lower = (rawAffliction || '').toLowerCase();
+  if (lower.includes('nostalgia') || lower.includes('homesick')) {
+    return 'a creepy daydreamy feeling like every clock in town had rolled straight back to 1995';
+  }
+  if (lower.includes('chronolog')) {
+    return 'a dizzy chill, like time itself had just hiccuped backward ten seconds';
+  }
+  if (lower.includes('sugar')) {
+    return 'heavy, wobbly knees—like eating three whole bags of sour candy right before a race';
+  }
+  if (lower.includes('static') || lower.includes('magnetic') || lower.includes('velcro')) {
+    return 'a prickly buzz that made every single hair on their arms stand straight up';
+  }
+  if (lower.includes('mall') || lower.includes('muzak')) {
+    return 'a spooky foggy feeling, like cheesy mall elevator music was echoing right inside their head';
+  }
+  if (lower.includes('dial-up') || lower.includes('stereo')) {
+    return 'a weird ringing in their ears that sounded just like an angry modem screeching in the dark';
+  }
+  if (lower.includes('slime') || lower.includes('plastic')) {
+    return 'a strange tingle in their fingertips, like the whole room was turning to rubber';
+  }
+  if (lower.includes('stereogram') || lower.includes('blacklight')) {
+    return 'a blinking double-vision chill that made every shadow look like it was waving hello';
+  }
+  if (lower.includes('hypercolor') || lower.includes('fever')) {
+    return 'a sudden weird wave of goosebumps—freezing cold one second and super warm the next';
+  }
+  if (lower.includes('pop-rock')) {
+    return 'a funny fizzy crackle in the air, like a thousand packs of popping candy going off at once';
+  }
+  if (lower.includes('thumb') || lower.includes('pet')) {
+    return 'a twitchy, jumpy feeling like they had just lost their last life on the final boss';
+  }
+  return 'a cold shiver straight down their spine—the kind that tells you to turn around right now';
+}
+
+function toGoosebumpsWeirdSign(rawDistortion: string): string {
+  const firstSentence =
+    (rawDistortion || 'The ceiling lights flickered on and off in a spooky rhythm.')
+      .split(/(?<=[.!?])\s+/)[0]
+      ?.trim() || 'The ceiling lights flickered on and off in a spooky rhythm.';
+  const cleaned = firstSentence
+    .replace(/\binfinite geometric voids\b/gi, 'weird glowing checkerboard tunnels')
+    .replace(/\bdimensional frequencies\b/gi, 'a creepy, buzzing tune')
+    .replace(/\bblack-hole antimatter\b/gi, 'glowing purple galaxy')
+    .replace(/\bfour-dimensional space\b/gi, 'thin air like giant black streamers')
+    .replace(/\bpurple nebulae\b/gi, 'swirling purple clouds')
+    .replace(/\bliving barcode tendrils\b/gi, 'wiggly black-and-white stripes')
+    .replace(/\bthe spacetime continuum\b/gi, 'the room like a glowing zipper')
+    .replace(/\bpolished obsidian\b/gi, 'jet-black glowing')
+    .replace(/\banother dimension\b/gi, 'some spooky other world')
+    .replace(/\bcosmic starfield\b/gi, 'bright starry night sky')
+    .replace(/\beerie reverse\b/gi, 'creepy backwards whispers')
+    .replace(/\bsynchronized rhythm\b/gi, 'slow, creepy unison')
+    .replace(/\ban event horizon reflecting distant nebulae\b/gi, 'a swirling starry mirror under their shoes')
+    .replace(/\bcomplex microtonal choral harmonies\b/gi, 'a spooky off-key ghost song')
+    .replace(/\bpurple night void\b/gi, 'glowing purple sky')
+    .replace(/\bunreadable astrological coordinates\b/gi, 'weird secret star symbols')
+    .replace(/\bhyper-dense gravitational mercury\b/gi, 'bouncy silver droplets that floated sideways')
+    .replace(/\bagainst gravity toward a singular localized point\b/gi, 'straight up into the air all by themselves')
+    .replace(/\bfluorescent\b/gi, 'buzzing overhead')
+    .replace(/\bkinetic\b/gi, 'wild')
+    .replace(/\bresonance\b/gi, 'buzz')
+    .replace(/\bdimensional\b/gi, 'spooky')
+    .replace(/\bwarp\b/g, 'warped')
+    .replace(/\bpeel\b/g, 'peeled')
+    .replace(/\bhum\b/g, 'hummed')
+    .replace(/\bspews\b/g, 'spewed')
+    .replace(/\bunravel\b/g, 'unraveled')
+    .replace(/\bemits\b/g, 'let out')
+    .replace(/\breveal\b/g, 'opened up to show')
+    .replace(/\bslice\b/g, 'sliced')
+    .replace(/\bspit\b/g, 'spat')
+    .replace(/\bascends\b/g, 'shot up')
+    .replace(/\bbroadcast\b/g, 'played back')
+    .replace(/\bbegin\b/g, 'began')
+    .replace(/\bcreates\b/g, 'turned into')
+    .replace(/\brings\b/g, 'rang')
+    .replace(/\bclimb\b/g, 'climbed')
+    .replace(/\bprint\b/g, 'printed')
+    .replace(/\bdrop\b/g, 'dropped')
+    .replace(/\bspray\b/g, 'sprayed')
+    .replace(/\broll\b/g, 'rolled')
+    .trim();
+  return /[.!?]$/.test(cleaned) ? cleaned : `${cleaned}.`;
+}
+
+function toGoosebumpsTrickName(rawSynergy: string): string {
+  return (rawSynergy || 'Rainbow Spark Blast')
+    .replace(/\bLife-Steal\b/gi, 'Energy Zap')
+    .replace(/\bTime Dilation\b/gi, 'Slow-Motion Freeze')
+    .replace(/\bKinetic Overdrive\b/gi, 'Turbo Bounce')
+    .replace(/\bKinetic Shockwave\b/gi, 'Mega Boom')
+    .replace(/\bPhosphor Glow Blindness\b/gi, 'Super Flash Dazzle')
+    .replace(/\bAudio-Pitch Frequency Shatter\b/gi, 'Ear-Popping Mega Screech')
+    .replace(/\bInvulnerability Blink\b/gi, 'Ghost-Mode Blink')
+    .replace(/\bRetina Burn\b/gi, 'Laser Disco Flash')
+    .replace(/\bTachyon Sever\b/gi, 'Zap-Snap')
+    .replace(/\bSector Overwrite\b/gi, 'Glitch Scramble')
+    .replace(/\bKinetic Entrapment\b/gi, 'Super Sticky Trap')
+    .replace(/\bDeath Curse Rebound\b/gi, 'Spooky Boomerang Bounce')
+    .replace(/\bDegauss Magnetic Burst\b/gi, 'Giant Rainbow Magnet Pop')
+    .replace(/\bSub-Atomic Fissure\b/gi, 'Fizz-Pop Boom')
+    .replace(/\bHallucinogenic Haze\b/gi, 'Rainbow Fog Cloud')
+    .replace(/\bStatic Discharge Hyper-Armor\b/gi, 'Mega Static Bubble')
+    .replace(/\bThermal Ink Heat Bleed\b/gi, 'Sizzling Color Splash')
+    .replace(/\bVibration Resonance\b/gi, 'Super Rumble Shake')
+    .replace(/\bOptical Camouflage\b/gi, 'Invisible Trick')
+    .replace(/\bTracking Glitch Phase Shift\b/gi, 'Fast-Forward Jump')
+    .replace(/\bDensity Compression\b/gi, 'Heavy Slammer Bonk')
+    .replace(/\bAcidic Pressurization\b/gi, 'Mega Fizzy Splash')
+    .replace(/\bElastic Absorption\b/gi, 'Bouncy Slime Catch')
+    .replace(/\bTremor Wave\b/gi, 'Bass-Drop Quake')
+    .replace(/\bMagnetic Shielding\b/gi, 'Super Bounce Shield')
+    .replace(/\bBullet Hell\b/gi, 'Token Hailstorm')
+    .replace(/\bAcid Spit Backlash\b/gi, 'Fizz-Splash Boom');
+}
+
+function toStoryHeroShortName(charShort: string): string {
+  const clean = (charShort || 'Sam').trim();
+  if (/^(The|Coach|Officer|Professor|Dr\.|Sgt\.|Detective|Big)\b/i.test(clean)) {
+    const words = clean.replace(/'[^']+'/g, '').replace(/\s+/g, ' ').trim().split(' ');
+    return words.slice(0, 2).join(' ') || clean;
+  }
+  const first = clean.split(/[\s']+/)[0];
+  return first || clean;
+}
+
+function toStoryPlacePhrase(rawLocation: string): string {
+  const clean = (rawLocation || 'the old novelty shop').trim();
+  if (/^(the|a|an)\s+/i.test(clean)) return clean;
+  if (/^(K&B|Chuck's|Suncoast|Rainforest|Scholastic|Discovery|Sizzling|Starlight|24-hour|1-Hour)/i.test(clean)) {
+    return clean;
+  }
+  return `the ${clean.charAt(0).toLowerCase() + clean.slice(1)}`;
+}
+
+function toStoryShortPlace(placePhrase: string): string {
+  const trimmed = placePhrase
+    .replace(/\s+(smelling of|filled with|stacked with|covered in|lined with|draped in|choked with|coated in|surrounded by|illuminated by|dusted with|vibrating at|humming with|where|with|under|during|at \d).*$/i, '')
+    .trim();
+  return trimmed.length >= 8 ? trimmed : placePhrase;
+}
+
 export function buildLongForm3ActChronicle(
   encounter: CombatEncounter,
-  anomalyOverride?: string
+  anomalyOverride?: string,
+  variantOffset: number = 0
 ): ZineActs {
-  const location = encounter.location || 'K&B Novelty Depot clearance aisle at 8:59 PM';
-  const charFull = encounter.featured_character || "Dex 'Neon-Drift' Kowalski (199X Suburban Recon Operative)";
-  const charShort = charFull.split('(')[0].trim() || 'The Operative';
+  const rawLocation = encounter.location || 'K&B Novelty Depot clearance aisle at 8:59 PM';
+  const locationFull = toStoryPlacePhrase(rawLocation);
+  const location = toStoryShortPlace(locationFull);
+  const charFull = encounter.featured_character || "Dex 'Neon-Drift' Kowalski";
+  const charIntro = charFull.split('(')[0].trim() || 'Sam';
+  const charShort = toStoryHeroShortName(charIntro);
   const anomaly =
     anomalyOverride ||
     encounter.anomaly_name ||
     (encounter.card_type === 'bad_guy'
       ? encounter.entity_name
-      : 'Residual Dimensional Rift Anomaly');
-  const weapon = encounter.protagonist_loadout?.improvised_weapon || 'modified hardware rig';
-  const artifact = encounter.protagonist_loadout?.nostalgia_artifact || 'retro pocket artifact';
-  const synergy = encounter.protagonist_loadout?.weird_synergy_effect || 'Harmonic Overdrive Resonance';
-  const distortion = encounter.cosmic_distortion || 'Fluorescent ceiling tubes hum at impossible dimensional frequencies.';
-  const affliction = encounter.status_affliction || 'Static-Shock Hallucinations';
-  const ticker0 = encounter.combat_ticker?.[0] || `${anomaly} destabilizes the local suburban grid.`;
-  const ticker1 = encounter.combat_ticker?.[1] || `${charShort} locks ${artifact} and ${weapon} into active phase alignment.`;
+      : 'The Neon Shadow Monster');
+  const weapon = encounter.protagonist_loadout?.improvised_weapon || 'duct-taped flashlight';
+  const artifact = encounter.protagonist_loadout?.nostalgia_artifact || 'glowing 90s pocket toy';
+  const funTrick = toGoosebumpsTrickName(
+    encounter.protagonist_loadout?.weird_synergy_effect || 'Rainbow Spark Pop'
+  );
+  const funSign = toGoosebumpsWeirdSign(encounter.cosmic_distortion || '');
+  const funFeeling = toGoosebumpsFeeling(encounter.status_affliction || '');
 
-  const seed = hashString(`${encounter.entity_name}|${location}|${weapon}|${artifact}`);
+  const seed =
+    hashString(`${encounter.entity_name}|${rawLocation}|${weapon}|${artifact}`) +
+    variantOffset * 97;
 
   const act1Openers = [
-    `At exactly one minute before closing time, ${location} had already slipped halfway out of standard suburban time and into something buzzing, airless, and electric. Along the scuffed checkerboard linoleum, forty-watt fluorescent ballast tubes flickered in an uneven three-beat cadence, casting pools of bruised violet and sodium-amber shadow between the deserted fixtures. Outside in the sodium-lit parking lot, not a single station wagon or hatchback moved; inside, the air tasted sharply of warm CRT ozone, floor wax, and copper coins.`,
-    `Nobody in the neighborhood ever lingered around ${location} once the sun dropped behind the cul-de-sac treeline, and tonight the silence felt thick enough to snap like an over-wound cassette ribbon. Rows of forgotten 1990s hardware and sun-bleached display racks stretched toward the back exit in rigid perspective lines, bathed in the sickly cyan wash of an idling transformer box. Even the dust motes hanging beneath the ceiling vents had stopped drifting, pinned in mid-air by an invisible barometric drop.`,
-    `The hum began forty feet beneath the concrete slab of ${location}, rising up through the metal shelving brackets until every loose price tag and wire rack vibrated in sympathetic harmony. Overhead, rain ticked against the skylights in slow, deliberate intervals, throwing streaked neon reflections across the empty corridor. It was the unmistakable signature of a late-night suburban breach—the exact moment mundane 199X architecture begins peeling at the corners.`,
+    `Everybody in town knew you were NEVER supposed to hang around ${locationFull} after dark. Naturally, that was the exact time ${charIntro} pushed the door open. The place was dead quiet—except for the creepy buzzing of a half-broken ceiling light. Blink. Buzz. Blink. The air smelled like stale popcorn, cold plastic, and a thunderstorm that hadn't hit yet.`,
+    `"Five minutes. In and out," ${charIntro} muttered, peering inside ${locationFull}. It was way too quiet. Even the old soda machine in the corner had stopped humming. Outside, the streetlights threw long, twisted shadows across the floor, and a cold draft brushed right past ${charShort}'s sneakers. Wait... weren't all the windows locked?`,
+    `It started as a totally normal Tuesday night—right up until ${charIntro} stepped into ${locationFull} and the door clicked shut by itself. Not a gentle click. A heavy, final *CLUNK*. ${charShort} jiggled the handle twice. Locked tight. Across the empty room, a single neon sign buzzed louder and louder until it sounded like a swarm of angry bees.`,
+    `If you ever hear strange tapping noises coming from ${locationFull} right before closing time, do yourself a favor: run the other way. ${charIntro} did NOT run the other way. Instead, ${charShort} tiptoed right past the empty front counter, listening to the squeak of their own sneakers echo way too loudly in the dark.`,
+    `The whole neighborhood swore ${locationFull} was haunted—or at least seriously weird after sunset. Still, ${charIntro} figured it was just a silly rumor... until the temperature suddenly dropped twenty degrees in two seconds. Their breath puffed out in a chilly white cloud. Somewhere down the back aisle, something heavy dragged across the floor. *SCRAAAPE.*`,
+    `At one minute to closing, ${locationFull} was supposed to be completely empty. Every shelf sat still. Every sign was switched off. So why was a weird purple glow leaking out from behind the back curtain? ${charIntro} took one slow step closer, stomach doing a nervous flip-flop.`,
+    `First rule of surviving the 1990s: never follow a mysterious glowing noise into ${locationFull} by yourself. ${charIntro} broke that rule in about three seconds flat. The air inside tasted fizzy, like opening a warm can of lemon-lime soda, and every plastic wrapper on the shelves was rattling softly on its own.`,
+    `Rain tapped against the roof of ${locationFull} like bony fingers asking to come inside. ${charIntro} wiped water off their jacket and peered down the dim, stretching aisle. Nobody was at the register. Nobody was in the back. Yet someone—or SOMETHING—had definitely left the lights flickering on and off like a spooky Morse code message.`,
   ];
 
   const act1Middles = [
-    `${charShort} stepped past the threshold with boots planted light on the tiles, keeping one gloved hand resting near the ${weapon} while checking the analog readout rigged to the ${artifact}. Across the sector, the first unmistakable symptoms of ${affliction} were already taking hold: shadows detached themselves by half an inch from the objects casting them, and a faint static charge raised the fine hairs along ${charShort}'s forearms. ${distortion}`,
-    `Crouching beside an overturned plastic crate to read the micro-vibrations in the floor, ${charShort} unclipped the ${artifact} and held it level toward the darkest recess of ${location}. Instead of normal ambient room noise, the air carried a low magnetic warble—the telltale carrier wave of ${affliction} saturating the building's wiring. Every reflective surface within thirty yards rippled like dark soda water as ${distortion.charAt(0).toLowerCase() + distortion.slice(1)}`,
-    `From the far end of ${location}, a cold draft smelling of scorched circuit boards and cherry fog-machine vapor rolled low across the floor tiles. ${charShort} adjusted the strap of the ${weapon}, watching the indicator LEDs on the ${artifact} climb rapidly into the red zone as ${affliction} began warping depth perception down the corridor. Right on cue, ${distortion.charAt(0).toLowerCase() + distortion.slice(1)}`,
+    `${charShort} gripped the ${weapon} in one hand and checked the ${artifact} clipped to their belt. Suddenly, they got ${funFeeling}. Then something even weirder happened. ${funSign} "Okay," ${charShort} whispered, swallowing hard. "Definitely not normal. Time to leave."`,
+    `Pulling out the ${artifact}, ${charShort} held it up like a lucky charm and kept the ${weapon} ready. Right away, ${charShort} was hit by ${funFeeling}. Across the room, things were going haywire—${funSign.charAt(0).toLowerCase() + funSign.slice(1)} "Please be a prank," ${charShort} said out loud. Nobody laughed back.`,
+    `${charShort} took a deep breath and squeezed the ${weapon} tighter. The ${artifact} started glowing bright and warm in their other hand. Out of nowhere came ${funFeeling}. Even crazier: ${funSign.charAt(0).toLowerCase() + funSign.slice(1)} Goosebumps popped up all over ${charShort}'s arms.`,
+    `"Hello? Anybody working tonight?" ${charShort} called out. Their voice bounced back sounding weirdly stretched and hollow. Clutched tight in their hands were the ${artifact} and the ${weapon}. Almost instantly, ${charShort} felt ${funFeeling}. Worse yet, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
+    `Every instinct screamed to turn around, grab a slushie, and go watch cartoons instead. Still, ${charShort} crept forward with the ${artifact} held high and the ${weapon} tucked under one arm. That's when ${funFeeling} washed over them. Right before their eyes, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
+    `Something was seriously wrong here. ${charShort} tapped the ${artifact} twice—it beeped back like crazy—and raised the ${weapon}. A split second later came ${funFeeling}. ${charShort} blinked hard, hoping they were imagining things, because ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
+    `${charShort} froze beside a wobbly display rack, clutching the ${weapon} and squinting at the buzzing ${artifact}. Instantly, they felt ${funFeeling}. Up and down the aisle, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)} "Okay, yep, this is officially way above my allowance," ${charShort} gulped.`,
+    `Taking two tiny steps back, ${charShort} bumped into a display shelf—*CRASH!*—and nearly jumped out of their sneakers. Holding up the ${artifact} and the ${weapon}, they suddenly felt ${funFeeling}. All around them, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
   ];
 
   const act1Closers = [
-    `Then the ambient hum cut out completely, replaced by a sub-audible pressure wave that bowed the ceiling tiles inward. Out of the deepest pocket of shadow at the heart of ${location}, ${anomaly} began to uncoil into physical space, bending the surrounding neon glare around its silhouette like a lens. ${ticker0} There would be no backup from town tonight—only whatever improvised 199X engineering ${charShort} carried on their belt.`,
-    `At the center of the warped geometry, space fractured with the crisp snap of an overloaded flyback transformer. ${anomaly} surged into full material density, radiating chromatic shockwaves that turned drifting dust into glittering geometric sparks across ${location}. ${ticker0} ${charShort} exhaled once, steadied their stance, and Thumb-clicked the ${artifact} into live combat calibration.`,
-    `Before the emergency exit sign could finish its third blink, the breach locked into full manifestation. Towering amidst the skewed architecture of ${location}, ${anomaly} announced its arrival with a bone-rattling kinetic pulse that rattled every bolt in the framing. ${ticker0} Narrowing their eyes against the glare, ${charShort} brought the ${weapon} forward to meet the surge head-on.`,
+    `Then every single light went out at once. Pitch black. *THUMP. THUMP. THUMP.* Something massive was stomping straight down the aisle! When the emergency lights blinked back on in spooky red, ${charShort} gasped. Towering right in front of them—glowing, grinning, and way bigger than any human—was ${anomaly}. And it was looking straight at ${charShort}!`,
+    `*CREEEAK.* The shadow on the back wall stretched taller... and taller... and then peeled right off the wall! ${charShort} tried to run, but their sneakers skidded on the waxed floor. Out of the swirling neon fog stepped ${anomaly}, rattling every shelf in ${location}. There was no escape—and no grown-up coming to save the day.`,
+    `A loud *ZAP!* shook the ceiling tiles, and a bright swirl of sparks burst open right in the middle of ${location}. ${charShort} ducked behind a counter and peeked over the edge. Bad idea. Rising out of the glowing mist like a giant nightmare come to life was ${anomaly}—and it had just spotted ${charShort}'s hiding spot!`,
+    `That's when ${charShort} noticed the creepy reflection in the glass. Something huge was standing RIGHT behind them. Slowly, ${charShort} turned around. Heart hammering like a drum, they stared straight up at ${anomaly}. It let out a wild, echoing rattle that shook loose half the ceiling tiles. "Uh... nice monster?" ${charShort} squeaked.`,
+    `Suddenly, the buzzing stopped. Total, spooky silence. Then—*BOOM!*—a shelf flew sideways and ${anomaly} burst straight into the open, crackling with wild neon sparks! ${charShort} stumbled back a step, gripping the ${weapon} with sweaty palms. Whatever this crazy thing was, it definitely wasn't friendly!`,
+    `A cold laugh echoed from every corner of ${location} at once. Before ${charShort} could even blink, a whirlpool of rainbow static spun up from the floor—and out popped ${anomaly}, towering almost to the ceiling! Its glowing eyes locked right onto ${charShort}. Uh-oh. Game on.`,
+    `Wait a second. The giant shadow stretching across the tiles wasn't ${charShort}'s. It had way too many glowing edges—and it was MOVING! Spinning around, ${charShort} came face-to-face with ${anomaly} looming over the aisle like a runaway movie monster. Running wasn't going to cut it anymore.`,
+    `One last flicker of the overhead lights, and *POP!*—the air smelled like burnt toast and electric sparks. Stepping right out of the shadows of ${location} was ${anomaly}, glowing brighter than a whole row of arcade machines. ${charShort} gulped, raised the ${artifact}, and whispered, "Here goes nothing!"`,
   ];
 
   const act2Openers = [
-    `The opening clash erupted across ${location} in a burst of pure 1990s graphic-novel velocity. ${anomaly} lunged first, lashing violent arcs of anomalous energy across the middle aisle and tearing deep gouges through metal trim and laminate paneling alike. Diving laterally beneath the initial sweep, ${charShort} skidded across the polished floor on scuffed sneakers, sparks kicking up as the ${weapon} deflected the leading edge of the shockwave by millimeters.`,
-    `Zero warning separated the standoff from full-throttle kinetic collision. ${anomaly} drove forward with terrifying mass and unnatural agility, warping the local gravity pocket inside ${location} until loose bolts, tokens, and shattered plastic housings orbited waist-high in the air. ${charShort} vaulted cleanly over a buckled counter, planting one boot against a structural column to launch sideways out of the anomaly's crushing trajectory.`,
-    `The first shockwave from ${anomaly} slammed down the length of ${location} like a runaway freight train made of static and neon. Ceiling louvers rattled loose as ${charShort} dropped into a low, balanced slide, bracing the ${weapon} with both hands to carve a clean defensive lane through the distortion field. Every impact echoed with the amplified crunch of overloaded arcade speakers.`,
+    `${anomaly} lunged first! ${charShort} yelped and dove sideways just as a wild wave of glowing sparks knocked a whole stack of boxes flying through the air. Sliding across the slick tiles on their sneakers like stealing second base, ${charShort} barely dodged behind a counter. "Hey! Watch the hair!" ${charShort} yelled.`,
+    `No warning. No countdown. ${anomaly} came charging straight down the aisle of ${location} like a runaway freight train! ${charShort} scrambled over a tilted shelf, ducked under a spinning neon blast, and swung the ${weapon} just in time to bat a flying ball of glowing fuzz right into the ceiling. *SPLAT!*`,
+    `"WHOA—LOOK OUT!" ${charShort} leaped straight over an overturned cart as ${anomaly} swept across the room, rattling everything that wasn't bolted down. Loose coins, wrappers, and plastic trinkets started spinning through the air like a crazy indoor tornado. ${charShort} ducked, rolled, and popped up behind a pillar, panting hard.`,
+    `The whole room went totally bonkers! ${anomaly} bounced off the back wall and zoomed straight at ${charShort} in a blaze of neon light. ${charShort} jumped left, slipped on a stray arcade token, and somehow slid RIGHT underneath the monster's giant swipe! Pure luck—and maybe a tiny bit of panic.`,
+    `With a loud *WHOOSH!*, ${anomaly} sent a glowing wave rolling across the floor of ${location}. ${charShort} hopped onto a sturdy counter like the floor was made of hot lava, wobbling wildly while trying not to drop the ${artifact}. Below them, the monster circled like a glowing shark waiting for dinner!`,
+    `${anomaly} wasn't playing around! It slammed into a row of shelves—*KABOOM!*—sending colorful 90s junk raining down everywhere. ${charShort} held the ${weapon} up like a shield, zigzagging through the cluttered aisles while the giant glowing monster chased right on their heels.`,
+    `Heart pounding a mile a minute, ${charShort} sprinted around the corner of ${location}—straight into a dead end! Behind them, ${anomaly} floated closer, glowing brighter and louder with every second. ${charShort} looked at the monster, looked at the ${artifact}, and looked at the ${weapon}. Think fast!`,
+    `"Okay, okay, BAD monster! SIT! STAY!" ${charShort} shouted, leaping over a puddle of glowing static as ${anomaly} zoomed past by an inch. Obviously, ${anomaly} did NOT sit. It spun around for another pass, making every light in ${location} flash like a disco party gone wrong.`,
   ];
 
   const act2Middles = [
-    `With zero room left to retreat, ${charShort} slammed the ${artifact} directly against the housing of the ${weapon}, bridging their circuits in an audacious field modification. Instantly, the improvised coupling ignited ${synergy}—flooding the corridor with a brilliant counter-frequency halo that pushed back the crushing weight of ${affliction}. ${ticker1} Arcs of electric cyan and hot magenta energy danced along the length of the ${weapon}, turning everyday suburban salvage into a precision anomaly-breaker.`,
-    `Remembering an old late-night schematic scribbled in the margins of a spiral notebook, ${charShort} twisted the dial on the ${artifact} past its factory stop and locked it onto the frame of the ${weapon}. The resulting feedback loop triggered ${synergy} with a deafening harmonic chord that rattled every pane of glass in ${location}. ${ticker1} Caught flat-footed by the sudden phase-shift, ${anomaly} recoiled as its outer distortion shield fractured like tempered ice.`,
-    `Timing the pulse between two erratic voltage spikes, ${charShort} pressed the ${artifact} flush into the grip assembly of the ${weapon}. A blinding ribbon of chromatic resonance roared to life as ${synergy} engaged at peak output, slicing cleanly through the haze of ${affliction}. ${ticker1} For three heart-stopping seconds, the entire interior of ${location} lit up like a pinball playfield on jackpot multiball.`,
+    `Wait a second—what if these two things worked TOGETHER?! With zero time to spare, ${charShort} jammed the ${artifact} right onto the ${weapon} and flipped every switch at once. *CLICK-BZZZT!* Instantly, bright rainbow sparks burst out, firing up ${funTrick}! "Whoa—it's actually working!" ${charShort} grinned.`,
+    `A totally crazy idea popped into ${charShort}'s head. Remembering a weird trick from a Saturday morning cartoon, ${charShort} slapped the ${artifact} straight against the ${weapon} and gave it one good whack. *WHIRRR-DING!* Suddenly, ${funTrick} roared to life in a dazzling wave of electric color that made ${anomaly} skid to a shocked stop!`,
+    `"Please work, please work, please work!" ${charShort} muttered, mashing the buttons on the ${artifact} while wedging it tight against the ${weapon}. For one scary second, nothing happened. Then—*KA-ZING!*—a bright blast of ${funTrick} lit up the entire room like a giant fireworks finale!`,
+    `No way was ${charShort} getting flattened tonight! Thinking fast, they clicked the ${artifact} onto the side of the ${weapon}, cranked it all the way past the red line, and aimed straight ahead. Out burst a wild, sizzling wave of ${funTrick}, pushing back the creepy glow and knocking ${anomaly} totally off balance!`,
+    `Just when things looked hopeless, the ${artifact} gave a loud *BEEP-BEEP!* right next to the ${weapon}. Sparks jumped between them! ${charShort} grinned wide, held them tight together, and yelled, "Eat this!" A huge colorful ripple of ${funTrick} blasted straight down the aisle of ${location}!`,
+    `${charShort} twisted the dial on the ${artifact} as far as it would go and tapped it straight against the ${weapon}. *ZAP-POP!* The two gadgets lit up like a Christmas tree on turbo mode, unleashing ${funTrick}! Even ${anomaly} froze in mid-air looking seriously surprised!`,
+    `Cornered with nowhere left to run, ${charShort} crossed their fingers and smashed the ${artifact} right into the handle of the ${weapon}. *BOOOOM!* Not a scary boom—an awesome neon rainbow boom! ${funTrick} erupted across ${location}, spinning all the weird floating junk right back in ${anomaly}'s face!`,
+    `"Time for Plan B!" ${charShort} shouted—even though they had just made up Plan B half a second ago. Locking the ${artifact} onto the ${weapon}, they unleashed a full-blast wave of ${funTrick}! Brilliant streaks of neon light zipped around the room like a pinball machine hitting super jackpot!`,
   ];
 
   const act2Closers = [
-    `Pushing that momentum to the limit, ${charShort} sprinted up an inclined rack and drove a decisive, grounded strike straight through the core anchor sustaining ${anomaly}. No wasted motion, no theatricalflourish—just raw leverage, high-voltage synergy, and split-second 199X reflexes meeting cosmic impossibility at point-blank range. With a thunderous implosion of harmless prism sparks, the dimensional tether anchoring the breach snapped clean in two.`,
-    `Refusing to let the anomaly re-anchor, ${charShort} planted both heels into the floor tiles and unleashed the full stored charge of ${synergy} from the ${weapon}. The beam met ${anomaly} dead-center, unraveling its chaotic form into harmless ribbons ofphosphorescent vapor that spiraled toward the rafters and vanished. One final shockwave rolled outward through ${location}, blowing open the double doors before dropping into sudden, ringing stillness.`,
-    `In one fluid, grounded finish, ${charShort} pivoted behind a steel stanchion and channeled the surging resonance of the ${artifact} through the ${weapon}, pinning ${anomaly}'s dimensional rift until its unstable geometry collapsed inward on itself. A brilliant flash of ultraviolet and gold washed across the walls of ${location}, etching crisp comic-book silhouettes against every surface before the breach sealed shut with an audible vacuum pop.`,
+    `Direct hit! ${anomaly} wobbled like a giant glowing bowl of Jell-O, spun around three fast times, and let out a goofy *BWOOOOP!* sound. With one huge, harmless *POP!* of rainbow confetti sparks, the monster shrank smaller and smaller—until it vanished completely into thin air!`,
+    `Caught right in the middle of ${funTrick}, ${anomaly} couldn't hang on any longer! Its glowing outline fizzled, popped, and unraveled like a giant spool of bright neon ribbon spiraling straight toward the ceiling. One final sparkling *WHOOSH!*—and poof! Gone!`,
+    `${charShort} leaned in and gave the ${weapon} one last big push! The bright wave swept straight over ${anomaly}, lifting it off the floor in a swirl of dazzling starlight. With a silly whistling sound like a deflating balloon, the monster zipped upward into a tiny glowing dot and disappeared!`,
+    `"BULLSEYE!" ${charShort} cheered as ${funTrick} wrapped right around ${anomaly} like a giant glowing hula-hoop. The monster jittered, flickered like an old TV losing channel 3, and—*BLINK!*—vanished in a shower of warm twinkling sparkles that drifted gently down across ${location}.`,
+    `The blast hit ${anomaly} dead-center! For two breathless seconds, the whole room glowed bright enough to see from space. Then—*SNAP!*—every crazy floating object dropped softly back where it belonged, and ${anomaly} melted away into a harmless puff of glittering mist.`,
+    `Spinning faster and faster like a glowing top, ${anomaly} let out one last surprised rattle before folding inward with a crisp *POP!* Just like that, the neon storm vanished, the wind stopped howling, and the crazy lights inside ${location} blinked softly back to normal.`,
+    `One giant flash of purple and gold filled ${location} from wall to wall. ${charShort} shielded their eyes and waited. When they peeked through their fingers... nothing! ${anomaly} was totally gone, leaving only tiny shimmering sparks floating lazily toward the ceiling like sleepy fireflies.`,
+    `With a dramatic *FZZZT-POP!*, ${anomaly} burst into a hundred harmless glowing soap bubbles that floated upward and blinked out one by one. Every rattling shelf settled down. The weird hum cut off completely. ${charShort} blinked in the sudden quiet. "Did I... did I actually just win?"`,
   ];
 
   const act3Openers = [
-    `Silence returned to ${location} all at once—not the heavy, suffocating dread of the breach, but the crisp, familiar quiet of a late 1990s night after a summer thunderstorm passes. Overhead, half the fluorescent strips hummed steadily back to warm white life while cool night air drifted in through a cracked transom window, carrying the faint smell of wet asphalt and pine needles. The oppressive grip of ${affliction} evaporated completely.`,
-    `As the final ribbons of chromatic static dissolved above the rafters of ${location}, normal suburban gravity reasserted itself with a gentle clatter of settling plastic and brass tokens. The warped perspective lines along the floor tiles snapped smoothly back into true ninety-degree angles, leaving only faint scorch crescents and a dusting of iridescent frost where ${anomaly} had stood moments earlier.`,
-    `For a long minute, the only sound inside ${location} was the rhythmic tick of cooling metal housings and the distant hum of a streetlamp ballast out by the curb. ${charShort} remained crouched in a textbook grounded stance until every sensor needle on the ${artifact} settled back to zero, confirming that the local spacetime seam had fused shut for good.`,
+    `All at once, ${location} felt completely normal again. The regular ceiling lights clicked steadily back on, the creepy chill vanished, and the front door gave a friendly little *CLICK* as it unlocked by itself. ${charShort} slumped back against a counter and let out the biggest sigh of their entire life.`,
+    `Silence. Real, normal, totally-not-haunted silence! Outside, a car drove past with its radio playing an upbeat 90s hit, like nothing crazy had just happened ten feet away. ${charShort} let out a shaky laugh and wiped their forehead. "Okay. Nobody is EVER going to believe a single word of this."`,
+    `Just like waking up from a wild dream, every crooked shadow snapped straight back into place. The air in ${location} smelled ordinary again—just dust, carpet, and warm old electronics. ${charShort} stood up slowly, checked both hands, and grinned. Still in one piece!`,
+    `Whew! The crazy buzzing was gone, the lights stopped blinking, and even the soda machine in the corner kicked back on with a cheerful rumble. ${charShort} collapsed onto a nearby stool, catching their breath while giggling nervously. "Next time, I'm definitely staying home to play video games."`,
+    `One second it looked like the end of the world; the next second, ${location} was just a plain old quiet 1990s hangout again. Soft evening air drifted in through the doorway. ${charShort} dusted off their sleeves and stared around the peaceful room in total disbelief.`,
+    `The weird glow faded away until only the cozy night-lights remained. Not a single monster in sight! ${charShort} poked an empty display box carefully with one sneaker—just in case—and smiled when it didn't bite back. Coast clear!`,
+    `All the goosebumps on ${charShort}'s arms finally went away. Overhead, the regular lights hummed smoothly, and the whole room felt warm and safe again. ${charShort} leaned on the ${weapon} and shook their head with a grin. Best Tuesday night ever—and also the absolute worst!`,
+    `For a full ten seconds, ${charShort} didn't move a muscle, listening hard for any more creepy footsteps. Nothing. Just a distant cricket outside and the quiet hum of ${location}. Letting out a huge relieved laugh, ${charShort} finally lowered their guard.`,
   ];
 
   const act3Middles = [
-    `Lowering the ${weapon}, ${charShort} uncoupled the warm casing of the ${artifact} and blew a thin wisp of ozone smoke off its contacts. Despite running way past any sane voltage rating to sustain ${synergy}, the retro hardware held together with electrical tape, solder, and sheer 199X stubbornness. Across the room, the bizarre distortions that had twisted ${location} were already fading into ordinary scuff marks that the morning shift would blame on a faulty floor buffer.`,
-    `Standing up and brushing glittering dimensional grit from their jacket sleeves, ${charShort} ran a quick diagnostic check over the ${weapon} and tucked the ${artifact} safely back into a padded utility pouch. Without the ambient surge feeding ${synergy}, the gear looked almost ordinary again—just beat-up 1990s neighborhood salvage carrying hairline heat-tints that proved what had happened here.`,
-    `${charShort} walked the perimeter of ${location} once to make sure no secondary micro-rifts lingered behind the shelving bays. Beneath the sole of one sneaker, a handful of brass arcade tokens and fused plastic shards clinked across the tile—physical souvenirs from a clash nobody on the daytime town council would ever believe.`,
+    `${charShort} unhooked the warm, slightly smoking ${artifact} from the ${weapon} and blew on it like a hot slice of pizza. Somehow, held together with pure 90s luck, both pieces of gear still worked! A couple shiny arcade tokens rolled past their sneakers—weird little souvenirs from a wild night.`,
+    `Tucking the ${artifact} safely back into their pocket and slinging the ${weapon} over one shoulder, ${charShort} brushed glowing glitter dust off their jacket. The morning crew was definitely going to wonder why half the shelves looked slightly crooked, though!`,
+    `Looking down at the beat-up ${weapon} and the humming ${artifact}, ${charShort} couldn't help smiling. They looked totally ordinary again—just regular neighborhood junk that had somehow saved the whole block from ${anomaly}. Not bad at all.`,
+    `${charShort} did one quick lap around ${location} just to be 100% sure no sneaky glowing puddles were hiding behind the counters. Everything was spotless—well, except for a funny scorched smiley shape left right on the floor tiles.`,
+    `Carefully packing away the ${artifact} and the ${weapon}, ${charShort} shook their head at the tiny sparkles still clinging to their shoelaces. Good luck explaining THOSE to anyone tomorrow morning!`,
+    `With the ${weapon} tucked under one arm and the ${artifact} safe in their backpack, ${charShort} headed toward the exit. Every step felt lighter now—like finishing the scariest roller coaster in the park and realizing you survived.`,
+    `${charShort} gave the trusty ${artifact} a grateful pat and wiped a smudge of glowing neon dust off the ${weapon}. Everything in ${location} sat peacefully in place, as if ${anomaly} had never even been there.`,
+    `Checking their watch, ${charShort} blinked—only three minutes had passed! How could a whole monster showdown take three minutes?! Shaking their head, they grabbed the ${weapon} and ${artifact} and pushed open the exit door.`,
   ];
 
   const act3Closers = [
-    `Right at the exact focal point where ${anomaly} had vanished, a single rectangle of condensed prismatic cardstock rested face-up on the floor, shimmering with a fresh Series 2 holographic foil sheen. ${charShort} scooped up the newly crystallized trading card, slipped it into a protective binder sleeve, and shouldered the ${weapon}. By the time the distant town clock struck the hour, ${location} stood quiet and secure—logged, archived, and ready for the next issue.`,
-    `Resting squarely atop a scarred countertop at the center of ${location} was the unmistakable glint of a freshly minted Series 2 archival card, its embossed surface still warm from the dimensional collapse. ${charShort} pocketed the specimen alongside the ${artifact}, gave the quiet room one final nod, and stepped out under the sodium-orange streetlights into the cool 199X night.`,
-    `Before slipping out the side service door of ${location}, ${charShort} spotted a gleaming prismatic card wedged neatly beside a cooled brass token—the unmistakable physical imprint left behind whenever an Omega-class anomaly is neutralized. Sliding the card into their jacket pocket and slinging the ${weapon} low, ${charShort} disappeared down the misty sidewalk before the first patrol headlights turned the corner.`,
+    `Wait a second—what was that shiny thing lying right where ${anomaly} had popped? ${charShort} bent down and picked up a brand-new, super-glossy holographic trading card, still warm to the touch. It had a picture of ${anomaly} right on the front! ${charShort} slid it into their pocket and walked out under the streetlights... totally missing the tiny moment when the monster on the card winked.`,
+    `Right on the front counter sat something that definitely wasn't there before: a gleaming rainbow foil trading card showing ${anomaly} frozen mid-leap! "Whoa... cool!" ${charShort} grinned, slipping the card into their pocket before heading home. Only when they reached the sidewalk did the card let out one tiny, muffled giggle from inside their jacket.`,
+    `Before stepping outside, ${charShort} spotted a bright holographic trading card tucked neatly beside a shiny brass token. They picked it up, admired the shimmering picture of ${anomaly}, and laughed. "Nice trophy!" They hurried home through the cool night—never noticing that back inside ${location}, the neon sign blinked twice and spelled: SEE YOU NEXT ISSUE.`,
+    `Something sparkly caught ${charShort}'s eye by the door. Resting face-up on the floor was a crisp new holographic trading card with ${anomaly} grinning right off the foil! ${charShort} pocketed it and jogged down the sidewalk, feeling unstoppable. Half a block later, they pulled the card back out for one more look—and froze. Wait... wasn't the monster facing LEFT a second ago?!`,
+    `Sitting neatly right on the counter was a freshly glowing Series 2 holographic trading card! ${charShort} scooped it up with a grin, tucked it beside the ${artifact}, and stepped out into the quiet night air. Everything was finally over. Totally over. At least... until their pocket began to buzz with a soft, familiar little *BZZZT*.`,
+    `Right at the doorstep lay a shimmering rainbow trading card, glowing faintly like a night-light. ${charShort} picked it up, smiled at the wild picture of ${anomaly} trapped inside the foil, and headed home whistling a tune. Behind them, the empty glass window of ${location} steamed up with one tiny drawn smiley face... and then went dark.`,
+    `Just before locking up, ${charShort} found a gleaming holographic card resting right where the monster had vanished. "Awesome," ${charShort} whispered, sliding it into a protective sleeve and heading out into the starry 1990s night. Inside their backpack, the card gave one tiny playful tap... tap... tap.`,
+    `A sudden glint on the floor made ${charShort} stop in their tracks. Lying there was a brand-new holographic trading card, sparkling with rainbow foil and still faintly warm! ${charShort} slipped it into their jacket pocket and strolled happily down the quiet street—totally unaware that their own shadow behind them had just sprouted two tiny glowing antennae.`,
   ];
 
   return {
@@ -1699,16 +1896,15 @@ export function compile199xZinePrompts(
     `1990s suburban cosmic story soundtrack (118 BPM, 45-60s instrumental) structured to follow the 3-Act Zine story in "${location}": [0:00-0:15 Act I Tension] mysterious analog cassette synth drone, buzzing fluorescent hum, and creeping bass pulse; [0:15-0:42 Act II Action] punchy FM synthwave bassline, gated 16-bit snare drums, and electric guitar power chords erupting for "${synergy}"; [0:42-0:60 Act III Aftermath] warm, nostalgic midnight synth pads and shimmering bell arpeggios fading into quiet resolution. Strictly instrumental, no vocals.`
   );
 
-  // 9. External 3-Act Long-Form Story Prompt
-  const storyGeneratorPrompt = `Write a rich, deadpan-weird, kinetic 1990s suburban cosmic comic-zine story (~900 words total) broken into 3 Acts with EXACTLY 3 vivid paragraphs per Act (labeled "ACT 01", "ACT 02", and "ACT 03"):
+  // 9. External 3-Act Long-Form Story Prompt (Fun, spooky 1990s Goosebumps paperback style!)
+  const storyGeneratorPrompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style paperback story (~750 words total) broken into 3 Acts with EXACTLY 3 punchy paragraphs per Act (labeled "ACT 01", "ACT 02", and "ACT 03"):
 - Title: ${encounter.entity_name}
 - Setting: ${location}
-- Operative: ${charClean}
-- Anomaly: ${anomaly}
-- Retro Gear Loadout: ${rawArtifact} + ${rawWeapon} (Synergy: ${synergy})
-- Environmental Distortion: ${distortion}
-- Status Debuff: ${encounter.status_affliction}
-Keep 100% authentic 1990s suburban details, tactile hardware physics, and a grounded, definitive Act 03 resolution where a holographic trading card crystallizes in the aftermath.`;
+- Hero: ${charClean}
+- Spooky Monster: ${anomaly}
+- Cool 90s Gear: ${rawArtifact} + ${rawWeapon} (Combo Trick: ${synergy})
+- Weird Spooky Sign: ${distortion}
+STYLE RULES: Keep the vocabulary super fun, simple, and easy to read (like a classic 1990s spooky kid-adventure paperback — NO heavy technical jargon, NO big textbook sci-fi words!). Use short suspenseful sentences, funny nervous dialogue, creepy sound effects, a cliffhanger at the end of Act 01, a wild slapstick-spooky showdown in Act 02, and a classic playful Goosebumps twist ending in Act 03 where a shiny holographic trading card left behind does one sneaky spooky thing at the very end!`;
 
   // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL SHEET (16 Visual Mediums x 12 Story Arcs x 24 Cast Silhouettes x 10 Atmospheres x 6 Camera Grammars!)
   const masterStoryboard2x2Prompt = sanitizeVisualPromptText(

@@ -350,22 +350,23 @@ app.post("/api/zine-story", async (req, res) => {
       const anomalyLabel =
         encounter.anomaly_name ||
         (encounter.card_type === "bad_guy" ? encounter.entity_name : "Sentient Neon Rift Anomaly");
-      const prompt = `Write a vivid, cohesive, progressing 199X suburban cosmic comic-zine story (~850 to 1,050 words total) based on this 199X encounter:
-- Good Guy Hero: ${encounter.featured_character || "Dex 'Neon-Drift' Kowalski"} (KEEP THIS EXACT SAME SINGLE HERO from start to finish — never add a second hero or switch gender!)
-- Bad Guy Monster/Anomaly: ${anomalyLabel}
-- Location: ${encounter.location || "K&B Novelty Depot clearance aisle at 8:59 PM"}
-- Retro Artifact: ${encounter.protagonist_loadout?.nostalgia_artifact}
-- Improvised Weapon: ${encounter.protagonist_loadout?.improvised_weapon}
-- Synergy Effect: ${encounter.protagonist_loadout?.weird_synergy_effect}
-- Cosmic Distortion: ${encounter.cosmic_distortion}
-- Status Debuff: ${encounter.status_affliction}
+      const prompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style paperback story (~700 to 850 words total) based on this 199X encounter:
+- Hero: ${encounter.featured_character || "Dex 'Neon-Drift' Kowalski"} (KEEP THIS EXACT SAME SINGLE HERO from start to finish — never add a second hero or switch gender!)
+- Spooky Monster: ${anomalyLabel}
+- Setting: ${encounter.location || "K&B Novelty Depot clearance aisle at 8:59 PM"}
+- Retro Toy/Artifact: ${encounter.protagonist_loadout?.nostalgia_artifact}
+- Improvised 90s Gear: ${encounter.protagonist_loadout?.improvised_weapon}
+- Wild Combo Trick: ${encounter.protagonist_loadout?.weird_synergy_effect}
+- Creepy Warning Sign: ${encounter.cosmic_distortion}
 
-CRITICAL COHESIVE PROGRESSION:
+WRITING STYLE (VERY IMPORTANT):
+Write like a classic 1990s Goosebumps paperback! Use simple, fun, everyday words — ZERO heavy sci-fi jargon, ZERO big technical or academic words! Use short suspenseful sentences, funny nervous dialogue, creepy sound effects (like *CLICK*, *THUMP*, *ZAP!*), and fast page-turner energy.
+
 Return valid JSON with three fields: "sceneSetup", "intervention", and "aftermath".
-Each field MUST contain EXACTLY 3 rich, multi-sentence paragraphs separated by "\\n\\n" (~250-350 words per Act, ~850-1,050 words total):
-1. "sceneSetup" (Act 01): The lone Good Guy Hero arrives inside the eerie 1990s location, notices the sensory cosmic distortion, and watches the Bad Guy Monster emerge from the shadows.
-2. "intervention" (Act 02): Direct, high-speed Good Guy vs. Bad Guy showdown where the Hero couples the retro artifact onto the improvised weapon to unleash the exact synergy effect and overwhelm the monster.
-3. "aftermath" (Act 03): Grounded, definitive victory; the Bad Guy dissipates, the suburban room falls quiet, and the Hero's cooled gear rests beside a newly crystallized holographic trading card.`;
+Each field MUST contain EXACTLY 3 lively, punchy paragraphs separated by "\\n\\n" (~220-280 words per Act):
+1. "sceneSetup" (Act 01): The hero sneaks into or lingers inside the spooky 1990s hangout after dark, notices hilarious-creepy warning signs, and ends on a classic cliffhanger as the monster steps out of the shadows!
+2. "intervention" (Act 02): A fast, goofy-scary monster showdown where the hero dodges flying 90s stuff, slams their two retro gadgets together to trigger the wild combo trick, and pops/vanishes the monster in a shower of sparks!
+3. "aftermath" (Act 03): Everything returns to normal, the hero finds a brand-new glowing holographic trading card left behind, and the story ends with a classic playful Goosebumps twist on the very last sentence!`;
 
       const CANDIDATE_MODELS = [
         "gemini-3-flash-preview",
