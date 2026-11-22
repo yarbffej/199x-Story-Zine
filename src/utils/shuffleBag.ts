@@ -8,9 +8,10 @@ import {
   IMPROVISED_GEAR,
   RETRO_ART_STYLES
 } from '../data/retroLibrary';
-import { getFilteredPoolsForTheme, getThemeSetById } from '../data/themeSets';
+import { getFilteredPoolsForTheme, getThemeSetById, isMutableEchoTheme } from '../data/themeSets';
 
 const STORAGE_KEY_CUSTOM = "suburban_custom_options_v1";
+const STORAGE_KEY_HISTORY = "suburban_shuffle_history_v1";
 
 export interface CustomOptionsData {
   customLocations: string[];
@@ -71,15 +72,75 @@ function saveCustomData(data: CustomOptionsData): void {
   }
 }
 
-// Memory buffer of recently picked items to prevent back-to-back repeats
-const recentLocations: string[] = [];
-const recentAnomalies: string[] = [];
-const recentCharacters: string[] = [];
-const recentArtifacts: string[] = [];
-const recentWeapons: string[] = [];
-const recentGear: string[] = [];
-const recentArtStyles: string[] = [];
-const MAX_HISTORY = 30;
+// Persisted memory buffer of recently picked items to prevent repeats even across page refreshes
+interface ShuffleHistoryStore {
+  locations: string[];
+  anomalies: string[];
+  characters: string[];
+  artifacts: string[];
+  weapons: string[];
+  gear: string[];
+  artStyles: string[];
+}
+
+function loadShuffleHistory(): ShuffleHistoryStore {
+  const empty: ShuffleHistoryStore = {
+    locations: [],
+    anomalies: [],
+    characters: [],
+    artifacts: [],
+    weapons: [],
+    gear: [],
+    artStyles: [],
+  };
+  if (typeof localStorage === 'undefined') return empty;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
+    if (!raw) return empty;
+    const parsed = JSON.parse(raw);
+    return {
+      locations: Array.isArray(parsed.locations) ? parsed.locations : [],
+      anomalies: Array.isArray(parsed.anomalies) ? parsed.anomalies : [],
+      characters: Array.isArray(parsed.characters) ? parsed.characters : [],
+      artifacts: Array.isArray(parsed.artifacts) ? parsed.artifacts : [],
+      weapons: Array.isArray(parsed.weapons) ? parsed.weapons : [],
+      gear: Array.isArray(parsed.gear) ? parsed.gear : [],
+      artStyles: Array.isArray(parsed.artStyles) ? parsed.artStyles : [],
+    };
+  } catch {
+    return empty;
+  }
+}
+
+const persistedHistory = loadShuffleHistory();
+const recentLocations: string[] = persistedHistory.locations;
+const recentAnomalies: string[] = persistedHistory.anomalies;
+const recentCharacters: string[] = persistedHistory.characters;
+const recentArtifacts: string[] = persistedHistory.artifacts;
+const recentWeapons: string[] = persistedHistory.weapons;
+const recentGear: string[] = persistedHistory.gear;
+const recentArtStyles: string[] = persistedHistory.artStyles;
+const MAX_HISTORY = 40;
+
+function saveShuffleHistory(): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(
+      STORAGE_KEY_HISTORY,
+      JSON.stringify({
+        locations: recentLocations.slice(-MAX_HISTORY),
+        anomalies: recentAnomalies.slice(-MAX_HISTORY),
+        characters: recentCharacters.slice(-MAX_HISTORY),
+        artifacts: recentArtifacts.slice(-MAX_HISTORY),
+        weapons: recentWeapons.slice(-MAX_HISTORY),
+        gear: recentGear.slice(-MAX_HISTORY),
+        artStyles: recentArtStyles.slice(-MAX_HISTORY),
+      })
+    );
+  } catch {
+    // ignore storage quota errors
+  }
+}
 
 function sampleNonRepeating(pool: string[], history: string[], commit: boolean = true): string {
   if (!pool || pool.length === 0) return "";
@@ -95,9 +156,11 @@ function sampleNonRepeating(pool: string[], history: string[], commit: boolean =
   // Track history only if committing
   if (commit) {
     history.push(chosen);
-    if (history.length > Math.min(MAX_HISTORY, Math.floor(pool.length * 0.75))) {
+    const maxCap = Math.min(MAX_HISTORY, Math.max(2, Math.floor(pool.length * 0.78)));
+    while (history.length > maxCap) {
       history.shift();
     }
+    saveShuffleHistory();
   }
   return chosen;
 }
@@ -176,7 +239,14 @@ export class RetroOptionManager {
   }
 
   rollCharacter(commit: boolean = true, themeId?: string): string {
-    return sampleNonRepeating(this.getCharacters(themeId), recentCharacters, commit);
+    const targetTheme = themeId ?? this.activeThemeId;
+    const themed = this.getCharacters(targetTheme);
+    // Avoid small 5-10 character theme bottlenecks in 199X by drawing across the full 52-character cast
+    if (!isMutableEchoTheme(targetTheme) && themed.length < 16) {
+      const fullPool = Array.from(new Set([...(this.custom.customCharacters || []), ...RETRO_CHARACTERS]));
+      return sampleNonRepeating(fullPool, recentCharacters, commit);
+    }
+    return sampleNonRepeating(themed, recentCharacters, commit);
   }
 
   rollArtifact(commit: boolean = true): string {
@@ -203,6 +273,7 @@ export class RetroOptionManager {
     if (commit) {
       recentGear.push(combined);
       if (recentGear.length > MAX_HISTORY) recentGear.shift();
+      saveShuffleHistory();
     }
     return combined;
   }

@@ -27,6 +27,7 @@ import {
   ZineActs,
   STORYBOARD_VISUAL_STYLES,
   STORYBOARD_STORY_ARCS,
+  STORYBOARD_HERO_LOOKS,
   buildZineIssueFromEncounter,
   buildLongForm3ActChronicle,
   parsePasted3ActStory,
@@ -103,6 +104,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [synthStyleIdx, setSynthStyleIdx] = useState<number>(0);
   const [visualStyleOverride, setVisualStyleOverride] = useState<string | undefined>(undefined);
   const [storyArcOverride, setStoryArcOverride] = useState<string | undefined>(undefined);
+  const [heroLookOverride, setHeroLookOverride] = useState<string | undefined>(undefined);
   const [isSavingShelf, setIsSavingShelf] = useState(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -195,6 +197,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     setEditingRecordId(undefined);
     setVisualStyleOverride(undefined);
     setStoryArcOverride(undefined);
+    setHeroLookOverride(undefined);
     setIssueNumber(shelfRecords.length + 1);
     setZinePaletteId(getZinePalette(encounter.card_theme).finishId);
     setActs(buildLongForm3ActChronicle(encounter));
@@ -252,6 +255,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       cardVideoUrl: videoUrl,
       visualStyleIdOverride: visualStyleOverride,
       storyArcIdOverride: storyArcOverride,
+      heroLookIdOverride: heroLookOverride,
     });
     if (editingRecordId) built.id = editingRecordId;
     built.zinePaletteId = zinePaletteId;
@@ -271,6 +275,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     zinePaletteId,
     visualStyleOverride,
     storyArcOverride,
+    heroLookOverride,
   ]);
 
   useEffect(() => {
@@ -896,6 +901,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     onLoadShelfEncounter?.(rec.encounter);
 
     setEditingRecordId(rec.id);
+    setVisualStyleOverride(undefined);
+    setStoryArcOverride(undefined);
+    setHeroLookOverride(undefined);
     setIssueNumber(rec.issueNumber);
     setZinePaletteId(rec.zinePaletteId);
     setActs(rec.acts);
@@ -1742,12 +1750,12 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Copy <strong>1 Flow-safe prompt</strong> into Google Flow / Gemini → get <strong>1 cohesive 4-panel image</strong> → drop it here. <em>Tip: click <strong>+</strong> for a fresh Flow chat if an older prompt was flagged.</em>
+                    Copy <strong>1 Flow-safe prompt</strong> into a <strong>fresh Flow chat (click +)</strong> so Flow never reuses your last roll&apos;s hero, then drop the 4-panel sheet here. <em>(Set Flow to 1 output if you don&apos;t need 2 copies.)</em>
                   </p>
                 </div>
 
-                <div className="space-y-2.5">
-                  {/* 12-Medium Visual Style Picker (Film, Claymation, Oil, 3D CGI, Flash Photo, Risograph, etc.) */}
+                <div className="space-y-2">
+                  {/* 16-Medium Visual Style Picker */}
                   <div className="flex items-center gap-1.5">
                     <select
                       aria-label="Visual art medium for this Zine"
@@ -1761,7 +1769,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
-                      title="Auto-rotates across 12 completely different mediums (35mm Film, Claymation, Oil Painting, 1997 3D CGI, Flash Photo, Risograph, etc.) — pick any style anytime!"
+                      title="Auto-rotates across 16 completely different mediums (35mm Film, Claymation, Papercut Shadowbox, Stained Glass, Pixel Art, Oil, 3D CGI, etc.)!"
                     >
                       {STORYBOARD_VISUAL_STYLES.map((st) => (
                         <option key={st.id} value={st.id}>
@@ -1786,14 +1794,14 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         backgroundColor: uiTheme.surfaceElevated,
                         color: uiTheme.ink,
                       }}
-                      className="px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105"
+                      className="w-[74px] px-2 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105 text-center"
                       title="Cycle to next visual medium (updates Step 1, Step 2 GIFs & Step 3 Videos)"
                     >
                       ↻ Style
                     </button>
                   </div>
 
-                  {/* 10-Arc 4-Panel Storyboard Action Picker (Chase, Zero-G, Portal Hop, Truce, Switch Flip, etc.) */}
+                  {/* 12-Arc 4-Panel Storyboard Action Picker */}
                   <div className="flex items-center gap-1.5">
                     <select
                       aria-label="4-scene storyboard action arc for this Zine"
@@ -1807,7 +1815,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
-                      title="Auto-rotates across 10 completely different 4-panel story sequences (Chase & Trap, Zero-G Floating Chaos, Dimension Portal Hop, Harmonic Truce, etc.)!"
+                      title="Auto-rotates across 12 completely different 4-panel story sequences (Chase & Trap, Zero-G Chaos, Scale Flip, Indoor Seasons, etc.)!"
                     >
                       {STORYBOARD_STORY_ARCS.map((arc) => (
                         <option key={arc.id} value={arc.id}>
@@ -1832,10 +1840,56 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         backgroundColor: uiTheme.surfaceElevated,
                         color: uiTheme.ink,
                       }}
-                      className="px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105"
+                      className="w-[74px] px-2 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105 text-center"
                       title="Cycle to a completely different 4-panel scene sequence"
                     >
                       ↻ Scenes
+                    </button>
+                  </div>
+
+                  {/* 24-Archetype Visual Cast Picker (Diverse Ages/Silhouettes + Drone + Pure World No-Human!) */}
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      aria-label="Visual protagonist cast look for this Zine"
+                      value={liveIssue.prompts.resolvedHeroLookId}
+                      onChange={(e) => {
+                        playZineBlip(860);
+                        setHeroLookOverride(e.target.value);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.inputBg,
+                        color: uiTheme.ink,
+                      }}
+                      className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
+                      title="Auto-rotates across 22 radically different visual hero silhouettes/ages/wardrobes PLUS Mini Hover-Drone and Pure World (No Human Hero) modes!"
+                    >
+                      {STORYBOARD_HERO_LOOKS.map((look) => (
+                        <option key={look.id} value={look.id}>
+                          {look.emoji} {look.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        playZineBlip(900);
+                        const idx = STORYBOARD_HERO_LOOKS.findIndex(
+                          (h) => h.id === liveIssue.prompts.resolvedHeroLookId
+                        );
+                        const next =
+                          STORYBOARD_HERO_LOOKS[
+                            (idx + 1) % STORYBOARD_HERO_LOOKS.length
+                          ];
+                        setHeroLookOverride(next.id);
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="w-[74px] px-2 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105 text-center"
+                      title="Cycle visual protagonist silhouette (including No Human / Pure World & Hover-Drone)"
+                    >
+                      ↻ Cast
                     </button>
                   </div>
 
