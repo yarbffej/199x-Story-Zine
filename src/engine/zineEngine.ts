@@ -1015,32 +1015,70 @@ function toVisualSafeCreatureDescription(
   const seed = hashString(lower || 'cosmic-creature');
   const glowPalette = pickSeeded(
     [
-      'luminous cyan and hot-magenta neon energy lines',
-      'shimmering ultraviolet-purple and electric-aqua crystal highlights',
-      'glowing amber-gold and neon-teal starlight rings',
+      'luminous cyan and hot-magenta neon highlights',
+      'shimmering ultraviolet-purple and electric-aqua prism glow',
+      'glowing amber-gold and neon-teal starlight accents',
       'iridescent lime-green and coral-pink glowing contours',
-      'warm molten-orange and cobalt-blue prismatic accents',
+      'warm molten-orange and cobalt-blue luminous trim',
+      'pearlescent moonlight silver and ruby-crimson glow',
     ],
     seed,
     4
   );
 
-  if (/(robot|toy|animatronic|automaton|vending|claw|jukebox|rewinder|drone|pinsetter)/i.test(lower) || morphologyId === 'mechanical_automaton') {
-    return `"${cleanedName}", an imaginative towering 1990s retro sci-fi robot-automaton built from chunky vintage hardware, chrome dials, glowing glass screens, and ${glowPalette}`;
+  // 14 wildly distinct creature silhouettes (checked by specific name FIRST so non-robot monsters never default to robots!)
+  if (/(flamingo|owl|moth|peacock|crane|raven|dragon|drake|unicorn)/i.test(lower)) {
+    return `"${cleanedName}", a dramatic towering winged creature with sweeping ornate wings, expressive glowing eyes, rich tactile textures matching its theme, and ${glowPalette}`;
   }
-  if (/(slime|ooze|slushie|soda|gum|candy|pizza|gel|gak|syrup|cream)/i.test(lower) || morphologyId === 'slime_ooze') {
-    return `"${cleanedName}", a whimsical towering translucent jelly-and-crystal retro sci-fi creature swirling with fizzy bubbles and ${glowPalette}`;
+  if (/(octopus|jellyfish|kraken|anglerfish|crab|frog|toad|whale|shark|turtle)/i.test(lower)) {
+    return `"${cleanedName}", an imaginative towering aquatic-themed storybook creature with glistening translucent fins, tentacles, or patterned shell details and ${glowPalette}`;
+  }
+  if (/(yeti|snow-cone|snowglobe|frost|blizzard|cotton-candy|cloud|fog-machine|djinn|storm-cloud|lightning|stag)/i.test(lower)) {
+    return `"${cleanedName}", a towering swirling elemental creature sculpted from sparkling frost crystals, billowing glowing mist clouds, or luminous vapor with ${glowPalette}`;
+  }
+  if (/(moss|sprout|flytrap|cactus|geode|gargoyle|concrete|asphalt|scarecrow|jack-o|pretzel)/i.test(lower)) {
+    return `"${cleanedName}", a towering tactile organic-and-stone storybook creature crafted from glowing mossy vines, glittering crystal rock facets, carved stone, or patchwork autumn textures with ${glowPalette}`;
+  }
+  if (/(dummy|marionette|puppet|clown|jester|plush|troll|mannequin|sock-monkey|carousel|santa|genie|sphinx|teacup|porcelain)/i.test(lower)) {
+    return `"${cleanedName}", a theatrical towering vintage-carnival storybook creature made of glossy painted wood, stitched velvet, porcelain, or gleaming brass trim with ${glowPalette}`;
+  }
+  if (/(origami|paper|book|catalog|ticket|binder|bookmark|halftone|painting|velvet)/i.test(lower)) {
+    return `"${cleanedName}", a fantastical towering living-paper and artwork creature made of unfolding origami creases, swirling fluttering pages, foil cutouts, and ${glowPalette}`;
+  }
+  if (/(spider|beetle|mantis|centipede|scarab|firefly|bug)/i.test(lower)) {
+    return `"${cleanedName}", a striking towering jewel-shelled creature with glittering faceted glass eyes, articulated chrome-and-enamel legs, iridescent wings, and ${glowPalette}`;
+  }
+  if (/(lava-lamp|wax|slime|ooze|slushie|soda|gum|candy|pizza|popcorn|nacho|gumball|root-beer|soft-serve|gel|gak|syrup|cream|pie)/i.test(lower)) {
+    return `"${cleanedName}", a whimsical towering bubbling-wax, translucent jelly, frosted swirl, or candy-glass retro creature glowing from within with ${glowPalette}`;
+  }
+  if (/(ribbon|cord|serpent|boa|slinky|spring-coil|hose|noodle|hydra|tentacle|wire|tape)/i.test(lower)) {
+    return `"${cleanedName}", a sweeping looping serpentine creature woven from colorful coiling ribbons, flexible glowing tubes, neon springs, and ${glowPalette}`;
+  }
+  if (/(fox|cat|raccoon|lion|lizard|hound|minotaur|dust bunny|gremlin)/i.test(lower)) {
+    return `"${cleanedName}", a mischievous oversized nocturnal storybook creature with gleaming expressive eyes, fluffy or sculpted retro textures, and ${glowPalette}`;
+  }
+  if (/(mirror|disco-ball|kaleidoscope|chandelier|neon-sign|glass-tube|prism)/i.test(lower)) {
+    return `"${cleanedName}", a dazzling towering mirrored-prism and bent-neon-glass creature refracting rainbow starbursts across every wall with ${glowPalette}`;
+  }
+  if (/(robot|animatronic|automaton|vending|claw|jukebox|rewinder|drone|pinsetter|toaster|dryer|pinball|cuckoo-clock|blender|lawnmower)/i.test(lower) || morphologyId === 'mechanical_automaton') {
+    return `"${cleanedName}", an imaginative towering 1990s retro hardware automaton built from chunky vintage dials, polished chrome trim, glowing indicator bulbs, and ${glowPalette}`;
   }
   if (/(modem|crt|tv|video|floppy|cd|cable|pixel|hologram|phone|stereogram|glitch|microchip|keyboard|console|pet)/i.test(lower) || morphologyId === 'cyber_signal') {
-    return `"${cleanedName}", a quirky glowing 1990s holographic electronics creature made of floating vintage CRT screens, pixel waves, tangled retro cords, and ${glowPalette}`;
+    return `"${cleanedName}", a quirky glowing 1990s holographic signal creature made of floating vintage monitors, shimmering pixel waves, tangled cords, and ${glowPalette}`;
   }
-  if (/(ribbon|cord|serpent|boa|tentacle|hose|wire|tape)/i.test(lower) || morphologyId === 'serpent_constricter') {
-    return `"${cleanedName}", a sweeping serpentine retro sci-fi creature woven from iridescent floating magnetic tape ribbons, neon coils, and ${glowPalette}`;
+  if (/(ghost|phantom|poltergeist|specter|revenant|banshee|shadow|wizard|organ pipe|parade)/i.test(lower) || morphologyId === 'spectral_phantom') {
+    return `"${cleanedName}", a dramatic billowing luminous apparition draped in translucent swirling nebula mist, glowing stardust trails, and ${glowPalette}`;
   }
-  if (/(swarm|cluster|token|figurine|plush|slammer|marionette|doll|shark|unicorn)/i.test(lower) || morphologyId === 'swarm_cluster') {
-    return `"${cleanedName}", a fantastical floating 1990s retro-toy cosmic entity surrounded by orbiting holographic prisms and ${glowPalette}`;
+  if (morphologyId === 'slime_ooze') {
+    return `"${cleanedName}", a whimsical towering translucent jelly-and-crystal creature swirling with fizzy glowing bubbles and ${glowPalette}`;
   }
-  return `"${cleanedName}", a towering imaginative 1990s cosmic sci-fi creature made of translucent vintage plastic, chrome rings, geometric prisms, and ${glowPalette}`;
+  if (morphologyId === 'serpent_constricter') {
+    return `"${cleanedName}", a sweeping coiling ribbon-and-coil creature weaving gracefully through the air with ${glowPalette}`;
+  }
+  if (morphologyId === 'swarm_cluster') {
+    return `"${cleanedName}", a fantastical orbiting swarm of glowing vintage collectibles swirling around a bright core with ${glowPalette}`;
+  }
+  return `"${cleanedName}", a towering imaginative 1990s storybook creature sculpted from glowing translucent prisms, tactile retro textures, and ${glowPalette}`;
 }
 
 export interface StoryboardVisualStyle {

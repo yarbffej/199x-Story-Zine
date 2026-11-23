@@ -120,7 +120,7 @@ const recentArtifacts: string[] = persistedHistory.artifacts;
 const recentWeapons: string[] = persistedHistory.weapons;
 const recentGear: string[] = persistedHistory.gear;
 const recentArtStyles: string[] = persistedHistory.artStyles;
-const MAX_HISTORY = 40;
+const MAX_HISTORY = 160;
 
 function saveShuffleHistory(): void {
   if (typeof localStorage === 'undefined') return;

@@ -71,7 +71,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['synthwave-grid', 'laser-backdrop', 'holo-diffraction', 'atomic-purple', 'memphis-rad'],
     threatColors: ['#00F0FF', '#FF007F', '#BD00FF', '#39FF14'],
     locationPattern: /(arcade|laser tag|roller rink|bowling|pinball|skeeball|redemption|fighting game|game cage|chained game|miniature golf|bumper boat)/i,
-    anomalyPattern: /(arcade|laser|token|skeeball|bowling|pinsetter|rollerblade|digital pet|virtual|game counselor|jukebox|stereogram|bop|reflex|8-ball|hologram|clown)/i,
+    anomalyPattern: /(arcade|laser|token|skeeball|bowling|pinsetter|rollerblade|digital pet|virtual|game counselor|jukebox|stereogram|bop|reflex|8-ball|hologram|clown|pinball|disco-ball|fortune-teller|mini-golf|roller-rink|ticket-muncher|spring-coil|kaleidoscope|fog-machine)/i,
     characterPattern: /(quarter-king|laser-ace|boombox|pinsetter|neon-drift|bop-it|pool-shark|card-shark|d20|glitter)/i,
     gearPattern: /(arcade|laser|rollerblade|yo-yo|pog|handheld|light-up|skateboard|billiard|pool cue|bowling|vest)/i,
     preferredArtStyles: [
@@ -101,7 +101,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['vhs-static', 'atomic-purple', 'cosmic-nebula', 'cracked-ice', 'laser-backdrop'],
     threatColors: ['#BD00FF', '#FF0055', '#00E5FF', '#FFE600'],
     locationPattern: /(video|vhs|suncoast|cinema|drive-in|darkroom|photo|tv|broadcast|cassette|record store|music megastore|comic shop)/i,
-    anomalyPattern: /(vhs|video|rewinder|projectionist|camera|darkroom|photo|negative|cassette|voice|audio|psychic hotline|channel 3|rotary|payphone|slide viewer|bookmark|horror book)/i,
+    anomalyPattern: /(vhs|video|rewinder|projectionist|camera|darkroom|photo|negative|cassette|voice|audio|psychic hotline|channel 3|rotary|payphone|slide viewer|bookmark|horror book|drive-in|portrait-kiosk|ventriloquist|velvet painting|halftone|shadow fox|cuckoo-clock)/i,
     characterPattern: /(av club|projectionist|polaroid|darkroom|walkman|astrology|raincoat|riot-grrrl|keytar|card-shark)/i,
     gearPattern: /(vhs|camcorder|video|cassette|talk-boy|walkman|3d slide|laserdisc|cd player|camera|phone|audio)/i,
     preferredArtStyles: [
@@ -131,7 +131,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['memphis-rad', 'jazz-cup', 'gold-embossed', 'hypercolor-thermal', 'holo-diffraction'],
     threatColors: ['#FF007F', '#00FFA3', '#FFE600', '#00F0FF'],
     locationPattern: /(novelty depot|clearance|department store|mall|catalog|layaway|dressing room|shoe|carpet|toy warehouse|seasonal|blue-light|nail salon|laundromat)/i,
-    anomalyPattern: /(mall|manager|walker|escalator|security|santa|claw machine|plush|denim|t-shirt|windbreaker|mannequin|wish-book|gargoyle|troll doll|action figure|micro-mansion|shark puppet)/i,
+    anomalyPattern: /(mall|manager|walker|escalator|security|santa|claw machine|plush|denim|t-shirt|windbreaker|mannequin|wish-book|gargoyle|troll doll|action figure|micro-mansion|shark puppet|carousel|shopping-cart|laundromat|dryer|chandelier|lava-lamp|neon-sign|snowglobe|rock-shop|aquarium|teacup)/i,
     characterPattern: /(neon-drift|mall security|henderson|coupons|dayglo|scrunchie|pawn-shop|dragon-kick|slap-bracelet)/i,
     gearPattern: /(sneakers|slap-bracelet|mirror|watch|skillet|shopping|coat|windbreaker|umbrella|compact|hair gel|stapler)/i,
     preferredArtStyles: [
@@ -162,7 +162,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['toxic-ooze', 'hypercolor-thermal', 'memphis-rad', 'jazz-cup', 'atomic-purple'],
     threatColors: ['#39FF14', '#CCFF00', '#FF3366', '#FF6600'],
     locationPattern: /(soft-serve|pizza|food court|slushie|cafeteria|snack bar|popcorn|soda|bakery|buffet|diner|yogurt|ice cream|fast food|drive-thru)/i,
-    anomalyPattern: /(slime|slushie|blender|pizza|soda|gum|candy|drink|lip balm|gak|ooze|goop|pastry|pie|lunch counter|popping-candy|drive-thru|animatronic|vending)/i,
+    anomalyPattern: /(slime|slushie|blender|pizza|soda|gum|candy|drink|lip balm|gak|ooze|goop|pastry|pie|lunch counter|popping-candy|drive-thru|animatronic|vending|snow-cone|pretzel|soft-serve|toaster|bubble-tea|cotton-candy|gumball|popcorn|root-beer|nacho-cheese|ice cream)/i,
     characterPattern: /(short-order|slush-queen|jawbreaker|lunch lady|barbecue)/i,
     gearPattern: /(slime|skillet|plunger|waffle iron|ladle|drink straw|candy|putty|bucket|griddle|squeegee)/i,
     preferredArtStyles: [
@@ -222,7 +222,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['cosmic-nebula', 'cracked-ice', 'liquid-chrome', 'atomic-purple', 'vintage-cardstock'],
     threatColors: ['#FFE600', '#00F0FF', '#FF5500', '#76FF03'],
     locationPattern: /(cul-de-sac|skatepark|parking lot|basement|waterpark|pool|rooftop|stormwater|batting cage|tire|garage|trampoline|quarry|climbing|drive-in|greenhouse|storm cellar|culvert|car wash|driveway|radio tower)/i,
-    anomalyPattern: /(water|lawnmower|aerator|asphalt|bug zapper|kraken|vigilante|battery acid|tire|semi-truck|unicorn|8-ball|hellhound|fogger|alien)/i,
+    anomalyPattern: /(water|lawnmower|aerator|asphalt|bug zapper|kraken|vigilante|battery acid|tire|semi-truck|unicorn|8-ball|hellhound|fogger|alien|flamingo|attic|treehouse|garden hose|trampoline|firefly|sprout-head|scarecrow|sump-pump|noodle|pool-noodle|neon-moth|rain-puddle|storm-cloud|barn-owl|venus-flytrap|raccoon|cactus|skateboard)/i,
     characterPattern: /(alley-cat|spokes|half-pipe|snowblower|grip-tape|bait-shop|barbecue|tailgate|cardboard)/i,
     gearPattern: /(garden|baseball|skateboard|bicycle|maglite|crowbar|tire|hammer|wrench|shovel|rake|hose|water|flashlight)/i,
     preferredArtStyles: [
@@ -252,7 +252,7 @@ export const THEME_SETS: ThemeSetDefinition[] = [
     cardThemes: ['vintage-cardstock', 'laser-backdrop', 'gold-embossed', 'memphis-rad', 'holo-diffraction'],
     threatColors: ['#FFAB00', '#FF007F', '#00E5FF', '#39FF14'],
     locationPattern: /(scholastic|book|school|wrestling|library|play-zone|ball pit|cafeteria|playground|marble|av club|dentist|band room|hobby shop)/i,
-    anomalyPattern: /(pog|binder|book|play-zone|ball-pit|pta|ankle|compact|bookmark|8-ball|marionette|fang|counselor|figurines|stereogram)/i,
+    anomalyPattern: /(pog|binder|book|play-zone|ball-pit|pta|ankle|compact|bookmark|8-ball|marionette|fang|counselor|figurines|stereogram|sock-monkey|ceiling-star|color-block|transit-bus|library|card-catalog|origami|sticky-hand|jack-in-the-box)/i,
     characterPattern: /(maya lin|coach miller|titanium|pendelton|slap-shot|microfiche|coupons|slap-bracelet|d20|pom-pom|cross|cardboard|tailgate|glitter|lunch lady)/i,
     gearPattern: /(trapper keeper|lunchbox|pog|folder|binder|pencil|hockey|jump rope|dart bow|sketch|gazette|ankle|dental|crutch)/i,
     preferredArtStyles: [

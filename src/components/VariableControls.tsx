@@ -30,6 +30,7 @@ interface VariableControlsProps {
   onToggleHeroLocked?: () => void;
   onSwapHero?: () => void;
   onSwapVillain?: () => void;
+  onPickVillain?: (villain: string) => void;
   artStyle?: string;
   activeThemeId?: string;
   activeUniverse?: UniverseId;
@@ -78,6 +79,7 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
   onToggleHeroLocked,
   onSwapHero,
   onSwapVillain,
+  onPickVillain,
   artStyle = "90s Dark Horse indie graphic novel ink-and-watercolor illustration",
   activeThemeId = 'all',
   activeUniverse,
@@ -128,7 +130,10 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
 
   const handleSelectFromLibrary = (category: 'location' | 'anomaly' | 'gear' | 'character' | 'artStyle', value: string) => {
     if (category === 'location') onLocationChange(value);
-    if (category === 'anomaly') onAnomalyChange(value);
+    if (category === 'anomaly') {
+      if (onPickVillain) onPickVillain(value);
+      else onAnomalyChange(value);
+    }
     if (category === 'character') onCharacterChange(value);
     if (category === 'gear') onImprovisedGearChange(value);
     if (category === 'artStyle') onArtStyleChange?.(value);
@@ -290,13 +295,21 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
 
           <span className="text-zinc-500 font-black text-[11px]">VS.</span>
 
-          {/* Bad Guy Pill + Swap */}
+          {/* Bad Guy Pill + Stockpile Browser + Swap */}
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-950/75 border border-pink-500/40 text-pink-200">
             <Ghost className="w-3.5 h-3.5 text-pink-400 shrink-0" />
             <span className="text-[11px] uppercase text-pink-400 font-bold">Bad Guy:</span>
             <span className="font-bold text-white truncate max-w-[190px] sm:max-w-[260px]">
               {anomaly}
             </span>
+            <button
+              type="button"
+              onClick={() => openLibraryWithTab('anomalies')}
+              className="ml-0.5 px-1.5 py-0.5 rounded bg-pink-500/25 hover:bg-pink-500/40 border border-pink-400/40 text-[10px] font-bold text-pink-200 hover:text-white cursor-pointer transition-colors"
+              title="Browse, search, or add to your 200+ Bad Guy Stockpile"
+            >
+              {retroOptionManager.getAnomalies('all').length} Stockpile
+            </button>
             {onSwapVillain && (
               <button
                 type="button"

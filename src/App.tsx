@@ -452,6 +452,24 @@ export default function App() {
     setHistoryIndex(0);
   };
 
+  const handleSelectSpecificVillain = (chosenAnom: string) => {
+    const trimmed = chosenAnom.trim();
+    if (!trimmed) return;
+    setAnomaly(trimmed);
+    const updated = generateProceduralEncounter({
+      location,
+      anomaly: trimmed,
+      improvised_gear: improvisedGear,
+      character,
+      art_style: artStyle,
+      theme_set_id: activeThemeId,
+    });
+    dispatchCardFinishChange(updated.card_theme);
+    setCurrentEncounter(updated);
+    setHistory(prev => [updated, ...prev].slice(0, 20));
+    setHistoryIndex(0);
+  };
+
   const handleRandomizeAll = () => {
     if (isRolling) {
       handleStopRolling();
@@ -732,6 +750,7 @@ export default function App() {
               onToggleHeroLocked={() => setHeroLocked((prev) => !prev)}
               onSwapHero={handleSwapHeroOnly}
               onSwapVillain={handleSwapVillainOnly}
+              onPickVillain={handleSelectSpecificVillain}
               artStyle={artStyle}
               activeThemeId={activeThemeId}
               activeUniverse={activeUniverse}
