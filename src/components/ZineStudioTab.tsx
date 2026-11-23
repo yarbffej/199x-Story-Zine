@@ -975,7 +975,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     {
       key: 'video',
       label: '🎬 1. Lead Video',
-      sub: 'Good Guy vs. Bad Guy (16:9)',
+      sub: 'Peak Monster Mayhem (16:9)',
       text: liveIssue.prompts.leadVideo16x9,
       bg: uiTheme.accent3,
       ink: uiTheme.accent3Ink,
@@ -991,7 +991,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     {
       key: 'shot1',
       label: '🌍 3. Image 01 (Act I)',
-      sub: 'Hero Arrives in Sector',
+      sub: 'After Closing Setup',
       text: liveIssue.prompts.shot01WideArchitecture,
       bg: uiTheme.surfaceElevated,
       ink: uiTheme.ink,
@@ -999,7 +999,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     {
       key: 'gif1',
       label: '🎞️ 4. GIF 01 (Act I)',
-      sub: 'Hero vs. Looming Shadow Loop',
+      sub: 'Spooky Creeping Tension Loop',
       text: liveIssue.prompts.gif01Act1TensionLoop,
       bg: uiTheme.accent2,
       ink: uiTheme.accent2Ink,
@@ -1007,7 +1007,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     {
       key: 'shot2',
       label: '👾 5. Image 02 (Act II)',
-      sub: 'Bad Guy Villain Portrait',
+      sub: 'Bad Guy Monster Reveal',
       text: liveIssue.prompts.shot02AnomalyPortrait,
       bg: uiTheme.surfaceElevated,
       ink: uiTheme.ink,
@@ -1015,7 +1015,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     {
       key: 'shot3',
       label: '⚡ 6. Image 03 (Act II)',
-      sub: 'Good Guy vs. Bad Guy Splash',
+      sub: 'Peak Monster Mayhem Splash',
       text: liveIssue.prompts.shot03LowAngleAction,
       bg: uiTheme.surfaceElevated,
       ink: uiTheme.ink,
@@ -1708,7 +1708,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span className="font-mono-zine text-[11px] font-bold uppercase opacity-75">
-                  3-STEP COHESIVE ZINE DIRECTOR • 1 GEMINI TAB, 100% MATCHED HERO &amp; STORY PROGRESSION
+                  3-STEP BAD-GUY ZINE DIRECTOR • 1 GEMINI TAB, 100% MONSTER SPOTLIGHT (ZERO HUMAN HEROES)
                 </span>
                 <h3 className="font-display text-xl sm:text-2xl font-extrabold uppercase">
                   Build Your Complete Zine in 3 Easy Steps
@@ -1759,7 +1759,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Copy <strong>1 Flow-safe prompt</strong> into a <strong>fresh Flow chat (click +)</strong> so Flow never reuses your last roll&apos;s hero, then drop the 4-panel sheet here. <em>(Set Flow to 1 output if you don&apos;t need 2 copies.)</em>
+                    Copy <strong>1 Flow-safe Bad-Guy-only prompt</strong> into a <strong>fresh Flow chat (click +)</strong> so Flow never reuses your last monster, then drop the 4-panel sheet here. <em>(Set Flow to 1 output if you don&apos;t need 2 copies.)</em>
                   </p>
                 </div>
 
@@ -1856,10 +1856,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     </button>
                   </div>
 
-                  {/* 24-Archetype Visual Cast Picker (Diverse Ages/Silhouettes + Drone + Pure World No-Human!) */}
+                  {/* 10-Vibe Bad-Guy Monster Staging Picker (100% Monster-Only, Zero Humans!) */}
                   <div className="flex items-center gap-1.5">
                     <select
-                      aria-label="Visual protagonist cast look for this Zine"
+                      aria-label="Monster staging vibe for this Bad Guy Zine"
                       value={liveIssue.prompts.resolvedHeroLookId}
                       onChange={(e) => {
                         playZineBlip(860);
@@ -1870,11 +1870,11 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
-                      title="Auto-rotates across 22 radically different visual hero silhouettes/ages/wardrobes PLUS Mini Hover-Drone and Pure World (No Human Hero) modes!"
+                      title="Auto-rotates across 10 distinct Bad-Guy Monster staging vibes (Colossal Giant, Shadow Lurker, Disco Overdrive, Frost & Fog, Poltergeist Vortex, etc.) with ZERO human heroes!"
                     >
-                      {STORYBOARD_HERO_LOOKS.map((look) => (
-                        <option key={look.id} value={look.id}>
-                          {look.emoji} {look.shortLabel}
+                      {STORYBOARD_HERO_LOOKS.map((mood) => (
+                        <option key={mood.id} value={mood.id}>
+                          {mood.emoji} {mood.shortLabel}
                         </option>
                       ))}
                     </select>
@@ -1896,9 +1896,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="w-[74px] px-2 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105 text-center"
-                      title="Cycle visual protagonist silhouette (including No Human / Pure World & Hover-Drone)"
+                      title="Cycle Bad-Guy Monster staging vibe"
                     >
-                      ↻ Cast
+                      ↻ Vibe
                     </button>
                   </div>
 
@@ -2243,7 +2243,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                             : uiTheme.accent3Ink,
                       }}
                       className="pop-btn px-2 py-2 font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
-                      title="8-second Act II Good Guy vs. Bad Guy Showdown video (paste in same Gemini chat)"
+                      title="8-second Act II Peak Monster Mayhem video (paste in same Gemini/Flow chat)"
                     >
                       {copiedKey === 'same-chat-vid' ? (
                         <>
@@ -2251,7 +2251,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         </>
                       ) : (
                         <>
-                          <Film className="w-3.5 h-3.5" /> Video 1 (Clash)
+                          <Film className="w-3.5 h-3.5" /> Video 1 (Mayhem)
                         </>
                       )}
                     </button>

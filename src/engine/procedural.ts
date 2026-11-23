@@ -45,7 +45,7 @@ export function generateProceduralEncounter(
 
   const cardType: 'bad_guy' | 'good_guy' = params?.card_type && params.card_type !== 'auto'
     ? params.card_type
-    : (Math.random() < 0.78 ? 'bad_guy' : 'good_guy');
+    : 'bad_guy';
   const isBadGuy = cardType === 'bad_guy';
 
   // Resolve concrete containment gear
@@ -247,8 +247,8 @@ export function generateThemedCardSetBatch(themeId: string, count: number = 9): 
   const batchFinishOffset = finishRotationCursor++;
 
   for (let i = 0; i < count; i++) {
-    // Every 4th card in a batch is a Good Guy Operative, others are Bad Guy Anomalies
-    const cardType: 'bad_guy' | 'good_guy' = (i % 4 === 3) ? 'good_guy' : 'bad_guy';
+    // 100% Bad Guy Monsters across the full 200 Bad Guy Stockpile
+    const cardType: 'bad_guy' | 'good_guy' = 'bad_guy';
 
     // Guarantee exciting chase cards in every batch (Card #1 = Prism leader, Card #5 = Gold, #3/#8 = Silver)
     let forcedFoil: 'standard' | 'silver' | 'gold' | 'prism' = 'standard';

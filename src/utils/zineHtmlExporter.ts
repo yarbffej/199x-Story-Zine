@@ -351,7 +351,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[0])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[0]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
-                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popCyan}; color:${expTheme.popCyanInk}">🌍 IMAGE 01 // HERO ARRIVES</span>
+                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popCyan}; color:${expTheme.popCyanInk}">🌍 IMAGE 01 // AFTER CLOSING</span>
                   <span class="font-mono text-xs font-bold underline">Pop Open 2K ⤢</span>
                 </div>
               </div>`
@@ -380,7 +380,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[2])})" class="w-full pop-card th-surface p-2.5 sm:p-3 cursor-pointer lg:rotate-[1.2deg] hover:rotate-0 transition-transform">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[2]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-2.5 flex justify-between items-center">
-                  <span class="px-2.5 py-0.5 rounded-full border-2 th-border font-mono text-[11px] font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">⚡ IMAGE 03 // GOOD GUY VS. BAD GUY</span>
+                  <span class="px-2.5 py-0.5 rounded-full border-2 th-border font-mono text-[11px] font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">⚡ IMAGE 03 // PEAK MONSTER MAYHEM</span>
                   <span class="font-mono text-[11px] font-bold">2K ⤢</span>
                 </div>
               </div>`
@@ -389,7 +389,7 @@ export async function exportStandaloneZineHtml(
       </div>
       <div class="lg:col-span-5 space-y-6 order-1 lg:order-2">
         <article class="pop-card p-6 sm:p-7" style="background:${expTheme.tile2}; color:${expTheme.ink}">
-          <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">ACT 02 // THE BIG SHOWDOWN</span>
+          <span class="inline-block px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase mb-3" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">ACT 02 // MONSTER MAYHEM</span>
           <h2 class="font-display text-2xl sm:text-3xl font-extrabold uppercase mb-4">${escapeHtml(issue.synergy)}</h2>
           <p class="text-base sm:text-[17px] leading-[1.75] font-medium whitespace-pre-line">${escapeHtml(issue.acts.intervention)}</p>
         </article>

@@ -398,16 +398,6 @@ function toGoosebumpsTrickName(rawSynergy: string): string {
     .replace(/\bAcid Spit Backlash\b/gi, 'Fizz-Splash Boom');
 }
 
-function toStoryHeroShortName(charShort: string): string {
-  const clean = (charShort || 'Sam').trim();
-  if (/^(The|Coach|Officer|Professor|Dr\.|Sgt\.|Detective|Big)\b/i.test(clean)) {
-    const words = clean.replace(/'[^']+'/g, '').replace(/\s+/g, ' ').trim().split(' ');
-    return words.slice(0, 2).join(' ') || clean;
-  }
-  const first = clean.split(/[\s']+/)[0];
-  return first || clean;
-}
-
 function toStoryPlacePhrase(rawLocation: string): string {
   const clean = (rawLocation || 'the old novelty shop').trim();
   if (/^(the|a|an)\s+/i.test(clean)) return clean;
@@ -432,124 +422,120 @@ export function buildLongForm3ActChronicle(
   const rawLocation = encounter.location || 'K&B Novelty Depot clearance aisle at 8:59 PM';
   const locationFull = toStoryPlacePhrase(rawLocation);
   const location = toStoryShortPlace(locationFull);
-  const charFull = encounter.featured_character || "Dex 'Neon-Drift' Kowalski";
-  const charIntro = charFull.split('(')[0].trim() || 'Sam';
-  const charShort = toStoryHeroShortName(charIntro);
   const anomaly =
     anomalyOverride ||
     encounter.anomaly_name ||
-    (encounter.card_type === 'bad_guy'
-      ? encounter.entity_name
-      : 'The Neon Shadow Monster');
-  const weapon = encounter.protagonist_loadout?.improvised_weapon || 'duct-taped flashlight';
+    encounter.entity_name ||
+    'The Neon Shadow Monster';
+  const weapon = encounter.protagonist_loadout?.improvised_weapon || 'old store flashlight';
   const artifact = encounter.protagonist_loadout?.nostalgia_artifact || 'glowing 90s pocket toy';
   const funTrick = toGoosebumpsTrickName(
     encounter.protagonist_loadout?.weird_synergy_effect || 'Rainbow Spark Pop'
   );
   const funSign = toGoosebumpsWeirdSign(encounter.cosmic_distortion || '');
-  const funFeeling = toGoosebumpsFeeling(encounter.status_affliction || '');
+  const funFeeling = toGoosebumpsFeeling(encounter.status_affliction || '').replace(/\btheir\b/g, 'your');
 
   const seed =
     hashString(`${encounter.entity_name}|${rawLocation}|${weapon}|${artifact}`) +
     variantOffset * 97;
 
   const act1Openers = [
-    `Everybody in town knew you were NEVER supposed to hang around ${locationFull} after dark. Naturally, that was the exact time ${charIntro} pushed the door open. The place was dead quiet—except for the creepy buzzing of a half-broken ceiling light. Blink. Buzz. Blink. The air smelled like stale popcorn, cold plastic, and a thunderstorm that hadn't hit yet.`,
-    `"Five minutes. In and out," ${charIntro} muttered, peering inside ${locationFull}. It was way too quiet. Even the old soda machine in the corner had stopped humming. Outside, the streetlights threw long, twisted shadows across the floor, and a cold draft brushed right past ${charShort}'s sneakers. Wait... weren't all the windows locked?`,
-    `It started as a totally normal Tuesday night—right up until ${charIntro} stepped into ${locationFull} and the door clicked shut by itself. Not a gentle click. A heavy, final *CLUNK*. ${charShort} jiggled the handle twice. Locked tight. Across the empty room, a single neon sign buzzed louder and louder until it sounded like a swarm of angry bees.`,
-    `If you ever hear strange tapping noises coming from ${locationFull} right before closing time, do yourself a favor: run the other way. ${charIntro} did NOT run the other way. Instead, ${charShort} tiptoed right past the empty front counter, listening to the squeak of their own sneakers echo way too loudly in the dark.`,
-    `The whole neighborhood swore ${locationFull} was haunted—or at least seriously weird after sunset. Still, ${charIntro} figured it was just a silly rumor... until the temperature suddenly dropped twenty degrees in two seconds. Their breath puffed out in a chilly white cloud. Somewhere down the back aisle, something heavy dragged across the floor. *SCRAAAPE.*`,
-    `At one minute to closing, ${locationFull} was supposed to be completely empty. Every shelf sat still. Every sign was switched off. So why was a weird purple glow leaking out from behind the back curtain? ${charIntro} took one slow step closer, stomach doing a nervous flip-flop.`,
-    `First rule of surviving the 1990s: never follow a mysterious glowing noise into ${locationFull} by yourself. ${charIntro} broke that rule in about three seconds flat. The air inside tasted fizzy, like opening a warm can of lemon-lime soda, and every plastic wrapper on the shelves was rattling softly on its own.`,
-    `Rain tapped against the roof of ${locationFull} like bony fingers asking to come inside. ${charIntro} wiped water off their jacket and peered down the dim, stretching aisle. Nobody was at the register. Nobody was in the back. Yet someone—or SOMETHING—had definitely left the lights flickering on and off like a spooky Morse code message.`,
+    `Everybody in town knew you were NEVER supposed to peek through the windows of ${locationFull} after closing time. The second the last store key turned in the lock, the empty place turned dead silent—except for the creepy buzzing of a half-broken ceiling light. Blink. Buzz. Blink. Inside, the air smelled like stale popcorn, cold plastic, and a thunderstorm that hadn't hit yet.`,
+    `At 9:01 PM sharp, ${locationFull} was supposed to be completely empty. Every cash register was shut. Every broom was leaned neatly in the closet. Even the old soda machine in the corner had stopped humming. Outside, streetlights stretched twisted shadows across the waxed floor—and then the front deadbolt slid shut all by itself with a heavy *CLUNK*.`,
+    `It started as a totally normal Tuesday night at ${locationFull}... right up until the wall clock ticked straight past midnight and stopped dead. Not a single footstep. Not a single car in the parking lot. Yet down the darkest back aisle, a single neon sign began buzzing louder and louder until it sounded like a swarm of angry bees.`,
+    `If you ever press your nose up against the glass at ${locationFull} late at night, do yourself a favor: walk away fast. Because the moment the streetlights flicker on, the temperature inside drops twenty degrees in two seconds flat. Frost creeps along the window corners, and somewhere behind the back curtain, something heavy drags across the floor. *SCRAAAPE.*`,
+    `The whole neighborhood swore ${locationFull} came alive after sunset. Most grown-ups laughed it off as a silly kid rumor—nobody ever stayed late enough to check. Tonight, though, a strange purple glow began leaking right out from underneath the back storage door, making every plastic package on the shelves rattle softly on its own.`,
+    `Rain tapped against the roof of ${locationFull} like bony fingers asking to be let inside. Inside the locked, empty room, nobody stood behind the counter. Nobody walked the aisles. So why were the ceiling lights blinking on and off in a slow, spooky rhythm—like something hidden in the dark was practicing a secret code?`,
+    `First rule of the 1990s: never leave weird retro junk sitting around ${locationFull} past closing time. Tonight, the empty air tasted fizzy—like opening a warm can of lemon-lime soda—and the shiny floor tiles began humming softly right beneath the deserted display racks.`,
+    `Long after the last customer went home and the parking lot cleared out, ${locationFull} stayed weirdly wide awake. A cold draft rolled down the empty corridor even though every single window was bolted shut. Somewhere near the back wall, a quiet giggle echoed off the ceiling tiles.`,
   ];
 
   const act1Middles = [
-    `${charShort} gripped the ${weapon} in one hand and checked the ${artifact} clipped to their belt. Suddenly, they got ${funFeeling}. Then something even weirder happened. ${funSign} "Okay," ${charShort} whispered, swallowing hard. "Definitely not normal. Time to leave."`,
-    `Pulling out the ${artifact}, ${charShort} held it up like a lucky charm and kept the ${weapon} ready. Right away, ${charShort} was hit by ${funFeeling}. Across the room, things were going haywire—${funSign.charAt(0).toLowerCase() + funSign.slice(1)} "Please be a prank," ${charShort} said out loud. Nobody laughed back.`,
-    `${charShort} took a deep breath and squeezed the ${weapon} tighter. The ${artifact} started glowing bright and warm in their other hand. Out of nowhere came ${funFeeling}. Even crazier: ${funSign.charAt(0).toLowerCase() + funSign.slice(1)} Goosebumps popped up all over ${charShort}'s arms.`,
-    `"Hello? Anybody working tonight?" ${charShort} called out. Their voice bounced back sounding weirdly stretched and hollow. Clutched tight in their hands were the ${artifact} and the ${weapon}. Almost instantly, ${charShort} felt ${funFeeling}. Worse yet, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
-    `Every instinct screamed to turn around, grab a slushie, and go watch cartoons instead. Still, ${charShort} crept forward with the ${artifact} held high and the ${weapon} tucked under one arm. That's when ${funFeeling} washed over them. Right before their eyes, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
-    `Something was seriously wrong here. ${charShort} tapped the ${artifact} twice—it beeped back like crazy—and raised the ${weapon}. A split second later came ${funFeeling}. ${charShort} blinked hard, hoping they were imagining things, because ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
-    `${charShort} froze beside a wobbly display rack, clutching the ${weapon} and squinting at the buzzing ${artifact}. Instantly, they felt ${funFeeling}. Up and down the aisle, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)} "Okay, yep, this is officially way above my allowance," ${charShort} gulped.`,
-    `Taking two tiny steps back, ${charShort} bumped into a display shelf—*CRASH!*—and nearly jumped out of their sneakers. Holding up the ${artifact} and the ${weapon}, they suddenly felt ${funFeeling}. All around them, ${funSign.charAt(0).toLowerCase() + funSign.slice(1)}`,
+    `First came the spooky chill—the kind that would give anyone ${funFeeling}. Then the whole empty place started going completely haywire. ${funSign} Sitting all alone on a cluttered counter, the ${artifact} suddenly blinked on by itself and began beeping faster and faster!`,
+    `Across the deserted aisles, things got super weird in a hurry. ${funSign} Right beside a forgotten ${weapon} on the back shelf, the ${artifact} started rattling like a trapped beetle. If anyone had been standing inside, they would have felt ${funFeeling}.`,
+    `Tick. Tick. *CLICK.* A row of empty display racks swayed backward with zero wind to push them. ${funSign} Over on the front counter, the ${artifact} and the ${weapon} began glowing bright neon orange—as if warning the whole empty room that something big was waking up!`,
+    `Without a single human anywhere in sight, the spooky signs spread from wall to wall. ${funSign} The empty air felt heavy enough to trigger ${funFeeling}. Even the forgotten ${artifact} sitting by the register flipped itself right-side-up and gave a frantic *BEEP-BEEP-BEEP!*`,
+    `Something was definitely loose inside ${location} tonight. ${funSign} Shelves creaked. Price tags fluttered off their hooks like startled moths. Next to a dusty ${weapon}, the ${artifact} hummed so loudly it danced three inches across the counter all by itself.`,
+    `One by one, the empty rows of ${location} began tilting into weird spooky angles. ${funSign} Any passerby peeking through the glass would have felt ${funFeeling}. Down by the back aisle, the lights turned bright electric green—and the shadow on the far wall didn't match a single shelf in the room.`,
+    `Weird sparks danced across the empty counters of ${location} like tiny glowing fireflies. ${funSign} Sitting right near the middle aisle, the ${artifact} clicked on with a loud *WHIRRR*, throwing crazy rainbow patterns straight across the ceiling.`,
+    `Nobody was inside to hear it, yet the whole empty room groaned like an old haunted house waking up from a hundred-year nap. ${funSign} Up on the top rack, the ${weapon} rattled against the ${artifact} with a sharp *CLANK!*—right before every lamp in ${location} blinked pitch-black.`,
   ];
 
   const act1Closers = [
-    `Then every single light went out at once. Pitch black. *THUMP. THUMP. THUMP.* Something massive was stomping straight down the aisle! When the emergency lights blinked back on in spooky red, ${charShort} gasped. Towering right in front of them—glowing, grinning, and way bigger than any human—was ${anomaly}. And it was looking straight at ${charShort}!`,
-    `*CREEEAK.* The shadow on the back wall stretched taller... and taller... and then peeled right off the wall! ${charShort} tried to run, but their sneakers skidded on the waxed floor. Out of the swirling neon fog stepped ${anomaly}, rattling every shelf in ${location}. There was no escape—and no grown-up coming to save the day.`,
-    `A loud *ZAP!* shook the ceiling tiles, and a bright swirl of sparks burst open right in the middle of ${location}. ${charShort} ducked behind a counter and peeked over the edge. Bad idea. Rising out of the glowing mist like a giant nightmare come to life was ${anomaly}—and it had just spotted ${charShort}'s hiding spot!`,
-    `That's when ${charShort} noticed the creepy reflection in the glass. Something huge was standing RIGHT behind them. Slowly, ${charShort} turned around. Heart hammering like a drum, they stared straight up at ${anomaly}. It let out a wild, echoing rattle that shook loose half the ceiling tiles. "Uh... nice monster?" ${charShort} squeaked.`,
-    `Suddenly, the buzzing stopped. Total, spooky silence. Then—*BOOM!*—a shelf flew sideways and ${anomaly} burst straight into the open, crackling with wild neon sparks! ${charShort} stumbled back a step, gripping the ${weapon} with sweaty palms. Whatever this crazy thing was, it definitely wasn't friendly!`,
-    `A cold laugh echoed from every corner of ${location} at once. Before ${charShort} could even blink, a whirlpool of rainbow static spun up from the floor—and out popped ${anomaly}, towering almost to the ceiling! Its glowing eyes locked right onto ${charShort}. Uh-oh. Game on.`,
-    `Wait a second. The giant shadow stretching across the tiles wasn't ${charShort}'s. It had way too many glowing edges—and it was MOVING! Spinning around, ${charShort} came face-to-face with ${anomaly} looming over the aisle like a runaway movie monster. Running wasn't going to cut it anymore.`,
-    `One last flicker of the overhead lights, and *POP!*—the air smelled like burnt toast and electric sparks. Stepping right out of the shadows of ${location} was ${anomaly}, glowing brighter than a whole row of arcade machines. ${charShort} gulped, raised the ${artifact}, and whispered, "Here goes nothing!"`,
+    `Pitch dark. Dead quiet. Then—*THUMP. THUMP. THUMP.* Something massive stomped straight out into the center aisle! When the emergency lights blinked back on in spooky red, there it stood—glowing, grinning, and towering almost to the rafters: ${anomaly}! And tonight, ${location} belonged entirely to the monster.`,
+    `*CREEEAK.* The gigantic shadow stretched across the back wall... taller... wider... and then peeled completely off the wall! Out of a swirling cloud of glowing neon fog stepped ${anomaly}, rattling every single shelf in ${location}. No humans. No rules. Showtime!`,
+    `A loud *ZAP!* shook the ceiling tiles, and a bright whirlpool of rainbow sparks spun open right in the middle of ${location}. Rising straight out of the glowing mist like a runaway midnight movie monster was ${anomaly}—bright eyes flashing, wild energy crackling, and ready to turn the whole place upside down!`,
+    `Right inside the glossy front window glass, a gigantic spooky reflection appeared—even though the aisle looked empty! One second later—*POP!*—${anomaly} stepped right through the shimmer into full view, letting out a wild echoing rattle that shook loose half the ceiling tiles!`,
+    `Suddenly, every buzzing sound cut out completely. Total, creepy silence. Then—*BOOM!*—two display racks slid sideways and ${anomaly} burst straight into the open, crackling with wild neon sparks! Whatever had kept this crazy creature sleeping all day had finally snapped wide open!`,
+    `A mischievous echoing laugh bounced off every corner of ${location} at once. Up from the scuffed floor tiles swirled a glittering neon tornado—and out popped ${anomaly}, bigger and wilder than anything in a horror comic! Every arcade screen and store lamp flashed wildly to welcome its new boss.`,
+    `Wait a second. That gigantic glowing shape creeping past the front counter wasn't a store display—it was MOVING! Stretching all the way up toward the skylights, ${anomaly} shook off a shower of glowing sparks and grinned wide across empty ${location}.`,
+    `One last flicker of the overhead lights, and *FZZZT!*—the air smelled like burnt popcorn and electric sparks. Looming straight out of the darkest corner of ${location} was ${anomaly}, glowing brighter than ten pinball machines on multiball at once!`,
   ];
 
   const act2Openers = [
-    `${anomaly} lunged first! ${charShort} yelped and dove sideways just as a wild wave of glowing sparks knocked a whole stack of boxes flying through the air. Sliding across the slick tiles on their sneakers like stealing second base, ${charShort} barely dodged behind a counter. "Hey! Watch the hair!" ${charShort} yelled.`,
-    `No warning. No countdown. ${anomaly} came charging straight down the aisle of ${location} like a runaway freight train! ${charShort} scrambled over a tilted shelf, ducked under a spinning neon blast, and swung the ${weapon} just in time to bat a flying ball of glowing fuzz right into the ceiling. *SPLAT!*`,
-    `"WHOA—LOOK OUT!" ${charShort} leaped straight over an overturned cart as ${anomaly} swept across the room, rattling everything that wasn't bolted down. Loose coins, wrappers, and plastic trinkets started spinning through the air like a crazy indoor tornado. ${charShort} ducked, rolled, and popped up behind a pillar, panting hard.`,
-    `The whole room went totally bonkers! ${anomaly} bounced off the back wall and zoomed straight at ${charShort} in a blaze of neon light. ${charShort} jumped left, slipped on a stray arcade token, and somehow slid RIGHT underneath the monster's giant swipe! Pure luck—and maybe a tiny bit of panic.`,
-    `With a loud *WHOOSH!*, ${anomaly} sent a glowing wave rolling across the floor of ${location}. ${charShort} hopped onto a sturdy counter like the floor was made of hot lava, wobbling wildly while trying not to drop the ${artifact}. Below them, the monster circled like a glowing shark waiting for dinner!`,
-    `${anomaly} wasn't playing around! It slammed into a row of shelves—*KABOOM!*—sending colorful 90s junk raining down everywhere. ${charShort} held the ${weapon} up like a shield, zigzagging through the cluttered aisles while the giant glowing monster chased right on their heels.`,
-    `Heart pounding a mile a minute, ${charShort} sprinted around the corner of ${location}—straight into a dead end! Behind them, ${anomaly} floated closer, glowing brighter and louder with every second. ${charShort} looked at the monster, looked at the ${artifact}, and looked at the ${weapon}. Think fast!`,
-    `"Okay, okay, BAD monster! SIT! STAY!" ${charShort} shouted, leaping over a puddle of glowing static as ${anomaly} zoomed past by an inch. Obviously, ${anomaly} did NOT sit. It spun around for another pass, making every light in ${location} flash like a disco party gone wrong.`,
+    `${anomaly} wasted ZERO seconds! With a joyful, booming rattle, the monster swept straight down the main aisle of ${location}, sending stacks of 90s boxes, bright wrappers, and shiny tokens spinning up toward the ceiling like a crazy indoor parade!`,
+    `The whole empty room went completely bonkers! ${anomaly} bounced off the back wall in a blaze of neon glow, rattling every glass case and turning ordinary shelves into a wild glowing playground. *CRASH! CLATTER! BOING!*`,
+    `With a huge *WHOOSH!*, ${anomaly} sent a rippling wave of sparkling color rolling right across the waxed floor of ${location}. Stools lifted two feet into mid-air, old store signs spun around like pinwheels, and the monster loomed right in the middle of the chaos!`,
+    `${anomaly} wasn't holding back at all! Charging through ${location} like a runaway roller coaster made of neon sparks, the giant monster turned the whole deserted building into a glowing haunted funhouse—lights flashing like a disco party gone completely wild!`,
+    `First a shelf wobbled. Then the whole aisle tilted! Towering proudly at the heart of ${location}, ${anomaly} whirled its glowing energy through every corner until forgotten toys, cassette tapes, and brass coins orbited around it like tiny colorful moons!`,
+    `No one was around to tell ${anomaly} to quiet down—so the monster went all out! With a sizzling *CRACKLE-POP!*, it surged past the deserted front counter, making every buzzer, bell, and neon tube in ${location} sing at top volume!`,
+    `Right down the center of empty ${location}, ${anomaly} put on the wildest after-hours show in town! Giant glowing ribbons shot off the walls, retro displays jittered to life, and the monster stretched higher and brighter with every passing second!`,
+    `*KA-BOOM!* Not a scary boom—a wild, electric rainbow boom! ${anomaly} zoomed from one end of ${location} to the other, tossing clouds of neon glitter and spinning every loose fixture into a crazy late-night tornado!`,
   ];
 
   const act2Middles = [
-    `Wait a second—what if these two things worked TOGETHER?! With zero time to spare, ${charShort} jammed the ${artifact} right onto the ${weapon} and flipped every switch at once. *CLICK-BZZZT!* Instantly, bright rainbow sparks burst out, firing up ${funTrick}! "Whoa—it's actually working!" ${charShort} grinned.`,
-    `A totally crazy idea popped into ${charShort}'s head. Remembering a weird trick from a Saturday morning cartoon, ${charShort} slapped the ${artifact} straight against the ${weapon} and gave it one good whack. *WHIRRR-DING!* Suddenly, ${funTrick} roared to life in a dazzling wave of electric color that made ${anomaly} skid to a shocked stop!`,
-    `"Please work, please work, please work!" ${charShort} muttered, mashing the buttons on the ${artifact} while wedging it tight against the ${weapon}. For one scary second, nothing happened. Then—*KA-ZING!*—a bright blast of ${funTrick} lit up the entire room like a giant fireworks finale!`,
-    `No way was ${charShort} getting flattened tonight! Thinking fast, they clicked the ${artifact} onto the side of the ${weapon}, cranked it all the way past the red line, and aimed straight ahead. Out burst a wild, sizzling wave of ${funTrick}, pushing back the creepy glow and knocking ${anomaly} totally off balance!`,
-    `Just when things looked hopeless, the ${artifact} gave a loud *BEEP-BEEP!* right next to the ${weapon}. Sparks jumped between them! ${charShort} grinned wide, held them tight together, and yelled, "Eat this!" A huge colorful ripple of ${funTrick} blasted straight down the aisle of ${location}!`,
-    `${charShort} twisted the dial on the ${artifact} as far as it would go and tapped it straight against the ${weapon}. *ZAP-POP!* The two gadgets lit up like a Christmas tree on turbo mode, unleashing ${funTrick}! Even ${anomaly} froze in mid-air looking seriously surprised!`,
-    `Cornered with nowhere left to run, ${charShort} crossed their fingers and smashed the ${artifact} right into the handle of the ${weapon}. *BOOOOM!* Not a scary boom—an awesome neon rainbow boom! ${funTrick} erupted across ${location}, spinning all the weird floating junk right back in ${anomaly}'s face!`,
-    `"Time for Plan B!" ${charShort} shouted—even though they had just made up Plan B half a second ago. Locking the ${artifact} onto the ${weapon}, they unleashed a full-blast wave of ${funTrick}! Brilliant streaks of neon light zipped around the room like a pinball machine hitting super jackpot!`,
+    `Right in the middle of the mess, the forgotten ${artifact} and the ${weapon} slid straight across the shaking counter and slammed together—*CLICK-BZZZT!* Instantly, a dazzling chain reaction fired off ${funTrick}, blasting bright rainbow waves right into ${anomaly}'s glowing swirl!`,
+    `Even the weird 1990s junk on the shelves couldn't sit still anymore! The vibrating ${artifact} tumbled right onto the ${weapon}—*WHIRRR-DING!*—setting off an accidental fireworks burst of ${funTrick} that made ${anomaly} spin around in total surprise!`,
+    `Every plug, dial, and button inside ${location} hit overdrive at the exact same second! The ${artifact} sparked straight into the ${weapon}, unleashing a wild, bouncing wave of ${funTrick} that lit up the whole empty room like the Fourth of July!`,
+    `Caught up in ${anomaly}'s swirling neon breeze, the ${artifact} and the ${weapon} clattered together in mid-air—*KA-ZING!* Suddenly, a gigantic glowing burst of ${funTrick} erupted across ${location}, turning the ceiling into a spinning kaleidoscope!`,
+    `At the peak of the monster mayhem, ${anomaly} brushed right past the buzzing ${artifact} and the ${weapon} on the counter. *BEEP-BEEP-ZAP!* Out roared a sizzling super-wave of ${funTrick}, swirling around the giant creature like a runaway neon lasso!`,
+    `Higher and brighter grew the monster's glow—until the overloaded ${artifact} popped right against the ${weapon}! *ZAP-POP!* Together they unleashed ${funTrick} in a massive wave of color that shook every windowpane in ${location}!`,
+    `The whole building hummed like a giant stereo cranked past ten! Swirling straight through the glowing air, the ${artifact} and ${weapon} triggered ${funTrick}—wrapping ${anomaly} in dazzling streaks of light like a pinball machine hitting super jackpot!`,
+    `Just when ${anomaly} reached full giant size, every neon sign in ${location} blinked at once alongside the buzzing ${artifact} and ${weapon}. *BOOOOM!* A wild storm of ${funTrick} flooded every aisle from floor to rafters!`,
   ];
 
   const act2Closers = [
-    `Direct hit! ${anomaly} wobbled like a giant glowing bowl of Jell-O, spun around three fast times, and let out a goofy *BWOOOOP!* sound. With one huge, harmless *POP!* of rainbow confetti sparks, the monster shrank smaller and smaller—until it vanished completely into thin air!`,
-    `Caught right in the middle of ${funTrick}, ${anomaly} couldn't hang on any longer! Its glowing outline fizzled, popped, and unraveled like a giant spool of bright neon ribbon spiraling straight toward the ceiling. One final sparkling *WHOOSH!*—and poof! Gone!`,
-    `${charShort} leaned in and gave the ${weapon} one last big push! The bright wave swept straight over ${anomaly}, lifting it off the floor in a swirl of dazzling starlight. With a silly whistling sound like a deflating balloon, the monster zipped upward into a tiny glowing dot and disappeared!`,
-    `"BULLSEYE!" ${charShort} cheered as ${funTrick} wrapped right around ${anomaly} like a giant glowing hula-hoop. The monster jittered, flickered like an old TV losing channel 3, and—*BLINK!*—vanished in a shower of warm twinkling sparkles that drifted gently down across ${location}.`,
-    `The blast hit ${anomaly} dead-center! For two breathless seconds, the whole room glowed bright enough to see from space. Then—*SNAP!*—every crazy floating object dropped softly back where it belonged, and ${anomaly} melted away into a harmless puff of glittering mist.`,
-    `Spinning faster and faster like a glowing top, ${anomaly} let out one last surprised rattle before folding inward with a crisp *POP!* Just like that, the neon storm vanished, the wind stopped howling, and the crazy lights inside ${location} blinked softly back to normal.`,
-    `One giant flash of purple and gold filled ${location} from wall to wall. ${charShort} shielded their eyes and waited. When they peeked through their fingers... nothing! ${anomaly} was totally gone, leaving only tiny shimmering sparks floating lazily toward the ceiling like sleepy fireflies.`,
-    `With a dramatic *FZZZT-POP!*, ${anomaly} burst into a hundred harmless glowing soap bubbles that floated upward and blinked out one by one. Every rattling shelf settled down. The weird hum cut off completely. ${charShort} blinked in the sudden quiet. "Did I... did I actually just win?"`,
+    `That did it! Caught right in the middle of its own wild ${funTrick} storm, ${anomaly} wobbled like a giant glowing bowl of Jell-O, spun around three super-fast times, and let out a goofy *BWOOOOP!* With one huge sparkling *POP!* of rainbow confetti light, the monster shrank smaller and smaller—and vanished straight into thin air!`,
+    `As the first pale hint of sunrise peeked past the curtains, ${anomaly}'s glowing outline fizzled, popped, and unraveled like a giant spool of neon ribbon spiraling straight up to the rafters. One last twinkling *WHOOSH!*—and poof! Gone without a trace!`,
+    `Spinning faster and faster like a gigantic neon top, ${anomaly} floated upward in a swirl of dazzling starlight. With a funny whistling sound like a deflating balloon, the monster zipped into one tiny bright dot—and blinked out completely!`,
+    `Wrapped tight inside a glowing ring of ${funTrick}, ${anomaly} jittered, flickered like an old TV losing channel 3, and—*BLINK!*—exploded into a harmless shower of warm golden sparkles drifting gently down across empty ${location}.`,
+    `For two breathless seconds, ${location} glowed bright enough to spot from the moon. Then—*SNAP!*—every crazy floating box, token, and retro prop dropped softly right back onto its shelf, and ${anomaly} melted away into a puff of glittering mist.`,
+    `One final booming chuckle echoed off the ceiling before ${anomaly} folded inward with a crisp *POP!* Instantly, the neon storm died down, the weird indoor wind stopped, and the wild flashing lights inside ${location} blinked calmly back to normal.`,
+    `A huge flash of purple and gold swept from wall to wall across ${location}—and then total stillness! When the sparkling haze cleared a second later, ${anomaly} was completely gone, leaving only tiny shimmering sparks floating lazily like sleepy fireflies.`,
+    `With a dramatic *FZZZT-POP!*, ${anomaly} burst into a hundred harmless glowing soap bubbles that drifted toward the ceiling and blinked out one by one. Every rattling shelf settled back down. The weird hum stopped completely.`,
   ];
 
   const act3Openers = [
-    `All at once, ${location} felt completely normal again. The regular ceiling lights clicked steadily back on, the creepy chill vanished, and the front door gave a friendly little *CLICK* as it unlocked by itself. ${charShort} slumped back against a counter and let out the biggest sigh of their entire life.`,
-    `Silence. Real, normal, totally-not-haunted silence! Outside, a car drove past with its radio playing an upbeat 90s hit, like nothing crazy had just happened ten feet away. ${charShort} let out a shaky laugh and wiped their forehead. "Okay. Nobody is EVER going to believe a single word of this."`,
-    `Just like waking up from a wild dream, every crooked shadow snapped straight back into place. The air in ${location} smelled ordinary again—just dust, carpet, and warm old electronics. ${charShort} stood up slowly, checked both hands, and grinned. Still in one piece!`,
-    `Whew! The crazy buzzing was gone, the lights stopped blinking, and even the soda machine in the corner kicked back on with a cheerful rumble. ${charShort} collapsed onto a nearby stool, catching their breath while giggling nervously. "Next time, I'm definitely staying home to play video games."`,
-    `One second it looked like the end of the world; the next second, ${location} was just a plain old quiet 1990s hangout again. Soft evening air drifted in through the doorway. ${charShort} dusted off their sleeves and stared around the peaceful room in total disbelief.`,
-    `The weird glow faded away until only the cozy night-lights remained. Not a single monster in sight! ${charShort} poked an empty display box carefully with one sneaker—just in case—and smiled when it didn't bite back. Coast clear!`,
-    `All the goosebumps on ${charShort}'s arms finally went away. Overhead, the regular lights hummed smoothly, and the whole room felt warm and safe again. ${charShort} leaned on the ${weapon} and shook their head with a grin. Best Tuesday night ever—and also the absolute worst!`,
-    `For a full ten seconds, ${charShort} didn't move a muscle, listening hard for any more creepy footsteps. Nothing. Just a distant cricket outside and the quiet hum of ${location}. Letting out a huge relieved laugh, ${charShort} finally lowered their guard.`,
+    `All at once, ${location} looked completely ordinary again. The regular ceiling lights clicked steadily on, the spooky chill vanished, and the early-morning sunlight began warming the front glass. Outside, a delivery truck rumbled past—totally clueless about the wild monster party that had just rocked the building.`,
+    `Silence. Real, normal, totally-not-haunted morning silence! Down the street, sprinklers hissed onto suburban lawns and birds chirped like nothing weird had happened ten feet away. Inside ${location}, every crooked shadow had snapped neatly back into place.`,
+    `Just like waking up from a wild dream, the whole room settled back to everyday 1990s normal. The air inside ${location} smelled ordinary again—just floor wax, dusty cardboard, and warm old electronics. Not a single monster in sight!`,
+    `Whew—by sunrise, the crazy buzzing was totally gone, the neon signs stopped blinking, and even the soda machine in the corner kicked back on with a cheerful rumble. Nobody opening the shop today would ever guess what went down past midnight.`,
+    `One second it looked like a glowing monster funhouse; the next second, ${location} was just a plain, quiet neighborhood hangout again. Cool morning air slipped beneath the doorframe across spotless, peaceful tiles.`,
+    `The eerie neon glow faded away until only cozy daylight poured through the storefront windows. Every aisle sat straight. Every counter looked tidy—well, almost.`,
+    `All traces of the midnight storm vanished before the first alarm clocks started ringing down the block. Overhead, the regular lights hummed smoothly across quiet ${location}, keeping its big spooky secret locked tight.`,
+    `For a whole quiet hour before opening time, nothing moved a muscle inside ${location}. Just dust motes floating lazily in warm sunbeams and the steady tick of an ordinary wall clock.`,
   ];
 
   const act3Middles = [
-    `${charShort} unhooked the warm, slightly smoking ${artifact} from the ${weapon} and blew on it like a hot slice of pizza. Somehow, held together with pure 90s luck, both pieces of gear still worked! A couple shiny arcade tokens rolled past their sneakers—weird little souvenirs from a wild night.`,
-    `Tucking the ${artifact} safely back into their pocket and slinging the ${weapon} over one shoulder, ${charShort} brushed glowing glitter dust off their jacket. The morning crew was definitely going to wonder why half the shelves looked slightly crooked, though!`,
-    `Looking down at the beat-up ${weapon} and the humming ${artifact}, ${charShort} couldn't help smiling. They looked totally ordinary again—just regular neighborhood junk that had somehow saved the whole block from ${anomaly}. Not bad at all.`,
-    `${charShort} did one quick lap around ${location} just to be 100% sure no sneaky glowing puddles were hiding behind the counters. Everything was spotless—well, except for a funny scorched smiley shape left right on the floor tiles.`,
-    `Carefully packing away the ${artifact} and the ${weapon}, ${charShort} shook their head at the tiny sparkles still clinging to their shoelaces. Good luck explaining THOSE to anyone tomorrow morning!`,
-    `With the ${weapon} tucked under one arm and the ${artifact} safe in their backpack, ${charShort} headed toward the exit. Every step felt lighter now—like finishing the scariest roller coaster in the park and realizing you survived.`,
-    `${charShort} gave the trusty ${artifact} a grateful pat and wiped a smudge of glowing neon dust off the ${weapon}. Everything in ${location} sat peacefully in place, as if ${anomaly} had never even been there.`,
-    `Checking their watch, ${charShort} blinked—only three minutes had passed! How could a whole monster showdown take three minutes?! Shaking their head, they grabbed the ${weapon} and ${artifact} and pushed open the exit door.`,
+    `Over on the counter, the ${artifact} and the ${weapon} sat side by side, still faintly warm and dusted with tiny rainbow sparkles. A couple shiny brass arcade tokens sat nearby—weird little clues from a wild night nobody saw.`,
+    `Almost everything in ${location} looked completely untouched—except for a tiny dusting of glowing glitter along the top shelves and two displays sitting just half an inch crooked. Good luck to the morning shift figuring THAT one out!`,
+    `The beat-up ${weapon} and the quiet ${artifact} looked like plain old 1990s junk again, though a thin curl of ozone shimmer still hovered above the tabletop where ${anomaly} had peaked.`,
+    `Down the center aisle, the floor tiles gleamed spotless—except for one goofy, faintly glowing footprint shape right near the register that faded away the second the sun hit it.`,
+    `Every hanging banner hung straight again, and the forgotten ${artifact} sat silent beside the ${weapon}. Still, a couple tiny glowing sparks clung stubbornly to the counter edge like leftover magic.`,
+    `Anyone walking past ${location} this morning would think it was the most boring building on the whole block—unless they looked closely at the tiny rainbow prism light dancing off the back counter.`,
+    `The shelves stood straight, the glass looked crystal clear, and the ${artifact} wasn't beeping anymore. It was as if ${anomaly} had never even stepped out of the shadows.`,
+    `Only three minutes had actually ticked past on the wall clock all night long! Somehow, an entire midnight monster takeover had squeezed itself right between two quiet ticks of the second hand.`,
   ];
 
   const act3Closers = [
-    `Wait a second—what was that shiny thing lying right where ${anomaly} had popped? ${charShort} bent down and picked up a brand-new, super-glossy holographic trading card, still warm to the touch. It had a picture of ${anomaly} right on the front! ${charShort} slid it into their pocket and walked out under the streetlights... totally missing the tiny moment when the monster on the card winked.`,
-    `Right on the front counter sat something that definitely wasn't there before: a gleaming rainbow foil trading card showing ${anomaly} frozen mid-leap! "Whoa... cool!" ${charShort} grinned, slipping the card into their pocket before heading home. Only when they reached the sidewalk did the card let out one tiny, muffled giggle from inside their jacket.`,
-    `Before stepping outside, ${charShort} spotted a bright holographic trading card tucked neatly beside a shiny brass token. They picked it up, admired the shimmering picture of ${anomaly}, and laughed. "Nice trophy!" They hurried home through the cool night—never noticing that back inside ${location}, the neon sign blinked twice and spelled: SEE YOU NEXT ISSUE.`,
-    `Something sparkly caught ${charShort}'s eye by the door. Resting face-up on the floor was a crisp new holographic trading card with ${anomaly} grinning right off the foil! ${charShort} pocketed it and jogged down the sidewalk, feeling unstoppable. Half a block later, they pulled the card back out for one more look—and froze. Wait... wasn't the monster facing LEFT a second ago?!`,
-    `Sitting neatly right on the counter was a freshly glowing Series 2 holographic trading card! ${charShort} scooped it up with a grin, tucked it beside the ${artifact}, and stepped out into the quiet night air. Everything was finally over. Totally over. At least... until their pocket began to buzz with a soft, familiar little *BZZZT*.`,
-    `Right at the doorstep lay a shimmering rainbow trading card, glowing faintly like a night-light. ${charShort} picked it up, smiled at the wild picture of ${anomaly} trapped inside the foil, and headed home whistling a tune. Behind them, the empty glass window of ${location} steamed up with one tiny drawn smiley face... and then went dark.`,
-    `Just before locking up, ${charShort} found a gleaming holographic card resting right where the monster had vanished. "Awesome," ${charShort} whispered, sliding it into a protective sleeve and heading out into the starry 1990s night. Inside their backpack, the card gave one tiny playful tap... tap... tap.`,
-    `A sudden glint on the floor made ${charShort} stop in their tracks. Lying there was a brand-new holographic trading card, sparkling with rainbow foil and still faintly warm! ${charShort} slipped it into their jacket pocket and strolled happily down the quiet street—totally unaware that their own shadow behind them had just sprouted two tiny glowing antennae.`,
+    `Wait a second—what was that shiny rectangle lying right on the floor where ${anomaly} had popped? Resting face-up in a sunbeam was a brand-new, super-glossy holographic trading card, still warm to the touch, with a bright foil picture of ${anomaly} right on the front! The room stayed dead quiet... except for the sneaky little moment when the monster on the card winked.`,
+    `Right on the front counter sat something that definitely wasn't there yesterday: a gleaming rainbow foil trading card showing ${anomaly} frozen mid-leap! Everything inside ${location} looked completely over—right up until the shiny card wiggled half an inch to the left and let out one tiny, muffled giggle.`,
+    `Tucked neatly beside a brass token near the front door lay a crisp holographic trading card sparkling with rainbow foil! On the front, ${anomaly} grinned straight out of the shiny cardstock. High above the quiet doorway, the switched-off neon sign suddenly blinked twice and spelled: SEE YOU NEXT ISSUE.`,
+    `Right by the entrance sat a freshly minted holographic trading card with ${anomaly} glaring playfully off the foil! The whole empty building stayed silent for five whole seconds... and then, if you looked closely at the card, wait a minute—wasn't the monster facing LEFT a second ago?!`,
+    `Sitting neatly in the exact center of the counter was a glowing Series 2 holographic trading card of ${anomaly}! The midnight haunt was over. Totally over. At least... until the card slid across the polished laminate with a tiny, familiar *BZZZT*.`,
+    `Right on the doorstep lay a shimmering rainbow trading card, glowing faintly like a night-light with ${anomaly} trapped right inside the foil. Behind it, the empty glass window of ${location} fogged up all by itself with one cheeky drawn smiley face... and then cleared away.`,
+    `Lying right where the monster had vanished was a gleaming holographic card, shimmering softly in the quiet morning light. Everything was calm and still inside ${location}—until the shiny foil card gave one tiny playful tap... tap... tap against the counter.`,
+    `A sudden glint caught the morning sun on the floor of ${location}: a brand-new holographic trading card of ${anomaly}, sparkling with rainbow foil and still faintly warm! As the sun climbed higher outside, the tiny shadow cast by the card stretched across the counter—and sprouted two wiggly glowing antennae.`,
   ];
 
   return {
@@ -575,404 +561,132 @@ export interface StoryboardHeroLook {
   id: string;
   emoji: string;
   shortLabel: string;
-  mode: 'human' | 'drone' | 'pure-world';
-  gender: 'female' | 'male' | 'none';
-  ageBracket: '20s' | '30s' | '40s' | '50s' | '60s' | 'none';
+  mode: 'pure-world';
   colorFamily: string;
-  pronounSubj: 'she' | 'he' | 'it';
-  pronounPoss: 'her' | 'his' | 'its';
-  pronounObj: 'her' | 'him' | 'it';
   fullDescription: string;
-  shortAnchor: string;
+  stagingCue: string;
 }
 
-export const STORYBOARD_HERO_LOOKS: StoryboardHeroLook[] = [
+// 10 WILDLY DISTINCT BAD-GUY-ONLY MONSTER VIBES / STAGING MOODS (ZERO HUMAN HEROES!)
+export const STORYBOARD_MONSTER_MOODS: StoryboardHeroLook[] = [
   {
-    id: 'canary-raincoat-sleuth',
-    emoji: '🌧️',
-    shortLabel: 'Canary Raincoat Sleuth (54F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '50s',
-    colorFamily: 'yellow',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 54-year-old woman with silver-streaked wavy hair in a messy bun and round tortoiseshell glasses, wearing a bright canary-yellow hooded rain slicker, charcoal knit scarf, and tall rubber rain boots',
-    shortAnchor: 'the silver-haired woman in the bright canary-yellow rain slicker',
-  },
-  {
-    id: 'cherry-jumpsuit-mechanic',
-    emoji: '🔧',
-    shortLabel: 'Cherry Jumpsuit Mechanic (48M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '40s',
-    colorFamily: 'red',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a stout 48-year-old bearded man with curly salt-and-pepper hair under a dark knit beanie, wearing a cherry-red heavy canvas mechanic jumpsuit with rolled sleeves and scuffed tan work boots',
-    shortAnchor: 'the bearded man in the cherry-red mechanic jumpsuit and knit beanie',
-  },
-  {
-    id: 'mustard-trench-detective',
-    emoji: '🕵️',
-    shortLabel: 'Mustard Trench Detective (62M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '60s',
-    colorFamily: 'mustard',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a tall 62-year-old gray-haired veteran with a neatly trimmed mustache and classic wide-brim felt fedora, wearing a long sweeping mustard-tan trench coat with upturned collar, wool trousers, and leather oxfords',
-    shortAnchor: 'the gray-haired detective in the long mustard trench coat and fedora',
-  },
-  {
-    id: 'white-labcoat-scientist',
-    emoji: '🔬',
-    shortLabel: 'White Lab-Coat Scientist (36F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '30s',
-    colorFamily: 'white',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 36-year-old woman with long braided dark hair and retro clear-frame spectacles, wearing a crisp knee-length white vintage laboratory coat over an emerald turtleneck and pleated brown corduroy slacks',
-    shortAnchor: 'the braided scientist in the crisp white laboratory coat',
-  },
-  {
-    id: 'plum-overalls-artist',
-    emoji: '🎧',
-    shortLabel: 'Plum Overalls Artist (29F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '20s',
-    colorFamily: 'purple',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 29-year-old woman with a short asymmetric violet-tinted bob and vintage round headphones draped around her neck, wearing faded plum corduroy overalls over a striped marigold long-sleeve shirt and chunky white sneakers',
-    shortAnchor: 'the violet-bobbed artist in plum corduroy overalls and headphones',
-  },
-  {
-    id: 'tangerine-puffer-courier',
-    emoji: '🕶️',
-    shortLabel: 'Tangerine Puffer Courier (31M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '30s',
-    colorFamily: 'orange',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a wiry 31-year-old man with thick dark curly hair and mirrored wraparound sunglasses, wearing a bright sunset-orange quilted puffer vest over a black mock-neck sweater and baggy olive cargo pants',
-    shortAnchor: 'the curly-haired courier in the bright sunset-orange puffer vest',
-  },
-  {
-    id: 'emerald-varsity-captain',
-    emoji: '🧥',
-    shortLabel: 'Emerald Varsity Captain (27F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '20s',
-    colorFamily: 'green',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a tall 27-year-old athletic woman with fiery ginger curly hair tied in a high scrunchie ponytail, wearing an oversized emerald-green and cream vintage letterman jacket, pleated plaid midi skirt, and retro high-tops',
-    shortAnchor: 'the ginger-haired woman in the emerald-and-cream varsity jacket',
-  },
-  {
-    id: 'cream-fisherman-watcher',
-    emoji: '⚓',
-    shortLabel: 'Cream Knit Watcher (59M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '50s',
-    colorFamily: 'cream',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a weathered 59-year-old coastal veteran with a bushy white beard and maroon wool watch cap, wearing a thick cable-knit cream fisherman sweater, dark canvas trousers, and laced leather boots',
-    shortAnchor: 'the white-bearded man in the thick cream fisherman sweater and maroon cap',
-  },
-  {
-    id: 'burgundy-velvet-dj',
-    emoji: '💿',
-    shortLabel: 'Burgundy Velvet DJ (33F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '30s',
-    colorFamily: 'burgundy',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 33-year-old woman with long dark wavy hair and large gold hoop earrings, wearing a rich burgundy velvet 1990s blazer over a bright turquoise patterned shirt and wide-leg black trousers',
-    shortAnchor: 'the woman in the rich burgundy velvet blazer and gold hoop earrings',
-  },
-  {
-    id: 'silver-parka-futurist',
-    emoji: '🛸',
-    shortLabel: 'Silver Space-Parka Explorer (26M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '20s',
-    colorFamily: 'silver',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a 26-year-old man with bleached platinum spiky hair and amber-tinted retro visor glasses, wearing a shiny metallic-silver puffy winter parka, black nylon track pants, and bright neon-trimmed sneakers',
-    shortAnchor: 'the platinum-haired explorer in the shiny silver puffy parka',
-  },
-  {
-    id: 'teal-bowling-tech',
-    emoji: '🎳',
-    shortLabel: 'Teal Bowling-Shirt Tech (44M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '40s',
-    colorFamily: 'teal',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a 44-year-old balding man with round wire-rim glasses and a cheerful mustache, wearing a vintage teal-and-cream paneled retro bowling shirt, khaki pleated chinos, and leather loafers',
-    shortAnchor: 'the mustachioed technician in the teal-and-cream retro bowling shirt',
-  },
-  {
-    id: 'plaid-bucket-explorer',
-    emoji: '🏕️',
-    shortLabel: 'Buffalo-Plaid Explorer (42F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '40s',
-    colorFamily: 'plaid',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 42-year-old woman with long auburn braids under a tan canvas bucket hat, wearing a chunky red-and-black buffalo-plaid wool overshirt over brown utility overalls and laced hiking boots',
-    shortAnchor: 'the woman in the tan bucket hat and red-and-black buffalo-plaid overshirt',
-  },
-  {
-    id: 'hotpink-tracksuit-sprinter',
-    emoji: '⚡',
-    shortLabel: 'Hot-Pink Tracksuit Sprinter (30F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '30s',
-    colorFamily: 'magenta',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 30-year-old woman with short natural curly hair and a neon sweatband, wearing a vibrant hot-pink and turquoise geometric 1990s nylon tracksuit and crisp white retro trainers',
-    shortAnchor: 'the athletic woman in the bright hot-pink and turquoise tracksuit',
-  },
-  {
-    id: 'olive-field-archivist',
-    emoji: '🗂️',
-    shortLabel: 'Olive Field-Parka Archivist (51M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '50s',
-    colorFamily: 'olive',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a 51-year-old man with silver-rimmed rectangular glasses and neatly parted dark hair, wearing a multi-pocket olive-drab field parka over a burnt-orange knit vest and dark brown corduroys',
-    shortAnchor: 'the bespectacled archivist in the olive field parka and burnt-orange vest',
-  },
-  {
-    id: 'saffron-poncho-cyclist',
-    emoji: '🚲',
-    shortLabel: 'Saffron Poncho Cyclist (25F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '20s',
-    colorFamily: 'amber',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 25-year-old woman with twin dark braids tucked under a vintage turquoise cycling cap, wearing a flowing saffron-gold weatherproof poncho over dark cycling shorts and striped leg warmers',
-    shortAnchor: 'the cyclist in the flowing saffron-gold poncho and turquoise cap',
-  },
-  {
-    id: 'diner-apron-cook',
-    emoji: '🍳',
-    shortLabel: 'Diner Apron Cook (56M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '50s',
-    colorFamily: 'apron',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a broad-shouldered 56-year-old man with a graying crew cut and classic white paper diner cap, wearing a crisp white striped kitchen apron over a rolled-sleeve charcoal chambray shirt and dark slacks',
-    shortAnchor: 'the diner cook in the white paper cap and crisp striped kitchen apron',
-  },
-  {
-    id: 'crimson-wrap-martial',
-    emoji: '🥋',
-    shortLabel: 'Crimson Sash Martial Artist (35F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '30s',
-    colorFamily: 'crimson',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 35-year-old woman with a sleek high jet-black topknot, wearing a deep crimson-and-indigo quilted martial-arts wrap jacket tied with a wide cloth sash, loose charcoal cotton trousers, and canvas slip-ons',
-    shortAnchor: 'the topknotted martial artist in the deep crimson quilted wrap jacket',
-  },
-  {
-    id: 'suspenders-projectionist',
-    emoji: '🎞️',
-    shortLabel: 'Red-Suspenders Projectionist (39M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '30s',
-    colorFamily: 'checkered',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a lanky 39-year-old man with tousled chestnut curls and thick horn-rimmed glasses, wearing a crisp cream button-down shirt with bright red suspenders, black-and-white houndstooth trousers, and leather boots',
-    shortAnchor: 'the lanky projectionist in bright red suspenders and houndstooth trousers',
-  },
-  {
-    id: 'coral-cardigan-librarian',
-    emoji: '📚',
-    shortLabel: 'Coral Cardigan Librarian (64F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '60s',
-    colorFamily: 'coral',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 64-year-old grandmotherly woman with a fluffy white bob haircut and beaded eyeglass chain, wearing a cozy coral-pink patterned knit cardigan over a floral vintage blouse and long navy pleated skirt',
-    shortAnchor: 'the white-haired woman in the cozy coral-pink cardigan and pleated skirt',
-  },
-  {
-    id: 'hivis-night-custodian',
-    emoji: '🦺',
-    shortLabel: 'Neon-Vest Night Custodian (47M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '40s',
-    colorFamily: 'neon-lime',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'a 47-year-old man with a close-cropped beard and vintage corduroy cap, wearing a bright neon-lime reflective safety vest over a charcoal sweatshirt, dark utility trousers, and heavy work boots',
-    shortAnchor: 'the bearded custodian in the bright neon-lime reflective safety vest',
-  },
-  {
-    id: 'tweed-bowtie-professor',
-    emoji: '🎓',
-    shortLabel: 'Tweed Bow-Tie Professor (66M)',
-    mode: 'human',
-    gender: 'male',
-    ageBracket: '60s',
-    colorFamily: 'tweed',
-    pronounSubj: 'he',
-    pronounPoss: 'his',
-    pronounObj: 'him',
-    fullDescription:
-      'an eccentric 66-year-old professor with wild tufts of white hair and a crooked polka-dot bow tie, wearing a patched brown tweed blazer over a warm mustard waistcoat and pleated wool trousers',
-    shortAnchor: 'the white-haired professor in the brown tweed blazer and bow tie',
-  },
-  {
-    id: 'mint-goggles-tinkerer',
-    emoji: '🥽',
-    shortLabel: 'Mint Smock & Goggles Tinkerer (31F)',
-    mode: 'human',
-    gender: 'female',
-    ageBracket: '30s',
-    colorFamily: 'mint',
-    pronounSubj: 'she',
-    pronounPoss: 'her',
-    pronounObj: 'her',
-    fullDescription:
-      'a 31-year-old woman with copper-red curly hair and vintage brass magnifying goggles perched on her forehead, wearing a mint-green vintage utility smock, canvas tool apron, and cuffed brown boots',
-    shortAnchor: 'the copper-haired tinkerer in the mint utility smock and brass goggles',
-  },
-  {
-    id: 'retro-hover-drone',
-    emoji: '🤖',
-    shortLabel: 'Mini Retro CRT Hover-Drone (No Human)',
-    mode: 'drone',
-    gender: 'none',
-    ageBracket: 'none',
-    colorFamily: 'drone-purple',
-    pronounSubj: 'it',
-    pronounPoss: 'its',
-    pronounObj: 'it',
-    fullDescription:
-      'no human characters at all; instead, the sole protagonist is a charming floating translucent-purple 1990s mini CRT-cube companion drone with glowing amber pixel eyes, chrome bunny-ear antennas, and tiny mechanical gripper arms',
-    shortAnchor: 'the tiny floating translucent-purple CRT-cube drone',
-  },
-  {
-    id: 'pure-world-no-human',
-    emoji: '🌌',
-    shortLabel: 'Pure World & Creature Only (No Human)',
+    id: 'colossal-giant',
+    emoji: '🌋',
+    shortLabel: 'Colossal Towering Giant',
     mode: 'pure-world',
-    gender: 'none',
-    ageBracket: 'none',
-    colorFamily: 'no-human',
-    pronounSubj: 'it',
-    pronounPoss: 'its',
-    pronounObj: 'it',
+    colorFamily: 'colossal',
     fullDescription:
-      'completely uninhabited atmospheric scenes with no human figures anywhere, focusing purely on the surreal 1990s retro architecture, self-activated glowing vintage gadgets, and the towering cosmic creature transforming the empty space',
-    shortAnchor: 'the uninhabited retro room with no human figures',
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster at colossal skyscraper-like indoor scale, dwarfing shelves, arcade cabinets, and ceiling rafters',
+    stagingCue: 'colossal ceiling-scraping scale looming dramatically over tiny retro fixtures',
+  },
+  {
+    id: 'mischievous-trickster',
+    emoji: '😈',
+    shortLabel: 'Mischievous Slapstick Trickster',
+    mode: 'pure-world',
+    colorFamily: 'trickster',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the mischievous wide-eyed monster playfully juggling floating retro objects and tipping cluttered displays',
+    stagingCue: 'playful chaotic mischief tossing vintage toys, coins, and props across the room',
+  },
+  {
+    id: 'shadow-lurker',
+    emoji: '🌒',
+    shortLabel: 'Eerie Backlit Shadow Lurker',
+    mode: 'pure-world',
+    colorFamily: 'shadow',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the eerie backlit monster emerging out of deep moody fog with glowing eyes piercing the mist',
+    stagingCue: 'dramatic backlit mystery silhouette with glowing eyes shining through curling fog',
+  },
+  {
+    id: 'neon-disco-overdrive',
+    emoji: '🪩',
+    shortLabel: 'Neon Disco Prism Overdrive',
+    mode: 'pure-world',
+    colorFamily: 'disco',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster bursting with dazzling kaleidoscope prism beams, flashing arcade colors, and mirror-ball reflections',
+    stagingCue: 'blinding neon disco kaleidoscope bursts bouncing off every glossy surface',
+  },
+  {
+    id: 'haunted-frost-fog',
+    emoji: '❄️',
+    shortLabel: 'Haunted Frost & Fog Apparition',
+    mode: 'pure-world',
+    colorFamily: 'frost',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster trailing curling clouds of shimmering icy mist with sparkling frost creeping across glass and counters',
+    stagingCue: 'shimmering frost crystals, misty breath-like vapor clouds, and chilled glowing reflections',
+  },
+  {
+    id: 'poltergeist-vortex',
+    emoji: '🌀',
+    shortLabel: 'Swirling Poltergeist Vortex',
+    mode: 'pure-world',
+    colorFamily: 'vortex',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster centered inside a wild levitating cyclone of orbiting 1990s cassettes, coins, boxes, and flyers',
+    stagingCue: 'a spinning gravity-defying cyclone of orbiting retro objects swirling around the monster',
+  },
+  {
+    id: 'scale-growth-surge',
+    emoji: '🔬',
+    shortLabel: 'Miniature-to-Giant Growth Surge',
+    mode: 'pure-world',
+    colorFamily: 'growth',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster starting small beside tabletop relics in early frames before surging to gigantic room-filling scale',
+    stagingCue: 'dramatic size shift growing from tabletop curio scale to massive room-filling titan',
+  },
+  {
+    id: 'bioluminescent-relic',
+    emoji: '✨',
+    shortLabel: 'Glowing Firefly Bioluminescence',
+    mode: 'pure-world',
+    colorFamily: 'bioluminescent',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the luminous monster radiating magical firefly-like bioluminescent patterns and drifting glowing spores',
+    stagingCue: 'ethereal bioluminescent glow surrounded by hundreds of tiny floating starlight fireflies',
+  },
+  {
+    id: 'museum-diorama-spook',
+    emoji: '🏛️',
+    shortLabel: 'Haunted Spotlight Diorama',
+    mode: 'pure-world',
+    colorFamily: 'diorama',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster posed with theatrical eerie grandeur inside crisp spotlight beams like a haunted exhibit coming alive',
+    stagingCue: 'theatrical museum-gallery spotlight cones illuminating every tactile detail of the monster',
+  },
+  {
+    id: 'cartoon-reality-bender',
+    emoji: '🌈',
+    shortLabel: 'Surreal Wavy Reality Bender',
+    mode: 'pure-world',
+    colorFamily: 'surreal',
+    fullDescription:
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster warping checkered floor tiles, walls, and vintage signage into impossible wavy dreamlike curves',
+    stagingCue: 'playful surreal bent walls, wavy checkerboard floors, and impossible dreamlike geometry',
   },
 ];
 
-export function buildConsistentHeroVisualLock(charClean: string): {
+// Exported alias for backwards compatibility
+export const STORYBOARD_HERO_LOOKS = STORYBOARD_MONSTER_MOODS;
+
+export function buildConsistentHeroVisualLock(_charClean: string): {
   genderNoun: 'female' | 'male';
   pronounSubj: 'she' | 'he';
   pronounPoss: 'her' | 'his';
   shortRole: string;
   lockedSheet: string;
 } {
-  const match = charClean.match(/^([^(]+?)(?:\s*\((.+)\))?$/);
-  const shortName = (match?.[1] || charClean).trim();
-  const traitRaw = sanitizeVisualPromptText(
-    (
-      match?.[2] || '1990s suburban recon explorer in authentic nineties attire'
-    ).trim()
-  );
-  const seed = hashString(shortName.toLowerCase());
-  const humanLooks = STORYBOARD_HERO_LOOKS.filter((h) => h.mode === 'human');
-  const chosen = pickSeeded(humanLooks, seed, 2);
-  const genderNoun: 'female' | 'male' = chosen.gender === 'female' ? 'female' : 'male';
   return {
-    genderNoun,
-    pronounSubj: genderNoun === 'female' ? 'she' : 'he',
-    pronounPoss: genderNoun === 'female' ? 'her' : 'his',
-    shortRole: traitRaw,
-    lockedSheet: chosen.fullDescription,
+    genderNoun: 'male',
+    pronounSubj: 'he',
+    pronounPoss: 'his',
+    shortRole: 'Uninhabited 1990s Bad Guy Showcase',
+    lockedSheet: STORYBOARD_MONSTER_MOODS[0].fullDescription,
   };
 }
 
@@ -1361,7 +1075,7 @@ interface StoryboardPlan {
   gif2Idx: number;
 }
 
-const VARIETY_STORAGE_KEY = '199x_zine_visual_variety_v2';
+const VARIETY_STORAGE_KEY = '199x_zine_badguy_variety_v3';
 const storyboardPlanCache = new Map<string, StoryboardPlan>();
 
 function loadPersistedStoryboardHistory(): StoryboardPlan[] {
@@ -1409,57 +1123,9 @@ function pickRandomFreshIndex(length: number, avoid: number[]): number {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function pickFreshHeroLookIndex(recent: StoryboardPlan[]): number {
-  const avoidIdx = recent.slice(-12).map((p) => p.heroLookIdx);
-  const avoidColors = new Set(
-    recent
-      .slice(-6)
-      .map((p) => STORYBOARD_HERO_LOOKS[p.heroLookIdx]?.colorFamily)
-      .filter(Boolean)
-  );
-  const lastLook = recent.length > 0 ? STORYBOARD_HERO_LOOKS[recent[recent.length - 1].heroLookIdx] : undefined;
-  const secondLastLook =
-    recent.length > 1 ? STORYBOARD_HERO_LOOKS[recent[recent.length - 2].heroLookIdx] : undefined;
-
-  // Tier 1: unseen in last 12 + new color family (last 6) + different gender & age bracket from last roll
-  let candidates = STORYBOARD_HERO_LOOKS.map((_, i) => i).filter((i) => {
-    if (avoidIdx.includes(i)) return false;
-    const look = STORYBOARD_HERO_LOOKS[i];
-    if (avoidColors.has(look.colorFamily)) return false;
-    if (lastLook) {
-      if (look.mode !== 'human' && lastLook.mode !== 'human') return false;
-      if (look.gender !== 'none' && look.gender === lastLook.gender) return false;
-      if (look.ageBracket !== 'none' && look.ageBracket === lastLook.ageBracket) return false;
-    }
-    if (secondLastLook && look.ageBracket !== 'none' && look.ageBracket === secondLastLook.ageBracket) {
-      return false;
-    }
-    return true;
-  });
-
-  // Tier 2 fallback: unseen in last 10 + new color family + different gender from last roll
-  if (candidates.length === 0) {
-    candidates = STORYBOARD_HERO_LOOKS.map((_, i) => i).filter((i) => {
-      if (recent.slice(-10).some((p) => p.heroLookIdx === i)) return false;
-      const look = STORYBOARD_HERO_LOOKS[i];
-      if (avoidColors.has(look.colorFamily)) return false;
-      if (lastLook && look.gender !== 'none' && look.gender === lastLook.gender) return false;
-      return true;
-    });
-  }
-
-  // Tier 3 fallback: unseen in last 8
-  if (candidates.length === 0) {
-    candidates = STORYBOARD_HERO_LOOKS.map((_, i) => i).filter(
-      (i) => !recent.slice(-8).some((p) => p.heroLookIdx === i)
-    );
-  }
-
-  if (candidates.length === 0) {
-    candidates = STORYBOARD_HERO_LOOKS.map((_, i) => i);
-  }
-
-  return candidates[Math.floor(Math.random() * candidates.length)];
+function pickFreshMonsterMoodIndex(recent: StoryboardPlan[]): number {
+  const avoidIdx = recent.slice(-8).map((p) => p.heroLookIdx);
+  return pickRandomFreshIndex(STORYBOARD_MONSTER_MOODS.length, avoidIdx);
 }
 
 function getNonRepeatingStoryboardPlan(signature: string): StoryboardPlan {
@@ -1483,7 +1149,7 @@ function getNonRepeatingStoryboardPlan(signature: string): StoryboardPlan {
       STORYBOARD_CAMERA_GRAMMARS.length,
       recentStoryboardPlans.slice(-4).map((p) => p.compIdx)
     ),
-    heroLookIdx: pickFreshHeroLookIndex(recentStoryboardPlans),
+    heroLookIdx: pickFreshMonsterMoodIndex(recentStoryboardPlans),
     gif1Idx: pickRandomFreshIndex(
       8,
       recentStoryboardPlans.slice(-6).map((p) => p.gif1Idx)
@@ -1517,15 +1183,12 @@ export function compile199xZinePrompts(
   const rawAnomaly =
     anomalyOverride ||
     encounter.anomaly_name ||
-    (encounter.card_type === 'bad_guy'
-      ? encounter.entity_name
-      : 'Sentient Neon Rift Anomaly');
-  const rawChar = encounter.featured_character || "Dex 'Neon-Drift' Kowalski";
-  const charClean = sanitizeVisualPromptText(rawChar);
+    encounter.entity_name ||
+    'The Giant Lava-Lamp Wax Jellyfish';
   const rawWeapon = encounter.protagonist_loadout?.improvised_weapon || 'retro pocket frequency tuner';
   const rawArtifact = encounter.protagonist_loadout?.nostalgia_artifact || 'retro handheld scanner';
   const synergy = sanitizeVisualPromptText(
-    encounter.protagonist_loadout?.weird_synergy_effect || 'rainbow prism resonance'
+    encounter.protagonist_loadout?.weird_synergy_effect || 'rainbow prism burst'
   );
 
   // Preserve unique sanitized location & creature specifics while ensuring Flow / Nano Banana policy safety
@@ -1548,7 +1211,7 @@ export function compile199xZinePrompts(
     'bad_guy',
     safeGadget2,
     safeGadget1,
-    rawChar
+    ''
   );
   const leadPreset = presets[0];
 
@@ -1556,7 +1219,7 @@ export function compile199xZinePrompts(
   const lightingClean = sanitizeVisualPromptText(environment.lightingCue);
   const leadAudioClean = sanitizeVisualPromptText(leadPreset.audio);
 
-  const planSignature = `${rawLocation}|${rawAnomaly}|${rawChar}|${rawWeapon}|${rawArtifact}|${encounter.visual_style || ''}|${encounter.card_theme || ''}`;
+  const planSignature = `${rawLocation}|${rawAnomaly}|${rawWeapon}|${rawArtifact}|${encounter.visual_style || ''}|${encounter.card_theme || ''}`;
   const plan = getNonRepeatingStoryboardPlan(planSignature);
   const overrideStyle = visualStyleIdOverride
     ? STORYBOARD_VISUAL_STYLES.find((s) => s.id === visualStyleIdOverride)
@@ -1571,20 +1234,15 @@ export function compile199xZinePrompts(
     : plan.arcIdx % STORYBOARD_STORY_ARCS.length;
   const activeArcMeta = STORYBOARD_STORY_ARCS[resolvedArcIdx];
 
-  const overrideHeroLook = heroLookIdOverride
-    ? STORYBOARD_HERO_LOOKS.find((h) => h.id === heroLookIdOverride)
+  const overrideMood = heroLookIdOverride
+    ? STORYBOARD_MONSTER_MOODS.find((h) => h.id === heroLookIdOverride)
     : undefined;
-  const heroLook =
-    overrideHeroLook || STORYBOARD_HERO_LOOKS[plan.heroLookIdx % STORYBOARD_HERO_LOOKS.length];
-
-  const isPureWorld = heroLook.mode === 'pure-world';
-  const protag = heroLook.shortAnchor;
-  const pPoss = heroLook.pronounPoss;
-  const pObj = heroLook.pronounObj;
+  const monsterMood =
+    overrideMood || STORYBOARD_MONSTER_MOODS[plan.heroLookIdx % STORYBOARD_MONSTER_MOODS.length];
 
   const flowArtStyle = `${palette.medium}, color palette of ${palette.colors}, ${cameraGrammar}, borderless edge-to-edge full-bleed visuals, and blank surfaces with no words or lettering`;
 
-  // 12 COMPLETELY DIFFERENT 4-SCENE NARRATIVE ARCS — each explicitly naming the new protagonist look (or Pure World with zero humans!)
+  // 12 COMPLETELY DIFFERENT 4-SCENE BAD-GUY-ONLY ARCS (100% Monster Spotlight, ZERO Human Heroes!)
   interface StoryArcScript {
     p1: string;
     p2: string;
@@ -1597,8 +1255,7 @@ export function compile199xZinePrompts(
     outroBeat3: string;
   }
 
-  const storyArcScripts: Record<string, StoryArcScript> = isPureWorld
-    ? {
+  const storyArcScripts: Record<string, StoryArcScript> = {
         'chase-trap': {
           p1: `Empty high-energy interior of ${locationVisual} under ${atmosphere} with no human characters: vintage chairs, display racks, and retro boxes rattle as the towering cosmic creature bursts through the back aisles leaving swirling trails of ${palette.energyFx}.`,
           p2: `Close-up stillness inside empty ${locationVisual} with no people: ${safeGadget1} sits humming and blinking rapidly on a cluttered retro counter while the cosmic creature's gigantic glowing shadow sweeps across the far wall.`,
@@ -1731,140 +1388,6 @@ export function compile199xZinePrompts(
           outroBeat2: `those shimmering light ribbons condense onto the scuffed tiles into three gleaming blank rainbow holographic trading cards`,
           outroBeat3: `quiet room lights flicker steadily back on over the sparkling cards on the floor`,
         },
-      }
-    : {
-        'chase-trap': {
-          p1: `Sudden mid-chase sprint inside ${locationVisual} under ${atmosphere}: ${protag} races urgently toward the camera glancing over ${pPoss} shoulder while the towering cosmic creature bursts through background displays in a trail of ${palette.energyFx}.`,
-          p2: `Tense hide-and-seek suspense inside ${locationVisual}: tight close-up of ${protag} crouched silently behind a cluttered retro counter holding ${safeGadget1} close while the cosmic creature's gigantic glowing shadow sweeps directly across the wall overhead.`,
-          p3: `Clever environmental trap springing inside ${locationVisual}: wide dynamic angle as ${protag} pulls a heavy hanging cable or topples a glowing retro display rig, triggering a dazzling domino chain reaction that tangles the surprised cosmic creature in swirling ribbons of ${palette.energyFx} (no laser beams).`,
-          p4: `Relieved victorious breath-catcher outside ${locationVisual}: calm shot of ${protag} resting by the front curb steps catching ${pPoss} breath while tiny glowing stars drift peacefully upward from the building behind.`,
-          videoBeat1: `${protag} races around a cluttered retro counter in ${locationVisual} while the cosmic creature surges close behind knocking floating props aside`,
-          videoBeat2: `${protag} pulls a heavy overhead fixture cord, triggering a brilliant domino trap of glowing cables and ${palette.energyFx} that wraps cleanly around the startled creature`,
-          outroBeat1: `the tangled cosmic creature lets out a resonant musical chime and gently dissolves into floating ribbons of starlight as ${locationVisual} settles down`,
-          outroBeat2: `three shimmering blank holographic cards flutter gently down like falling leaves onto the curb beside the front steps`,
-          outroBeat3: `${protag} rests by the steps in happy relief, collecting the glowing cards under the quiet sky`,
-        },
-        'zero-g-chaos': {
-          p1: `Astonishing zero-gravity anomaly inside ${locationVisual} bathed in ${atmosphere}: chairs, stools, arcade tokens, retro boxes, and neon fixtures float effortlessly off the floor while ${protag} grips a bolted counter in wide-eyed wonder.`,
-          p2: `Weightless leap through floating debris inside ${locationVisual}: dynamic tilted mid-air view of ${protag} pushing off a floating display shelf, weaving gracefully between drifting retro objects toward the cosmic creature hovering upside-down at the center of the room.`,
-          p3: `High-stakes gravity core anchor inside ${locationVisual}: tight kinetic close-up as ${protag} floats right up to the swirling vortex center and latches ${safeGadget1} onto the glowing nexus, sending expanding golden rings of ${palette.energyFx} snapping outward across the ceiling and walls.`,
-          p4: `Soft grounded landing inside ${locationVisual}: cozy low-angle scene after gravity gently returns, showing ${protag} amidst harmlessly scattered retro props and fallen tokens while a single glowing prism shimmers softly on a tilted shelf.`,
-          videoBeat1: `inside weightless ${locationVisual}, tables and retro boxes drift slowly in mid-air as ${protag} pushes off a floating shelf toward the hovering cosmic creature`,
-          videoBeat2: `${protag} clips ${safeGadget1} right into the swirling floating vortex core, erupting in concentric golden rings of ${palette.energyFx} as normal gravity gently pulls everything downward`,
-          outroBeat1: `floating retro objects drift softly back onto the floor as the glowing cosmic creature unwinds upward into harmless pastel mist`,
-          outroBeat2: `three gleaming blank holographic cards settle smoothly onto an overturned crate beside ${protag}`,
-          outroBeat3: `${protag} scoops up the shimmering cards and takes in the calm settled room`,
-        },
-        'portal-hop': {
-          p1: `Surreal doorway discovery inside ${locationVisual} under ${atmosphere}: framing ${protag} standing before an ordinary back-room doorway that glows wildly open into an impossible neon-horizon cosmic dimension filled with floating geometric islands.`,
-          p2: `Stepping across worlds: dramatic side-angle view right on the glowing threshold as ${protag} moves halfway through the luminous portal archway while sideways gravity pulls retro posters and glowing dust into the starlit void.`,
-          p3: `Showdown inside the alternate cosmic pocket: breathtaking wide surreal vista of a dreamlike floating starfield mirror-version of ${locationVisual}, where ${protag} vaults across hovering checkered platforms outmaneuvering the gigantic glowing cosmic creature amid ${palette.energyFx}.`,
-          p4: `Returning safely to reality: cheerful candid floor-level frame of ${protag} landing cleanly back inside ordinary quiet ${locationVisual} in relief as the glowing doorway clicks shut into a normal everyday door.`,
-          videoBeat1: `inside the surreal starfield mirror-version of ${locationVisual}, ${protag} leaps effortlessly across hovering geometric platforms while the gigantic cosmic creature spirals around`,
-          videoBeat2: `${protag} activates ${safeGadget1} and ${safeGadget2} on the central platform, weaving a brilliant luminous ring of ${palette.energyFx} that folds the portal smoothly back toward home`,
-          outroBeat1: `the swirling starfield doorway folds inward in brilliant iridescent waves as ${protag} crosses cleanly back into normal ${locationVisual}`,
-          outroBeat2: `as the doorway returns to ordinary wood and glass, three gleaming blank holographic cards appear resting on the threshold`,
-          outroBeat3: `${protag} collects the glowing cards happily inside the quiet settled hallway`,
-        },
-        'harmonic-truce': {
-          p1: `Playful chaotic malfunction inside ${locationVisual} under ${atmosphere}: the oversized cosmic creature is bouncing clumsily through the background making neon signs spin and vintage displays flicker while ${protag} peers around a side aisle.`,
-          p2: `Gentle musical calibration: warm tight close-up of ${protag} carefully adjusting glowing analog dials on ${safeGadget1}, sending soft glowing sound-wave rings drifting through the air as the curious cosmic creature leans down listening with tilted head.`,
-          p3: `Synchronized cosmic crescendo: breathtaking wide painterly vista of ${protag} and the towering cosmic creature standing peacefully side-by-side at the center of ${locationVisual} bathed in swirling aurora ribbons of ${palette.energyFx} as warped shelves straighten harmoniously.`,
-          p4: `Heartwarming farewell: intimate close-up of the shrunk cosmic creature as a tiny warm glowing starlight orb hovering gently right beside ${protag} before drifting peacefully upward toward the skylights.`,
-          videoBeat1: `${protag} calmly adjusts the glowing dials on ${safeGadget1} inside ${locationVisual}, sending soft rhythmic rings of warm light floating gently toward the restless cosmic creature`,
-          videoBeat2: `the creature's chaotic static softens into glowing harmony as ${protag} and the creature stand together inside a breathtaking swirling aurora of ${palette.energyFx}`,
-          outroBeat1: `the peaceful cosmic creature shrinks into a warm glowing starlight firefly that circles ${protag} playfully once before floating up through the skylight`,
-          outroBeat2: `soft sparkles drift down and settle into three warm shimmering blank holographic trading cards`,
-          outroBeat3: `${protag} watches warmly toward the open skylight as ${locationVisual} glows peacefully`,
-        },
-        'machine-overload': {
-          p1: `Urgent warning signs inside ${locationVisual} under ${atmosphere}: dramatic angled close-up of blinking amber and crimson console gauges, humming transformers, and buzzing overhead fixtures while ${protag} rushes toward the back control wall.`,
-          p2: `Looming presence behind glass: suspenseful layered frame with ${protag} working urgently at a messy retro control panel of glowing toggle switches and coiled cables in the foreground while the giant cosmic creature presses right up against a frosted glass window directly behind ${pObj}.`,
-          p3: `Last-second breaker flip: kinetic low-angle freeze-frame of ${protag} reaching dramatically to pull a massive industrial switch lever on the wall just as the cosmic creature surges forward, flooding the entire room in a blinding harmonic wave of ${palette.energyFx}.`,
-          p4: `Warm power restored: peaceful wide shot of cozy golden lights humming steadily back on across quiet ${locationVisual} as ${protag} leans comfortably beside the calm control console.`,
-          videoBeat1: `while the giant cosmic creature looms behind a glowing glass partition in ${locationVisual}, ${protag} rushes across the floor dodging sparks toward the main vintage power lever`,
-          videoBeat2: `${protag} pulls the massive breaker lever down, unleashing a sweeping harmonic pulse of ${palette.energyFx} across every fixture in the room`,
-          outroBeat1: `the harmonic surge calms the overloaded machinery as the cosmic creature dissolves smoothly into peaceful glowing static`,
-          outroBeat2: `warm golden room lights flicker steadily back on while three blank shimmering holographic cards slide cleanly out of the console slot`,
-          outroBeat3: `${protag} gathers the gleaming cards and switches off the humming console in relief`,
-        },
-        'noir-mystery': {
-          p1: `Mysterious clue discovery inside ${locationVisual} under ${atmosphere}: moody low-angle view of ${protag} inspecting glowing iridescent footprints and softly humming melted arcade tokens leading deep into the shadowed aisles.`,
-          p2: `Silent widescreen first contact: dramatic symmetrical architectural wide shot showing BOTH ${protag} on the far near side and the towering cosmic creature standing silently at the opposite end of the long misty corridor of ${locationVisual}.`,
-          p3: `Surreal tilted reality bend: dizzying dramatic angle inside ${locationVisual} as walls and checkered floors curve upward around them while ${protag} moves along a banked aisle launching a bright arc of ${palette.energyFx} from ${safeGadget1} toward the creature's glowing core.`,
-          p4: `Quiet dawn walk-away: poetic wide exterior frame of ${protag} strolling across a misty empty suburban lot at cool pale dawn, glancing back once at the peaceful normal facade of ${locationVisual}.`,
-          videoBeat1: `across the long misty corridor of ${locationVisual}, walls and tiles tilt surreally as ${protag} navigates along a banked display rack toward the towering cosmic creature`,
-          videoBeat2: `${protag} snaps ${safeGadget1} into phase alignment, sending a crisp geometric wave of ${palette.energyFx} snapping the crooked room cleanly back to ninety-degree reality`,
-          outroBeat1: `the warped corridor straightens with a soft chime as the cosmic creature fades gently into drifting morning mist`,
-          outroBeat2: `a gleaming trio of blank holographic cards rests quietly on the damp doorstep outside as pale light breaks`,
-          outroBeat3: `${protag} collects the cards and heads peacefully across the quiet morning lot`,
-        },
-        'mirror-decoy': {
-          p1: `Uncanny mirror reveal inside ${locationVisual} under ${atmosphere}: medium side view of ${protag} gazing into a glossy storefront window or polished chrome mirror — the real room behind looks completely empty, yet the towering cosmic creature is visible ONLY inside the reflection.`,
-          p2: `Hall of holographic mirages: dazzling wide interior view of ${locationVisual} filled with three translucent shimmering holographic decoys of the cosmic creature refracting rainbow light across every wall as ${protag} navigates calmly between them.`,
-          p3: `Mirror-bounce counterplay: kinetic low-angle action shot as ${protag} angles gleaming reflective ${safeGadget1} sharply, bouncing the cosmic creature's own blinding prism wave straight back into a spinning kaleidoscope ring of ${palette.energyFx}.`,
-          p4: `Peaceful sunlit stillness: serene wide interior shot of clear light streaming through spotless dust-free glass across quiet ${locationVisual} beside ${protag}, with one tiny shimmering rainbow glass prism catching light on a windowsill.`,
-          videoBeat1: `surrounded by shimmering holographic mirages inside ${locationVisual}, ${protag} pivots swiftly angling gleaming reflective ${safeGadget1} as the real cosmic creature surges forward`,
-          videoBeat2: `the creature's prism wave strikes the reflective surface and rebounds into a breathtaking spinning kaleidoscope ring of ${palette.energyFx}`,
-          outroBeat1: `all the shimmering mirages chime and fold harmoniously back into a single bright prism spark that rises and vanishes`,
-          outroBeat2: `the mirror surfaces clear completely as three blank holographic rainbow cards materialize neatly along the sunlit ledge`,
-          outroBeat3: `${protag} collects the cards calmly and heads toward the bright exit`,
-        },
-        'rooftop-skyline': {
-          p1: `Looking up from the street outside ${locationVisual} under ${atmosphere}: dramatic low-angle outdoor establishing view gazing past ${protag} up at the glowing neon roof sign as swirling aurora clouds gather above the building.`,
-          p2: `High-altitude vantage point: thrilling overhead perspective of ${protag} perched atop the glowing neon awning or balcony overlook of ${locationVisual}, surveying the massive cosmic creature emerging into the mist-filled plaza below.`,
-          p3: `Skyward diversion leap: breathtaking dynamic mid-air shot capturing ${protag} launching off the high marquee ledge while channeling ${safeGadget1} and ${safeGadget2} to sweep the cosmic creature's swirling energy straight upward into the starry sky like a giant beacon of ${palette.energyFx}.`,
-          p4: `Peaceful suburban skyline exhale: serene wide closing view of ${protag} resting peacefully beside a rooftop parapet overlooking twinkling quiet suburban neighborhood lights under the clear sky.`,
-          videoBeat1: `from atop the glowing neon marquee of ${locationVisual}, ${protag} drops dynamically downward through swirling mist toward the towering cosmic creature in the plaza below`,
-          videoBeat2: `${protag} sweeps ${safeGadget1} skyward, channeling the creature's swirling energy straight up into the sky in a towering pillar of ${palette.energyFx}`,
-          outroBeat1: `the soaring aurora beacon blooms peacefully high above the roofline like silent starlight fireworks before fading clear`,
-          outroBeat2: `soft glowing sparkles rain gently onto the rooftop parapet, forming three gleaming blank holographic trading cards`,
-          outroBeat3: `${protag} collects the cards safely and looks out peacefully over the glowing neighborhood horizon`,
-        },
-        'flashlight-recon': {
-          p1: `Atmospheric late-night arrival outside ${locationVisual} under ${atmosphere}: wide moody street view with glowing reflections as ${protag} approaches the shadowy vintage building carrying ${safeGadget1}.`,
-          p2: `Flashlight beam cutting the dark: dramatic high-contrast chiaroscuro interior shot deep inside unlit ${locationVisual}, where a single bright cone of light projected by ${protag} cuts through swirling fog to suddenly reveal the cosmic creature's glowing eyes and giant silhouette.`,
-          p3: `Close-quarters counter vault: kinetic tight-angle action frame inside the narrow aisle as the cosmic creature sweeps forward sending floating papers skyward while ${protag} vaults agilely over a retro counter in a swirling wake of ${palette.energyFx}.`,
-          p4: `Quiet recovery & heading home: warm medium close-up of ${protag} holding three gleaming blank rainbow holographic cards while stepping peacefully back out into the calm humming night.`,
-          videoBeat1: `deep inside dimly lit ${locationVisual}, a bright flashlight beam from ${protag} sweeps across fog to reveal the giant cosmic creature surging down the narrow aisle`,
-          videoBeat2: `${protag} vaults smoothly over a counter in one fluid motion, triggering a bright sweeping halo of ${palette.energyFx} from ${safeGadget1} that calms the creature mid-stride`,
-          outroBeat1: `the glowing fog clears gently as the cosmic creature dissolves upward into soft shimmering dust motes inside quiet ${locationVisual}`,
-          outroBeat2: `a fanned trio of gleaming blank rainbow holographic cards rests softly on the polished counter beside ${protag}`,
-          outroBeat3: `${protag} gathers the glowing cards and exits peacefully into the calm evening air`,
-        },
-        'scale-flip': {
-          p1: `Miniature overhead diorama view of ${locationVisual} under ${atmosphere}: crisp bird's-eye dollhouse perspective looking straight down across the entire layout where tiny ${protag} investigates a brightly glowing corner.`,
-          p2: `Extreme ant-scale macro floor perspective inside ${locationVisual}: looking sharply upward past towering table legs and oversized floor tiles from beside ${protag} toward the colossal skyscraper-sized cosmic creature looming overhead.`,
-          p3: `Architectural side-profile cutaway view of ${locationVisual}: showing rafters, upper walkways, and main aisles at once as ${protag} moves high along an overhead catwalk releasing a shimmering cascade of ${palette.energyFx} from ${safeGadget1} straight down over the cosmic creature.`,
-          p4: `Crisp macro still-life close-up: ${protag} admiring a single vintage glass snowglobe on a shelf containing a tiny peaceful glowing miniature reflection of ${locationVisual}.`,
-          videoBeat1: `from a dramatic ant-scale floor viewpoint inside ${locationVisual}, towering shelves frame ${protag} gazing up at the colossal cosmic creature surging overhead`,
-          videoBeat2: `from an elevated walkway above, ${protag} triggers a shimmering prism cascade of ${palette.energyFx} from ${safeGadget1}, gently shrinking the distortion back to calm scale`,
-          outroBeat1: `the colossal cosmic creature folds down into a tiny warm spark floating safely into a glass curio jar`,
-          outroBeat2: `three crisp blank holographic trading cards appear leaning neatly beside the glowing miniature glass jar`,
-          outroBeat3: `${protag} smiles at the peaceful miniature glow and collects the shimmering cards`,
-        },
-        'season-warp': {
-          p1: `Sudden indoor winter snowstorm inside ${locationVisual} under ${atmosphere}: glowing frost crystals, icicles, and swirling snowflakes suddenly coat the retro neon shelves as ${protag} braces against the chilly gust while the cosmic creature manifests.`,
-          p2: `Instant lush tropical bloom inside ${locationVisual}: giant luminescent emerald ferns, glowing vines, and warm golden pollen sprout wildly around vintage displays as ${protag} climbs across overgrown counters toward the towering cosmic creature.`,
-          p3: `Dramatic indoor autumn-leaf cyclone inside ${locationVisual}: thousands of glowing amber leaves and vintage paper flyers spiral into a radiant vortex of ${palette.energyFx} circling the cosmic creature while ${protag} anchors the storm using ${safeGadget1}.`,
-          p4: `Fresh sunlit spring morning inside peaceful ${locationVisual}: sparkling dew drops glisten on spotless retro counters beneath a soft indoor rainbow arc as ${protag} pauses warmly beside the sunlit window.`,
-          videoBeat1: `inside ${locationVisual}, indoor snow flurries transform instantly into blooming glowing tropical vines around ${protag} and the towering cosmic creature`,
-          videoBeat2: `${protag} lifts ${safeGadget1} into a swirling indoor cyclone of golden autumn leaves and ${palette.energyFx}, clearing the storm into bright spring clarity`,
-          outroBeat1: `the seasonal whirlwind melts peacefully into warm golden sunbeams and drifting flower petals`,
-          outroBeat2: `three gleaming blank holographic cards settle dry and sparkling on a sunlit counter beside ${protag}`,
-          outroBeat3: `${protag} enjoys the fresh quiet morning light filling ${locationVisual}`,
-        },
-        'classic-showdown': {
-          p1: `Wide exterior threshold arrival outside ${locationVisual} under ${atmosphere}: ${protag} pushes open the glowing entrance doors holding ${safeGadget1} and ${safeGadget2} as strange shimmer spills onto the pavement.`,
-          p2: `Dramatic solo reveal deep inside ${locationVisual}: tight atmospheric close-up of the towering cosmic creature rising out of swirling mist amid ${palette.energyFx}.`,
-          p3: `Widescreen full-body showdown inside ${locationVisual}: dynamic low-angle view with ${protag} braced on the left projecting a blazing beam of ${palette.energyFx} from ${safeGadget1} and ${safeGadget2} straight across toward the advancing cosmic creature on the right.`,
-          p4: `Clean 90-degree top-down overhead flat-lay still life on scuffed retro tiles inside ${locationVisual} showing cooled ${safeGadget1}, ${safeGadget2}, gleaming brass arcade tokens, and three blank shimmering rainbow holographic foil trading cards.`,
-          videoBeat1: `the camera glides past ${protag} bracing on the left of ${locationVisual} linking ${safeGadget1} and ${safeGadget2} while the cosmic creature advances on the right`,
-          videoBeat2: `a blazing linear beam of ${palette.energyFx} streams across the room, gently pushing the glowing creature back into calm stillness`,
-          outroBeat1: `the cosmic creature shimmers and dissolves upward into ribbons of glowing holographic light as ${locationVisual} snaps back to normal`,
-          outroBeat2: `those shimmering light ribbons condense onto the scuffed floor beside ${protag} into three gleaming blank rainbow holographic trading cards`,
-          outroBeat3: `${protag} gathers the sparkling cards and glides calmly out through the glowing exit doors into the quiet air`,
-        },
       };
 
   const arc = storyArcScripts[activeArcMeta.id] || storyArcScripts['chase-trap'];
@@ -1892,65 +1415,56 @@ export function compile199xZinePrompts(
     `a warm tabletop still-life of a glowing glass snowglobe and three blank shimmering foil cards resting quietly by a bright window`,
   ];
 
-  const castHeaderLine = isPureWorld
-    ? `Characters: ${heroLook.fullDescription}.`
-    : heroLook.mode === 'drone'
-    ? `Protagonist across all panels: ${heroLook.fullDescription}.`
-    : `Protagonist across all panels: ${heroLook.fullDescription}.`;
+  const castHeaderLine = `Monster staging: ${monsterMood.fullDescription}, emphasizing ${monsterMood.stagingCue}.`;
+  const freshStoryLead = `Brand-new standalone atmospheric monster showcase featuring an uninhabited 1990s location with no human characters anywhere, an all-new creature design, and an all-new artistic medium completely unrelated to any earlier images.`;
 
-  const freshStoryLead = isPureWorld
-    ? `Brand-new standalone atmospheric visual story featuring uninhabited retro architecture with no human figures anywhere, an all-new location, and an all-new artistic medium completely unrelated to any earlier images.`
-    : `Brand-new standalone visual story featuring an all-new protagonist, all-new wardrobe and silhouette, all-new location, and an all-new artistic medium completely unrelated to any earlier images.`;
-
-  // 1-4 Individual Shot Prompts (synced 100% to the rolled Visual Medium, Story Arc & Hero Cast!)
+  // 1-4 Individual Shot Prompts (100% Bad-Guy-Only, synced to Visual Medium, Story Arc & Monster Vibe!)
   const shot01WideArchitecture = sanitizeVisualPromptText(
-    `${freshStoryLead} A 16:9 widescreen scene rendered in ${flowArtStyle}. ${castHeaderLine} Cosmic creature: ${safeCreature}. ${arc.p1}`
+    `${freshStoryLead} A 16:9 widescreen scene rendered in ${flowArtStyle}. ${castHeaderLine} Featured monster: ${safeCreature}. ${arc.p1}`
   );
   const shot02AnomalyPortrait = sanitizeVisualPromptText(
-    `A 16:9 widescreen scene rendered in ${flowArtStyle}. ${castHeaderLine} Cosmic creature: ${safeCreature}. ${arc.p2}`
+    `A 16:9 widescreen scene rendered in ${flowArtStyle}. ${castHeaderLine} Featured monster: ${safeCreature}. ${arc.p2}`
   );
   const shot03LowAngleAction = sanitizeVisualPromptText(
-    `A 16:9 widescreen action frame rendered in ${flowArtStyle}. ${castHeaderLine} Cosmic creature: ${safeCreature}. ${arc.p3}`
+    `A 16:9 widescreen action frame rendered in ${flowArtStyle}. ${castHeaderLine} Featured monster: ${safeCreature}. ${arc.p3}`
   );
   const shot04TabletopGearFlatlay = sanitizeVisualPromptText(
-    `A 16:9 widescreen closing frame rendered in ${flowArtStyle}. ${castHeaderLine} ${arc.p4}`
+    `A 16:9 widescreen closing frame rendered in ${flowArtStyle}. Uninhabited 1990s closing scene with no human figures anywhere. ${arc.p4}`
   );
 
   // 5-6 Standalone GIF Prompts
   const gif01Act1TensionLoop = sanitizeVisualPromptText(
-    `A 4-second seamless 16:9 looping ${palette.videoType} at 24fps in ${flowArtStyle}. Close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
+    `A 4-second seamless 16:9 looping ${palette.videoType} at 24fps in ${flowArtStyle} with no human figures. Close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
   );
   const gif02Act3AftermathLoop = sanitizeVisualPromptText(
-    `A 4-second seamless 16:9 looping ${palette.videoType} at 24fps in ${flowArtStyle}. Atmospheric closing cutaway: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
+    `A 4-second seamless 16:9 looping ${palette.videoType} at 24fps in ${flowArtStyle} with no human figures. Atmospheric closing cutaway: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
   );
 
-  // 7. Lead 16:9 Hero Cinema Video Prompt
+  // 7. Lead 16:9 Monster Cinema Video Prompt
   const leadVideo16x9 = sanitizeVisualPromptText(
-    `A 4-second 16:9 ${palette.videoType} at 24fps in ${flowArtStyle}. Inside ${locationVisual} under ${lightingClean}, featuring ${heroLook.fullDescription} and ${safeCreature}: ${arc.videoBeat1}; then ${arc.videoBeat2} as the scene hits a dramatic grounded finish. Audio: ${leadAudioClean}`
+    `A 4-second 16:9 ${palette.videoType} at 24fps in ${flowArtStyle}. Inside empty ${locationVisual} under ${lightingClean} with no human figures anywhere, showcasing ${safeCreature} (${monsterMood.stagingCue}): ${arc.videoBeat1}; then ${arc.videoBeat2} as the scene hits a dramatic grounded finish. Audio: ${leadAudioClean}`
   );
 
   // 8. Story-Synced 3-Act Synth Soundtrack Prompt
   const synthSongPrompt = sanitizeVisualPromptText(
-    `1990s suburban cosmic story soundtrack (118 BPM, 45-60s instrumental) structured to follow the 3-Act Zine story in "${location}": [0:00-0:15 Act I Tension] mysterious analog cassette synth drone, buzzing fluorescent hum, and creeping bass pulse; [0:15-0:42 Act II Action] punchy FM synthwave bassline, gated 16-bit snare drums, and electric guitar power chords erupting for "${synergy}"; [0:42-0:60 Act III Aftermath] warm, nostalgic midnight synth pads and shimmering bell arpeggios fading into quiet resolution. Strictly instrumental, no vocals.`
+    `1990s suburban spooky monster story soundtrack (118 BPM, 45-60s instrumental) structured to follow the 3-Act Zine story in "${location}": [0:00-0:15 Act I After Closing] mysterious analog cassette synth drone, buzzing fluorescent hum, and creeping bass pulse; [0:15-0:42 Act II Monster Mayhem] punchy FM synthwave bassline, gated 16-bit snare drums, and electric guitar power chords erupting for "${synergy}"; [0:42-0:60 Act III Twist Ending] warm, nostalgic midnight synth pads and shimmering bell arpeggios fading into spooky quiet resolution. Strictly instrumental, no vocals.`
   );
 
-  // 9. External 3-Act Long-Form Story Prompt (Fun, spooky 1990s Goosebumps paperback style!)
-  const storyGeneratorPrompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style paperback story (~750 words total) broken into 3 Acts with EXACTLY 3 punchy paragraphs per Act (labeled "ACT 01", "ACT 02", and "ACT 03"):
-- Title: ${encounter.entity_name}
-- Setting: ${location}
-- Hero: ${charClean}
-- Spooky Monster: ${anomaly}
-- Cool 90s Gear: ${rawArtifact} + ${rawWeapon} (Combo Trick: ${synergy})
+  // 9. External 3-Act Long-Form Story Prompt (100% Bad-Guy-Only 1990s Goosebumps paperback style!)
+  const storyGeneratorPrompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style MONSTER-ONLY paperback story (~750 words total) broken into 3 Acts with EXACTLY 3 punchy paragraphs per Act (labeled "ACT 01", "ACT 02", and "ACT 03"):
+- Star Bad Guy Monster: ${anomaly} (100% Bad Guy focus — DO NOT include any human hero or Good Guy vs. Bad Guy battle!)
+- Spooky After-Hours Setting: ${location}
+- Haunted 90s Relics Sitting in the Shop: ${rawArtifact} & ${rawWeapon} (Wild Burst: ${synergy})
 - Weird Spooky Sign: ${distortion}
-STYLE RULES: Keep the vocabulary super fun, simple, and easy to read (like a classic 1990s spooky kid-adventure paperback — NO heavy technical jargon, NO big textbook sci-fi words!). Use short suspenseful sentences, funny nervous dialogue, creepy sound effects, a cliffhanger at the end of Act 01, a wild slapstick-spooky showdown in Act 02, and a classic playful Goosebumps twist ending in Act 03 where a shiny holographic trading card left behind does one sneaky spooky thing at the very end!`;
+STYLE RULES: Keep the vocabulary super fun, simple, and easy to read (like a classic 1990s spooky paperback — NO heavy technical jargon, NO big textbook sci-fi words, and NO human hero!). Tell what happens right after closing time when nobody is around and this monster takes over the whole place! Use short suspenseful sentences, creepy sound effects, a cliffhanger when the monster wakes up in Act 01, wild spooky-funny mayhem in Act 02, and a classic sneaky Goosebumps twist ending in Act 03 where a shiny holographic trading card left on the counter does one spooky little thing!`;
 
-  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL SHEET (16 Visual Mediums x 12 Story Arcs x 24 Cast Silhouettes x 10 Atmospheres x 6 Camera Grammars!)
+  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL SHEET (16 Visual Mediums x 12 Bad-Guy Arcs x 10 Monster Vibes x 10 Atmospheres x 6 Camera Grammars!)
   const masterStoryboard2x2Prompt = sanitizeVisualPromptText(
 `${freshStoryLead}
 
 ${palette.gridIntro}, created strictly in ${flowArtStyle}, divided cleanly into two equal columns and two equal rows.
 
-Setting: ${locationVisual} with ${atmosphere}. ${castHeaderLine} Cosmic creature: ${safeCreature}.
+Setting: ${locationVisual} with ${atmosphere}. ${castHeaderLine} Featured monster across panels: ${safeCreature}.
 
 Top-left panel: ${arc.p1}
 Top-right panel: ${arc.p2}
@@ -1958,7 +1472,7 @@ Bottom-left panel: ${arc.p3}
 Bottom-right panel: ${arc.p4}`
   );
 
-  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (keeps chosen visual medium, cast silhouette, AND a fresh distinct arc!)
+  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (keeps chosen visual medium, monster vibe, zero humans & distinct arc!)
   const backupArcMeta = STORYBOARD_STORY_ARCS[(resolvedArcIdx + 3) % STORYBOARD_STORY_ARCS.length];
   const backupArc = storyArcScripts[backupArcMeta.id] || arc;
   const masterStoryboardUltraSafePrompt = sanitizeVisualPromptText(
@@ -1966,35 +1480,32 @@ Bottom-right panel: ${arc.p4}`
 
 ${palette.gridIntro}, created strictly in ${flowArtStyle}.
 
-${castHeaderLine} Friendly glowing retro sci-fi creature: a whimsical towering neon crystal-and-chrome robot floating in swirling starlight.
+${castHeaderLine} Friendly glowing retro creature: a whimsical towering luminous crystal-and-neon storybook guardian floating in swirling starlight.
 
-Top-left panel: ${backupArc.p1.replaceAll(locationVisual, 'a vibrant 1990s retro neon plaza')}
-Top-right panel: ${backupArc.p2.replaceAll(locationVisual, 'the colorful retro hall')}
-Bottom-left panel: ${backupArc.p3.replaceAll(locationVisual, 'the glowing retro hall')}
-Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm retro plaza')}`
+Top-left panel: ${backupArc.p1.replaceAll(locationVisual, 'a vibrant empty 1990s retro neon plaza')}
+Top-right panel: ${backupArc.p2.replaceAll(locationVisual, 'the colorful uninhabited retro hall')}
+Bottom-left panel: ${backupArc.p3.replaceAll(locationVisual, 'the glowing empty retro hall')}
+Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm uninhabited retro plaza')}`
   );
 
   // 0B. SAME-CHAT GIF #1 FOLLOW-UP (MATCHES EXACT VISUAL MEDIUM!)
   const sameChatGif1FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above, create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
+    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
   );
 
   // 0C. SAME-CHAT GIF #2 FOLLOW-UP (MATCHES EXACT VISUAL MEDIUM!)
   const sameChatGif2FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above, create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
+    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
   );
 
-  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II CLIMAX MATCHING THIS EXACT ARC, CAST & VISUAL MEDIUM!)
-  const videoCastClause = isPureWorld
-    ? 'with no human characters anywhere'
-    : `keeping the exact look of ${protag}`;
+  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II MONSTER MAYHEM MATCHING THIS EXACT ARC, VIBE & VISUAL MEDIUM!)
   const sameChatVideoFollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium}, ${palette.colors} lighting, and cosmic creature design from the bottom-left panel above (${videoCastClause}), create an 8-second 16:9 ${palette.videoType} inside ${locationVisual} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and retro ambient hum.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, and monster design from the bottom-left panel above (with no human characters anywhere, keeping ${monsterMood.stagingCue}), create an 8-second 16:9 ${palette.videoType} inside empty ${locationVisual} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and spooky retro ambient hum.`
   );
 
-  // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING MATCHING THIS EXACT ARC, CAST & VISUAL MEDIUM!)
+  // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING MATCHING THIS EXACT ARC & VISUAL MEDIUM!)
   const sameChatOutroVideoPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} lighting from the four-panel image above (${videoCastClause}), create an 8-second 16:9 closing finale ${palette.videoType} inside ${locationVisual} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, gentle ambient warmth, soft ambience, and nostalgic 1990s synth pads fading out.`
+    `In the exact same ${palette.medium} and ${palette.colors} lighting from the four-panel image above (with no human characters anywhere), create an 8-second 16:9 closing finale ${palette.videoType} inside empty ${locationVisual} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, gentle ambient warmth, soft ambience, and nostalgic 1990s synth pads fading out.`
   );
 
   return {
@@ -2002,8 +1513,8 @@ Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm retro pl
     resolvedVisualStyleLabel: `${palette.emoji} ${palette.shortLabel}`,
     resolvedStoryArcId: activeArcMeta.id,
     resolvedStoryArcLabel: `${activeArcMeta.emoji} ${activeArcMeta.shortLabel}`,
-    resolvedHeroLookId: heroLook.id,
-    resolvedHeroLookLabel: `${heroLook.emoji} ${heroLook.shortLabel}`,
+    resolvedHeroLookId: monsterMood.id,
+    resolvedHeroLookLabel: `${monsterMood.emoji} ${monsterMood.shortLabel}`,
     resolvedAtmosphereLabel: atmosphereObj.label,
     masterStoryboard2x2Prompt,
     masterStoryboardUltraSafePrompt,
@@ -2047,30 +1558,27 @@ export function buildZineIssueFromEncounter(
   }
 ): ZineIssueData {
   const loc = encounter.location || 'K&B Novelty Depot clearance aisle at 8:59 PM';
-  const charFull = encounter.featured_character || "Dex 'Neon-Drift' Kowalski";
-  const charShort = charFull.split('(')[0].trim() || charFull;
   const anomalyName =
     encounter.anomaly_name ||
-    (encounter.card_type === 'bad_guy'
-      ? encounter.entity_name
-      : 'Dimensional Breach Anomaly');
+    encounter.entity_name ||
+    'The Giant Lava-Lamp Wax Jellyfish';
   const weapon =
-    encounter.protagonist_loadout?.improvised_weapon || 'Improvised Hardware Rig';
+    encounter.protagonist_loadout?.improvised_weapon || 'Retro Store Flashlight';
   const artifact =
-    encounter.protagonist_loadout?.nostalgia_artifact || '199X Pocket Artifact';
+    encounter.protagonist_loadout?.nostalgia_artifact || '199X Pocket Relic';
   const synergy =
-    encounter.protagonist_loadout?.weird_synergy_effect || 'Harmonic Overdrive';
+    encounter.protagonist_loadout?.weird_synergy_effect || 'Rainbow Spark Pop';
 
   const { morphology, environment, presets } = getChoreographyPresetsForCard(
-    encounter.entity_name || anomalyName,
+    anomalyName,
     loc,
-    encounter.card_type || 'bad_guy',
+    'bad_guy',
     weapon,
     artifact,
-    charFull
+    ''
   );
 
-  const seedNum = hashString(`${encounter.entity_name}|${loc}|${issueNumber}`);
+  const seedNum = hashString(`${anomalyName}|${loc}|${issueNumber}`);
   const hexSeed = `0x9X_${seedNum.toString(16).toUpperCase().slice(0, 6)}`;
   const pal = getZinePalette(encounter.card_theme);
 
@@ -2088,25 +1596,22 @@ export function buildZineIssueFromEncounter(
     id: `zine-${seedNum}-${issueNumber}`,
     issueNumber: encounter.card_number || issueNumber,
     hexSeed,
-    title: encounter.entity_name,
-    classification:
-      encounter.card_type === 'good_guy'
-        ? '199X HERO ISSUE'
-        : encounter.critical_smash
-        ? 'OMEGA ANOMALY SPECIAL'
-        : '199X ANOMALY CHRONICLE',
+    title: anomalyName,
+    classification: encounter.critical_smash
+      ? 'OMEGA BAD GUY SPECIAL'
+      : '199X BAD GUY EDITION',
     sectorTag: encounter.theme_set_badge || environment.badge.toUpperCase(),
-    actPhase: `${morphology.badge} • ${encounter.status_affliction || 'CONDITION AMBER'}`,
+    actPhase: `${morphology.badge} • ${encounter.status_affliction || 'AFTER HOURS'}`,
     location: loc,
     anomalyName,
-    characterName: charShort,
-    characterFull: charFull,
+    characterName: anomalyName,
+    characterFull: anomalyName,
     weapon,
     artifact,
     synergy,
     lightingMood: environment.lightingCue,
     cameraAngle: presets[0]?.camera || 'Dynamic Low-Angle 24fps Tracking Shot',
-    witnessPerspective: `${charShort} • Field Loadout Recon`,
+    witnessPerspective: 'After-Hours Empty Sighting',
     artStyle:
       encounter.visual_style ||
       '1990s indie graphic novel ink-and-watercolor illustration',

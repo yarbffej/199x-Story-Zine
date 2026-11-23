@@ -350,23 +350,21 @@ app.post("/api/zine-story", async (req, res) => {
       const anomalyLabel =
         encounter.anomaly_name ||
         (encounter.card_type === "bad_guy" ? encounter.entity_name : "Sentient Neon Rift Anomaly");
-      const prompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style paperback story (~700 to 850 words total) based on this 199X encounter:
-- Hero: ${encounter.featured_character || "Dex 'Neon-Drift' Kowalski"} (KEEP THIS EXACT SAME SINGLE HERO from start to finish — never add a second hero or switch gender!)
-- Spooky Monster: ${anomalyLabel}
-- Setting: ${encounter.location || "K&B Novelty Depot clearance aisle at 8:59 PM"}
-- Retro Toy/Artifact: ${encounter.protagonist_loadout?.nostalgia_artifact}
-- Improvised 90s Gear: ${encounter.protagonist_loadout?.improvised_weapon}
-- Wild Combo Trick: ${encounter.protagonist_loadout?.weird_synergy_effect}
+      const prompt = `Write a fun, spooky, fast-paced 1990s Goosebumps-style MONSTER-ONLY paperback story (~700 to 850 words total) based on this 199X Bad Guy:
+- Star Bad Guy Monster: ${anomalyLabel} (100% Bad Guy spotlight — DO NOT include any human hero or Good Guy fighting the monster!)
+- Spooky After-Hours Setting: ${encounter.location || "K&B Novelty Depot clearance aisle at 8:59 PM"}
+- Haunted 90s Relics Sitting in the Shop: ${encounter.protagonist_loadout?.nostalgia_artifact} & ${encounter.protagonist_loadout?.improvised_weapon}
+- Monster's Wild Signature Trick: ${encounter.protagonist_loadout?.weird_synergy_effect}
 - Creepy Warning Sign: ${encounter.cosmic_distortion}
 
 WRITING STYLE (VERY IMPORTANT):
-Write like a classic 1990s Goosebumps paperback! Use simple, fun, everyday words — ZERO heavy sci-fi jargon, ZERO big technical or academic words! Use short suspenseful sentences, funny nervous dialogue, creepy sound effects (like *CLICK*, *THUMP*, *ZAP!*), and fast page-turner energy.
+Write like a classic 1990s Goosebumps monster feature! Use simple, fun, everyday words — ZERO heavy sci-fi jargon, ZERO big technical words, and ZERO Good Guy vs. Bad Guy battle! Tell the spooky-funny story of what happens after closing time when nobody is around and THIS Bad Guy takes over the whole place. Use short suspenseful sentences, creepy sound effects (like *CLICK*, *THUMP*, *ZAP!*), and fast page-turner energy.
 
 Return valid JSON with three fields: "sceneSetup", "intervention", and "aftermath".
 Each field MUST contain EXACTLY 3 lively, punchy paragraphs separated by "\\n\\n" (~220-280 words per Act):
-1. "sceneSetup" (Act 01): The hero sneaks into or lingers inside the spooky 1990s hangout after dark, notices hilarious-creepy warning signs, and ends on a classic cliffhanger as the monster steps out of the shadows!
-2. "intervention" (Act 02): A fast, goofy-scary monster showdown where the hero dodges flying 90s stuff, slams their two retro gadgets together to trigger the wild combo trick, and pops/vanishes the monster in a shower of sparks!
-3. "aftermath" (Act 03): Everything returns to normal, the hero finds a brand-new glowing holographic trading card left behind, and the story ends with a classic playful Goosebumps twist on the very last sentence!`;
+1. "sceneSetup" (Act 01): Right after closing time in the empty 1990s hangout, spooky signs start happening by themselves, ending on a classic cliffhanger as the Bad Guy monster wakes up and steps out into the glow!
+2. "intervention" (Act 02): Pure goofy-spooky monster mayhem! The Bad Guy takes over the entire empty room, sets off the retro 90s gadgets on the shelves, unleashes its wild signature trick in a huge neon burst, and vanishes in a sparkling pop right before sunrise!
+3. "aftermath" (Act 03): Everything looks completely normal again by morning—except for a brand-new shiny holographic trading card of the Bad Guy left behind on the counter, ending on a classic sneaky Goosebumps twist on the very last sentence!`;
 
       const CANDIDATE_MODELS = [
         "gemini-3-flash-preview",

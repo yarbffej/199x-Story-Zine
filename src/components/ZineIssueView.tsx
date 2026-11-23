@@ -66,10 +66,10 @@ function formatSeconds(sec: number): string {
 }
 
 const SHOT_STICKERS = [
-  { badge: '🌍 IMAGE 01 // HERO ARRIVES IN SECTOR', note: 'Act 01 Setup • Same Locked Hero' },
-  { badge: '👾 IMAGE 02 // BAD GUY VILLAIN REVEAL', note: 'Act 01→02 Anomaly Emergence' },
-  { badge: '⚡ IMAGE 03 // GOOD GUY VS. BAD GUY', note: 'Act 02 Showdown Splash' },
-  { badge: '🌅 IMAGE 04 // ACT III AFTERMATH', note: 'Act 03 Gear & Foil Card' },
+  { badge: '🌍 IMAGE 01 // AFTER CLOSING', note: 'Act 01 Spooky Empty Setup' },
+  { badge: '👾 IMAGE 02 // BAD GUY MONSTER REVEAL', note: 'Act 01→02 Monster Wakes Up' },
+  { badge: '⚡ IMAGE 03 // PEAK MONSTER MAYHEM', note: 'Act 02 Full Monster Chaos' },
+  { badge: '🌅 IMAGE 04 // THE TWIST AFTERMATH', note: 'Act 03 Leftover Foil Card' },
 ];
 
 export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
@@ -1427,7 +1427,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                   color: zTheme.popCyanInk,
                 }}
               >
-                HERO: {issue.characterName}
+                {issue.prompts.resolvedHeroLookLabel || '👾 BAD GUY EDITION'}
               </span>
 
               {!readerMode && onAiRewriteStory && (
@@ -1601,7 +1601,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                       boxShadow: '2px 2px 0 var(--ui-border)',
                     }}
                   >
-                    ACT 02 // THE BIG SHOWDOWN
+                    ACT 02 // MONSTER MAYHEM
                   </span>
                   <span className="font-display text-5xl font-extrabold opacity-20 select-none">
                     02

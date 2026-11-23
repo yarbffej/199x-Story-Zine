@@ -252,54 +252,14 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
         </div>
       </div>
 
-      {/* Good Guy (Recurring Hero Lock) VS. Bad Guy Cast Strip */}
+      {/* Pure Bad Guy Focus Strip (100% Bad Guys Only • Zero Human Heroes!) */}
       <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800/80 text-xs font-mono">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Good Guy Pill + Lock + Swap */}
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/75 border border-emerald-500/40 text-emerald-200">
-            <User className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span className="text-[11px] uppercase text-emerald-400 font-bold">Good Guy:</span>
-            <span className="font-bold text-white truncate max-w-[190px] sm:max-w-[260px]">
-              {character.split('(')[0].trim() || character}
-            </span>
-            {onToggleHeroLocked && (
-              <button
-                type="button"
-                onClick={onToggleHeroLocked}
-                className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
-                  heroLocked
-                    ? 'bg-emerald-500 text-zinc-950'
-                    : 'bg-zinc-800 text-zinc-300 hover:text-white'
-                }`}
-                title={
-                  heroLocked
-                    ? 'Hero is PINNED across spins for a recurring sequel series. Click to roll a fresh hero each spin.'
-                    : 'Rolls a fresh hero on every spin (while keeping them consistent across all panels inside each zine). Click to pin.'
-                }
-              >
-                {heroLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-                <span>{heroLocked ? 'Pinned' : 'New / Spin'}</span>
-              </button>
-            )}
-            {onSwapHero && (
-              <button
-                type="button"
-                onClick={onSwapHero}
-                className="p-1 rounded bg-zinc-900/90 hover:bg-zinc-800 text-emerald-300 hover:text-white cursor-pointer"
-                title="Swap to a different Good Guy Hero"
-              >
-                <RefreshCw className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-
-          <span className="text-zinc-500 font-black text-[11px]">VS.</span>
-
           {/* Bad Guy Pill + Stockpile Browser + Swap */}
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pink-950/75 border border-pink-500/40 text-pink-200">
             <Ghost className="w-3.5 h-3.5 text-pink-400 shrink-0" />
             <span className="text-[11px] uppercase text-pink-400 font-bold">Bad Guy:</span>
-            <span className="font-bold text-white truncate max-w-[190px] sm:max-w-[260px]">
+            <span className="font-bold text-white truncate max-w-[200px] sm:max-w-[300px]">
               {anomaly}
             </span>
             <button
@@ -315,16 +275,24 @@ export const VariableControls: React.FC<VariableControlsProps> = ({
                 type="button"
                 onClick={onSwapVillain}
                 className="p-1 rounded bg-zinc-900/90 hover:bg-zinc-800 text-pink-300 hover:text-white cursor-pointer"
-                title="Swap to a different Bad Guy Villain"
+                title="Swap to a different Bad Guy Monster"
               >
                 <RefreshCw className="w-3 h-3" />
               </button>
             )}
           </div>
+
+          {/* Active Location Pill */}
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/80 border border-zinc-700/70 text-zinc-200">
+            <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+            <span className="font-semibold text-zinc-200 truncate max-w-[180px] sm:max-w-[260px]">
+              {location}
+            </span>
+          </div>
         </div>
 
         <span className="text-[11px] text-zinc-400 hidden xl:inline">
-          Same hero gender/hair/outfit locked across all prompts
+          100% Bad Guys Only • Zero Human Heroes
         </span>
       </div>
 
