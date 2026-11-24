@@ -351,7 +351,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[0])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[0]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
-                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popCyan}; color:${expTheme.popCyanInk}">🌍 IMAGE 01 // AFTER CLOSING</span>
+                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popCyan}; color:${expTheme.popCyanInk}">${escapeHtml(issue.prompts.panelLabels?.[0] || '🌍 IMAGE 01 // PANEL 01')}</span>
                   <span class="font-mono text-xs font-bold underline">Pop Open 2K ⤢</span>
                 </div>
               </div>`
@@ -369,7 +369,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[1])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer lg:-rotate-[1deg] hover:rotate-0 transition-transform">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[1]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
-                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">👾 IMAGE 02 // BAD GUY VILLAIN REVEAL</span>
+                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popPink}; color:${expTheme.popPinkInk}">${escapeHtml(issue.prompts.panelLabels?.[1] || '👾 IMAGE 02 // PANEL 02')}</span>
                   <span class="font-mono text-xs font-bold underline">Pop Open 2K ⤢</span>
                 </div>
               </div>`
@@ -380,7 +380,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[2])})" class="w-full pop-card th-surface p-2.5 sm:p-3 cursor-pointer lg:rotate-[1.2deg] hover:rotate-0 transition-transform">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[2]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-2.5 flex justify-between items-center">
-                  <span class="px-2.5 py-0.5 rounded-full border-2 th-border font-mono text-[11px] font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">⚡ IMAGE 03 // PEAK MONSTER MAYHEM</span>
+                  <span class="px-2.5 py-0.5 rounded-full border-2 th-border font-mono text-[11px] font-bold uppercase" style="background:${expTheme.heroYellow}; color:${expTheme.heroYellowInk}">${escapeHtml(issue.prompts.panelLabels?.[2] || '⚡ IMAGE 03 // PANEL 03')}</span>
                   <span class="font-mono text-[11px] font-bold">2K ⤢</span>
                 </div>
               </div>`
@@ -415,7 +415,7 @@ export async function exportStandaloneZineHtml(
             ? `<div onclick="openLightbox(${presentGallery.indexOf(encodedShots[3])})" class="pop-card th-surface p-2.5 sm:p-3 cursor-pointer">
                 <div class="aspect-[16/10] rounded-xl border-2 th-border overflow-hidden bg-[#121212]"><img src="${encodedShots[3]}" class="w-full h-full object-cover" /></div>
                 <div class="pt-3 flex justify-between items-center">
-                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">🌅 IMAGE 04 // ACT III AFTERMATH</span>
+                  <span class="px-3 py-1 rounded-full border-2 th-border font-mono text-xs font-bold uppercase" style="background:${expTheme.popLime}; color:${expTheme.popLimeInk}">${escapeHtml(issue.prompts.panelLabels?.[3] || '🌅 IMAGE 04 // PANEL 04')}</span>
                   <span class="font-mono text-xs font-bold underline">Pop Open 2K ⤢</span>
                 </div>
               </div>`

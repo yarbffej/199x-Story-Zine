@@ -761,7 +761,11 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
     compact: boolean = false
   ) => {
     const src = shots[slotIdx];
-    const meta = SHOT_STICKERS[slotIdx];
+    const fallbackMeta = SHOT_STICKERS[slotIdx];
+    const meta = {
+      badge: issue.prompts.panelLabels?.[slotIdx] || fallbackMeta.badge,
+      note: issue.prompts.resolvedStoryArcLabel || fallbackMeta.note,
+    };
     const slotKey = `shot${slotIdx}` as ZineMediaSlotKey;
     const promptText = shotPromptByIdx[slotIdx];
     const isHover = dragHoverSlot === slotKey;

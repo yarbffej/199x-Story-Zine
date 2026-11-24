@@ -16,6 +16,7 @@ export interface ZinePrompts {
   resolvedHeroLookId: string;
   resolvedHeroLookLabel: string;
   resolvedAtmosphereLabel: string;
+  panelLabels: [string, string, string, string];
   masterStoryboard2x2Prompt: string;
   masterStoryboardUltraSafePrompt: string;
   sameChatGif1FollowupPrompt: string;
@@ -414,6 +415,26 @@ function toStoryShortPlace(placePhrase: string): string {
   return trimmed.length >= 8 ? trimmed : placePhrase;
 }
 
+export function splitNamedBadGuy(rawAnomaly: string): {
+  shortName: string;
+  title: string;
+  fullIntro: string;
+} {
+  const clean = (rawAnomaly || 'Barnaby Wink — The Living Ventriloquist Dummy in a Velvet Suit').trim();
+  const sepIdx = clean.indexOf(' — ');
+  if (sepIdx > 0) {
+    const shortName = clean.slice(0, sepIdx).trim();
+    const title = clean.slice(sepIdx + 3).trim();
+    const lowerThe = title.startsWith('The ') ? `the ${title.slice(4)}` : title;
+    return {
+      shortName,
+      title,
+      fullIntro: `${shortName}, ${lowerThe}`,
+    };
+  }
+  return { shortName: clean, title: clean, fullIntro: clean };
+}
+
 export function buildLongForm3ActChronicle(
   encounter: CombatEncounter,
   anomalyOverride?: string,
@@ -422,11 +443,12 @@ export function buildLongForm3ActChronicle(
   const rawLocation = encounter.location || 'K&B Novelty Depot clearance aisle at 8:59 PM';
   const locationFull = toStoryPlacePhrase(rawLocation);
   const location = toStoryShortPlace(locationFull);
-  const anomaly =
+  const rawAnomaly =
     anomalyOverride ||
     encounter.anomaly_name ||
     encounter.entity_name ||
-    'The Neon Shadow Monster';
+    'Barnaby Wink — The Living Ventriloquist Dummy in a Velvet Suit';
+  const { shortName: anomaly, fullIntro: anomalyIntro } = splitNamedBadGuy(rawAnomaly);
   const weapon = encounter.protagonist_loadout?.improvised_weapon || 'old store flashlight';
   const artifact = encounter.protagonist_loadout?.nostalgia_artifact || 'glowing 90s pocket toy';
   const funTrick = toGoosebumpsTrickName(
@@ -462,14 +484,14 @@ export function buildLongForm3ActChronicle(
   ];
 
   const act1Closers = [
-    `Pitch dark. Dead quiet. Then—*THUMP. THUMP. THUMP.* Something massive stomped straight out into the center aisle! When the emergency lights blinked back on in spooky red, there it stood—glowing, grinning, and towering almost to the rafters: ${anomaly}! And tonight, ${location} belonged entirely to the monster.`,
-    `*CREEEAK.* The gigantic shadow stretched across the back wall... taller... wider... and then peeled completely off the wall! Out of a swirling cloud of glowing neon fog stepped ${anomaly}, rattling every single shelf in ${location}. No humans. No rules. Showtime!`,
-    `A loud *ZAP!* shook the ceiling tiles, and a bright whirlpool of rainbow sparks spun open right in the middle of ${location}. Rising straight out of the glowing mist like a runaway midnight movie monster was ${anomaly}—bright eyes flashing, wild energy crackling, and ready to turn the whole place upside down!`,
-    `Right inside the glossy front window glass, a gigantic spooky reflection appeared—even though the aisle looked empty! One second later—*POP!*—${anomaly} stepped right through the shimmer into full view, letting out a wild echoing rattle that shook loose half the ceiling tiles!`,
-    `Suddenly, every buzzing sound cut out completely. Total, creepy silence. Then—*BOOM!*—two display racks slid sideways and ${anomaly} burst straight into the open, crackling with wild neon sparks! Whatever had kept this crazy creature sleeping all day had finally snapped wide open!`,
-    `A mischievous echoing laugh bounced off every corner of ${location} at once. Up from the scuffed floor tiles swirled a glittering neon tornado—and out popped ${anomaly}, bigger and wilder than anything in a horror comic! Every arcade screen and store lamp flashed wildly to welcome its new boss.`,
-    `Wait a second. That gigantic glowing shape creeping past the front counter wasn't a store display—it was MOVING! Stretching all the way up toward the skylights, ${anomaly} shook off a shower of glowing sparks and grinned wide across empty ${location}.`,
-    `One last flicker of the overhead lights, and *FZZZT!*—the air smelled like burnt popcorn and electric sparks. Looming straight out of the darkest corner of ${location} was ${anomaly}, glowing brighter than ten pinball machines on multiball at once!`,
+    `Pitch dark. Dead quiet. Then—*THUMP. THUMP. THUMP.* Something massive stomped straight out into the center aisle! When the emergency lights blinked back on in spooky red, there it stood—glowing, grinning, and towering almost to the rafters: ${anomalyIntro}! And tonight, ${location} belonged entirely to ${anomaly}.`,
+    `*CREEEAK.* The gigantic shadow stretched across the back wall... taller... wider... and then peeled completely off the wall! Out of a swirling cloud of glowing neon fog stepped ${anomalyIntro}, rattling every single shelf in ${location}. No humans. No rules. Showtime!`,
+    `A loud *ZAP!* shook the ceiling tiles, and a bright whirlpool of rainbow sparks spun open right in the middle of ${location}. Rising straight out of the glowing mist like a runaway midnight movie monster was ${anomalyIntro}—bright eyes flashing, wild energy crackling, and ready to turn the whole place upside down!`,
+    `Right inside the glossy front window glass, a gigantic spooky reflection appeared—even though the aisle looked empty! One second later—*POP!*—${anomalyIntro} stepped right through the shimmer into full view, letting out a wild echoing rattle that shook loose half the ceiling tiles!`,
+    `Suddenly, every buzzing sound cut out completely. Total, creepy silence. Then—*BOOM!*—two display racks slid sideways and ${anomalyIntro} burst straight into the open, crackling with wild neon sparks! Whatever had kept ${anomaly} sleeping all day had finally snapped wide open!`,
+    `A mischievous echoing laugh bounced off every corner of ${location} at once. Up from the scuffed floor tiles swirled a glittering neon tornado—and out popped ${anomalyIntro}, bigger and wilder than anything in a horror comic! Every arcade screen and store lamp flashed wildly to welcome its new boss.`,
+    `Wait a second. That gigantic glowing shape creeping past the front counter wasn't a store display—it was MOVING! Stretching all the way up toward the skylights, ${anomalyIntro} shook off a shower of glowing sparks and grinned wide across empty ${location}.`,
+    `One last flicker of the overhead lights, and *FZZZT!*—the air smelled like burnt popcorn and electric sparks. Looming straight out of the darkest corner of ${location} was ${anomalyIntro}, glowing brighter than ten pinball machines on multiball at once!`,
   ];
 
   const act2Openers = [
@@ -813,7 +835,7 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '35mm 90s Live-Action Film',
     gridIntro: 'A photorealistic 16:9 four-panel 2x2 35mm movie film-still contact sheet',
     medium:
-      'photorealistic 1990s live-action 35mm anamorphic cinema photography featuring real human actors, tactile practical puppet and animatronic sci-fi creature effects, authentic physical film grain, shallow cinematic depth of field, and zero cartoon or illustration look',
+      'photorealistic 1990s live-action 35mm anamorphic cinema photography featuring real physical sets, tactile practical puppet and animatronic creature effects, authentic film grain, shallow cinematic depth of field, and zero cartoon or illustration look',
     colors: 'warm tungsten highlights, misty emerald shadows, and wet neon halation glow',
     energyFx: 'practical optical light rays, glowing volumetric prism haze, and warm anamorphic lens flares',
     videoType: 'live-action 35mm anamorphic 1990s sci-fi movie clip with real-world lighting and film grain',
@@ -835,7 +857,7 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '1990s 35mm Flash Photo',
     gridIntro: 'An authentic 16:9 four-panel 2x2 candid 35mm snapshot collage',
     medium:
-      'candid 1990s disposable-camera 35mm direct-flash live-action photography with real people, realistic suburban linoleum and plastic textures, crisp on-camera flash glare, authentic analog film color shifts, and completely photographic realism (not drawn or animated)',
+      'candid 1990s disposable-camera 35mm direct-flash live-action photography of real physical sets, authentic suburban linoleum and plastic textures, crisp on-camera flash glare, natural analog film color shifts, and completely photographic realism (not drawn or animated)',
     colors: 'raw direct-flash whites, nostalgic green-tinted shadows, and saturated fluorescent color pops',
     energyFx: 'bright overexposed flash reflections, prismatic optical light leaks, and glowing lens bloom',
     videoType: 'raw handheld 1990s live-action documentary film clip with candid natural motion',
@@ -879,7 +901,7 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '1990s Analog Camcorder',
     gridIntro: 'A candid 16:9 four-panel 2x2 1990s home-video camcorder freeze-frame sheet',
     medium:
-      'authentic lo-fi 1990s handheld home-video tape footage of real live-action people and physical locations with soft analog magnetic-tape texture, subtle chromatic color fringe around bright lights, warm indoor video bloom, and grounded documentary realism',
+      'authentic lo-fi 1990s handheld home-video tape footage of real physical locations and practical monster effects with soft analog magnetic-tape texture, subtle chromatic color fringe around bright lights, warm indoor video bloom, and grounded documentary realism',
     colors: 'warm fluorescent cream, soft cyan-magenta highlight bloom, and slightly faded analog tape shadows',
     energyFx: 'glowing analog tape light-bleed, dazzling phosphor glare, and shimmering video tracking ripples',
     videoType: 'authentic 1990s handheld analog camcorder live-action clip with gentle natural camera shake and warm tape bloom',
@@ -956,7 +978,7 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: 'Faded Vintage Instant-Film',
     gridIntro: 'A nostalgic 16:9 four-panel 2x2 vintage instant-film photograph contact sheet',
     medium:
-      'authentic faded 1970s and 1980s vintage instant-film analog photography featuring real-world people and lived-in locations, creamy yellowed highlights, soft dreamy optical lens vignette, muted pastel teal-and-ochre chemical film tints, and pure photographic realism (not illustrated)',
+      'authentic faded 1970s and 1980s vintage instant-film analog photography featuring real-world tactile locations and physical sets, creamy yellowed highlights, soft dreamy optical lens vignette, muted pastel teal-and-ochre chemical film tints, and pure photographic realism (not illustrated)',
     colors: 'creamy warm sepia ivory, faded pastel turquoise, muted rust-orange, and gentle golden lens flare',
     energyFx: 'dreamy overexposed analog chemical light leaks and soft rainbow prism lens halos',
     videoType: 'vintage faded instant-film live-action home-movie clip with soft organic grain and sunlit chemical glow',
@@ -1051,18 +1073,18 @@ export interface StoryboardArcMeta {
 }
 
 export const STORYBOARD_STORY_ARCS: StoryboardArcMeta[] = [
-  { id: 'chase-trap', emoji: '🏃', shortLabel: 'High-Speed Chase & Trap' },
-  { id: 'zero-g-chaos', emoji: '🪐', shortLabel: 'Zero-Gravity Floating Chaos' },
-  { id: 'portal-hop', emoji: '🌀', shortLabel: 'Dimension Portal Hop' },
-  { id: 'harmonic-truce', emoji: '🎵', shortLabel: 'Harmonic Taming & Truce' },
-  { id: 'machine-overload', emoji: '⚡', shortLabel: 'Ticking-Clock Switch Flip' },
-  { id: 'noir-mystery', emoji: '🔍', shortLabel: 'Noir Clues & Standoff' },
-  { id: 'mirror-decoy', emoji: '🪞', shortLabel: 'Mirror-World Mirage Trick' },
-  { id: 'rooftop-skyline', emoji: '🌙', shortLabel: 'Rooftop Skyline Leap' },
-  { id: 'flashlight-recon', emoji: '🔦', shortLabel: 'Darkness Flashlight Recon' },
-  { id: 'scale-flip', emoji: '🔬', shortLabel: 'Giant / Miniature Scale Flip' },
-  { id: 'season-warp', emoji: '🌦️', shortLabel: 'Indoor Seasons Time-Warp' },
-  { id: 'classic-showdown', emoji: '🃏', shortLabel: 'Classic Clash & Holo Relic' },
+  { id: 'field-guide', emoji: '📖', shortLabel: 'Monster Field-Guide Spread' },
+  { id: 'late-night-news', emoji: '📺', shortLabel: 'Late-Night News Sighting' },
+  { id: 'secret-lair', emoji: '🏠', shortLabel: 'Secret Lair & Routine' },
+  { id: 'cross-town-tour', emoji: '🚗', shortLabel: 'Cross-Town 4-Stop Rampage' },
+  { id: 'evolution-stages', emoji: '🥚', shortLabel: 'Tiny-to-Colossal Evolution' },
+  { id: 'reflections-only', emoji: '🪞', shortLabel: 'Reflections & Shadows Only' },
+  { id: 'toy-commercial', emoji: '📦', shortLabel: '90s Toy-Box & Model Town' },
+  { id: 'four-seasons-day', emoji: '🌦️', shortLabel: '4 Seasons / 4 Palettes' },
+  { id: 'cutaway-dollhouse', emoji: '🔍', shortLabel: 'Dollhouse Cutaway & Scale' },
+  { id: 'found-camera-roll', emoji: '📷', shortLabel: 'Found 35mm Camera Roll' },
+  { id: 'midnight-carnival', emoji: '🎪', shortLabel: 'Haunted Midnight Carnival' },
+  { id: 'dream-postcards', emoji: '🌌', shortLabel: '4 Surreal Dreamworld Realms' },
 ];
 
 interface StoryboardPlan {
@@ -1075,7 +1097,7 @@ interface StoryboardPlan {
   gif2Idx: number;
 }
 
-const VARIETY_STORAGE_KEY = '199x_zine_badguy_variety_v3';
+const VARIETY_STORAGE_KEY = '199x_zine_badguy_variety_v4';
 const storyboardPlanCache = new Map<string, StoryboardPlan>();
 
 function loadPersistedStoryboardHistory(): StoryboardPlan[] {
@@ -1242,8 +1264,9 @@ export function compile199xZinePrompts(
 
   const flowArtStyle = `${palette.medium}, color palette of ${palette.colors}, ${cameraGrammar}, borderless edge-to-edge full-bleed visuals, and blank surfaces with no words or lettering`;
 
-  // 12 COMPLETELY DIFFERENT 4-SCENE BAD-GUY-ONLY ARCS (100% Monster Spotlight, ZERO Human Heroes!)
+  // 12 RE-IMAGINED 4-PANEL ZINE FORMATS — every quadrant uses a COMPLETELY DIFFERENT camera distance, setting, lighting mood & subject!
   interface StoryArcScript {
+    labels: [string, string, string, string];
     p1: string;
     p2: string;
     p3: string;
@@ -1256,141 +1279,213 @@ export function compile199xZinePrompts(
   }
 
   const storyArcScripts: Record<string, StoryArcScript> = {
-        'chase-trap': {
-          p1: `Empty high-energy interior of ${locationVisual} under ${atmosphere} with no human characters: vintage chairs, display racks, and retro boxes rattle as the towering cosmic creature bursts through the back aisles leaving swirling trails of ${palette.energyFx}.`,
-          p2: `Close-up stillness inside empty ${locationVisual} with no people: ${safeGadget1} sits humming and blinking rapidly on a cluttered retro counter while the cosmic creature's gigantic glowing shadow sweeps across the far wall.`,
-          p3: `Spontaneous environmental chain-reaction inside uninhabited ${locationVisual}: overhead vintage cables and hanging neon fixtures swing down in a dazzling domino web, tangling the surprised cosmic creature in glowing ribbons of ${palette.energyFx}.`,
-          p4: `Serene quiet exterior of ${locationVisual} with no people: tiny glowing starlight motes drift peacefully upward from the empty entrance steps under the calm sky.`,
-          videoBeat1: `inside empty ${locationVisual} with no human figures, retro displays rattle wildly as the cosmic creature surges down the aisle knocking vintage props into mid-air`,
-          videoBeat2: `hanging neon cables and ${safeGadget1} snap into resonance, wrapping the startled cosmic creature in brilliant harmonic ribbons of ${palette.energyFx}`,
-          outroBeat1: `the tangled cosmic creature lets out a musical chime and gently dissolves into rising ribbons of starlight across empty ${locationVisual}`,
-          outroBeat2: `three shimmering blank holographic cards flutter gently down onto the quiet front doorstep`,
-          outroBeat3: `the empty retro storefront glows softly in peaceful stillness as the cards catch the evening light`,
-        },
-        'zero-g-chaos': {
-          p1: `Astonishing uninhabited zero-gravity anomaly inside ${locationVisual} bathed in ${atmosphere} with no people: stools, arcade tokens, retro boxes, and neon fixtures drift silently off the floor into mid-air.`,
-          p2: `Surreal weightless centerpiece inside empty ${locationVisual}: the towering cosmic creature hovers upside-down amid orbiting vintage televisions, glowing cassettes, and floating furniture.`,
-          p3: `Spontaneous gravity core reset inside ${locationVisual} with no humans: ${safeGadget1} floats right into the swirling vortex core and pulses outward in expanding golden rings of ${palette.energyFx}.`,
-          p4: `Soft grounded aftermath inside empty ${locationVisual}: fallen popcorn, retro props, and scattered tokens rest peacefully on the floor beside a single shimmering prism on a tilted shelf.`,
-          videoBeat1: `inside weightless uninhabited ${locationVisual}, tables, cassettes, and retro boxes orbit slowly in mid-air around the hovering cosmic creature`,
-          videoBeat2: `glowing ${safeGadget1} drifts directly into the vortex core, unleashing concentric golden rings of ${palette.energyFx} as normal gravity gently returns`,
-          outroBeat1: `floating retro objects drift softly back onto the floor as the glowing cosmic creature unwinds upward into pastel mist`,
-          outroBeat2: `three gleaming blank holographic cards settle smoothly onto an overturned vintage crate`,
-          outroBeat3: `quiet sunlight or neon shimmer washes across the empty, settled room`,
-        },
-        'portal-hop': {
-          p1: `Surreal uninhabited doorway inside ${locationVisual} under ${atmosphere} with no humans: an ordinary back-room door stands wide open into a luminous neon-horizon cosmic dimension of floating geometric islands.`,
-          p2: `Threshold pull inside empty ${locationVisual}: vintage posters, tokens, and swirling starlight dust drift sideways through the glowing open doorway into the starlit void.`,
-          p3: `Dreamlike alternate pocket dimension with no people: a breathtaking floating starfield mirror-version of ${locationVisual} where the gigantic cosmic creature spirals around hovering checkered platforms amid ${palette.energyFx}.`,
-          p4: `Quiet return to normal inside empty ${locationVisual}: the glowing doorway clicks shut into an ordinary wood-and-glass door as faint sparkles fade along the threshold.`,
-          videoBeat1: `inside the surreal uninhabited starfield mirror-version of ${locationVisual}, hovering geometric platforms drift slowly around the spiraling cosmic creature`,
-          videoBeat2: `${safeGadget1} hovering at the center pulses with a brilliant ring of ${palette.energyFx}, folding the dimensional doorway smoothly back toward home`,
-          outroBeat1: `the swirling starfield doorway folds inward in iridescent waves leaving ordinary empty ${locationVisual} behind`,
-          outroBeat2: `three gleaming blank holographic cards materialize neatly on the quiet wooden threshold`,
-          outroBeat3: `the empty hallway rests in calm golden silence as the cards shimmer softly`,
-        },
-        'harmonic-truce': {
-          p1: `Playful chaotic malfunction inside empty ${locationVisual} under ${atmosphere} with no people: the oversized cosmic creature bounces clumsily through the background making neon signs spin and vintage displays flicker.`,
-          p2: `Gentle musical resonance with no humans: close-up of ${safeGadget1} sitting on a counter emitting soft concentric glowing sound-wave rings while the curious cosmic creature leans down listening with tilted head.`,
-          p3: `Synchronized cosmic crescendo inside uninhabited ${locationVisual}: breathtaking wide painterly vista of the towering cosmic creature bathed in swirling aurora ribbons of ${palette.energyFx} as crooked shelves straighten harmoniously.`,
-          p4: `Heartwarming quiet farewell with no people: the cosmic creature shrinks into a tiny warm glowing starlight orb floating peacefully upward toward the open skylights.`,
-          videoBeat1: `inside empty ${locationVisual}, ${safeGadget1} hums on a retro counter sending gentle concentric rings of warm light toward the restless cosmic creature`,
-          videoBeat2: `the creature's chaotic static softens into glowing harmony inside a breathtaking swirling aurora of ${palette.energyFx}`,
-          outroBeat1: `the peaceful cosmic creature shrinks into a warm glowing starlight firefly drifting upward through the skylight`,
-          outroBeat2: `soft sparkles drift onto the polished counter and settle into three shimmering blank holographic trading cards`,
-          outroBeat3: `empty ${locationVisual} glows peacefully beneath the quiet sky`,
-        },
-        'machine-overload': {
-          p1: `Urgent machinery hum inside uninhabited ${locationVisual} under ${atmosphere} with no humans: angled close-up of blinking amber and crimson vintage console gauges, humming transformers, and buzzing overhead fixtures.`,
-          p2: `Looming silhouette behind frosted glass with no people: the giant cosmic creature presses right up against an illuminated retro partition window beside a wall of glowing toggle switches and coiled cables.`,
-          p3: `Automatic breaker surge inside empty ${locationVisual}: a massive industrial switch lever flips downward in a bright spark of static, flooding the entire room with a sweeping harmonic wave of ${palette.energyFx}.`,
-          p4: `Warm calm power restored in empty ${locationVisual}: cozy golden lights hum steadily back on across spotless silent counters and quiet control consoles.`,
-          videoBeat1: `inside empty ${locationVisual}, glowing console gauges race into the amber zone while the giant cosmic creature looms behind a frosted glass partition`,
-          videoBeat2: `the main vintage breaker snaps downward on its own, unleashing a sweeping harmonic wave of ${palette.energyFx} across every fixture`,
-          outroBeat1: `the harmonic surge calms the machinery as the cosmic creature dissolves smoothly into peaceful glowing static`,
-          outroBeat2: `warm golden room lights flicker steadily back on while three blank shimmering holographic cards slide cleanly out of the console slot`,
-          outroBeat3: `the quiet empty control room settles into warm analog peace`,
-        },
-        'noir-mystery': {
-          p1: `Mysterious clue trail inside uninhabited ${locationVisual} under ${atmosphere} with no humans: moody low-angle view of glowing iridescent footprints and softly humming melted arcade tokens leading down an empty shadowed aisle.`,
-          p2: `Silent architectural standoff with no people: dramatic symmetrical wide corridor shot of the towering cosmic creature standing motionless at the far misty end of empty ${locationVisual}.`,
-          p3: `Surreal tilted reality bend inside uninhabited ${locationVisual}: walls and checkered floors curve upward around the hovering cosmic creature while ${safeGadget1} projects a bright geometric wave of ${palette.energyFx}.`,
-          p4: `Quiet empty exterior at dawn with no humans: misty peaceful facade of ${locationVisual} facing an empty suburban parking lot as pale morning light breaks.`,
-          videoBeat1: `down the long empty misty corridor of ${locationVisual}, walls and tiles tilt surreally around the silent towering cosmic creature`,
-          videoBeat2: `${safeGadget1} pulses in phase alignment, sending a crisp geometric wave of ${palette.energyFx} snapping the crooked room back to true reality`,
-          outroBeat1: `the warped empty corridor straightens with a soft chime as the cosmic creature fades gently into morning mist`,
-          outroBeat2: `three gleaming blank holographic cards rest quietly on the damp front doorstep`,
-          outroBeat3: `pale morning light glides smoothly across the peaceful empty storefront`,
-        },
-        'mirror-decoy': {
-          p1: `Uncanny mirror reveal inside empty ${locationVisual} under ${atmosphere} with no humans: looking across a glossy storefront mirror — the real room looks empty, yet the towering cosmic creature is visible ONLY inside the reflection.`,
-          p2: `Hall of holographic mirages with no people: dazzling wide view of uninhabited ${locationVisual} filled with three translucent shimmering holographic echoes of the cosmic creature refracting rainbow light across every wall.`,
-          p3: `Prismatic mirror rebound inside empty ${locationVisual}: glowing beams bounce between glossy vintage mirrors and ${safeGadget1}, spinning into a breathtaking kaleidoscope ring of ${palette.energyFx}.`,
-          p4: `Peaceful sunlit stillness with no humans: serene wide interior shot of clear light streaming through spotless dust-free glass across quiet ${locationVisual}, with one tiny rainbow glass prism gleaming on a windowsill.`,
-          videoBeat1: `inside uninhabited ${locationVisual}, shimmering holographic mirages of the cosmic creature orbit across glossy vintage mirrors`,
-          videoBeat2: `refracted prism waves rebound between mirrored glass into a spinning kaleidoscope ring of ${palette.energyFx}`,
-          outroBeat1: `all the shimmering mirages chime and fold harmoniously back into a single bright prism spark that vanishes upward`,
-          outroBeat2: `the mirrors clear completely as three blank holographic rainbow cards materialize along the sunlit ledge`,
-          outroBeat3: `spotless empty ${locationVisual} glows peacefully in quiet stillness`,
-        },
-        'rooftop-skyline': {
-          p1: `Looking up from the empty street outside ${locationVisual} under ${atmosphere} with no humans: dramatic low-angle view gazing up at the glowing neon roof sign as swirling aurora clouds gather overhead.`,
-          p2: `High-altitude overhead view with no people: dramatic vista looking down past the glowing rooftop neon awning of ${locationVisual} as the massive cosmic creature emerges into the mist-filled empty plaza below.`,
-          p3: `Skyward aurora pillar with no humans: a towering spiraling beacon of ${palette.energyFx} erupts straight from ${locationVisual} up into the starry sky, lifting the cosmic creature's swirling light clouds skyward.`,
-          p4: `Peaceful empty suburban skyline with no people: serene rooftop parapet overlooking twinkling quiet suburban neighborhood lights beneath a clear calm sky.`,
-          videoBeat1: `high above empty ${locationVisual}, swirling aurora mist curls around the neon roof sign as the giant cosmic creature rises into the plaza below`,
-          videoBeat2: `a towering harmonious pillar of ${palette.energyFx} sweeps straight upward from the rooftop into the night sky`,
-          outroBeat1: `the soaring aurora beacon blooms silently above the roofline like gentle starlight fireworks before fading clear`,
-          outroBeat2: `soft glowing sparkles settle onto the empty rooftop parapet, forming three gleaming blank holographic trading cards`,
-          outroBeat3: `the quiet neighborhood lights twinkle peacefully across the calm horizon`,
-        },
-        'flashlight-recon': {
-          p1: `Atmospheric late-night exterior of empty ${locationVisual} under ${atmosphere} with no humans: warm amber streetlamps and colorful neon reflections across quiet damp pavement.`,
-          p2: `Dramatic spotlight cutting the dark inside empty ${locationVisual} with no people: a single shaft of bright window light cuts through swirling fog to suddenly reveal the cosmic creature's glowing eyes and giant silhouette.`,
-          p3: `Swirling aisle energy inside uninhabited ${locationVisual}: loose vintage flyers and sparks lift skyward in a sweeping halo of ${palette.energyFx} rippling past rows of retro displays.`,
-          p4: `Warm still close-up with no humans: three glowing blank rainbow holographic cards resting beside a warm vintage lantern on a quiet polished counter.`,
-          videoBeat1: `inside dimly lit uninhabited ${locationVisual}, a sharp shaft of glowing light cuts through drifting mist revealing the giant cosmic creature`,
-          videoBeat2: `a bright sweeping halo of ${palette.energyFx} ripples down the narrow aisle, calming the creature in mid-motion`,
-          outroBeat1: `the glowing fog clears gently as the cosmic creature dissolves upward into shimmering dust motes`,
-          outroBeat2: `a fanned trio of gleaming blank rainbow holographic cards rests softly on the polished retro counter`,
-          outroBeat3: `quiet vintage fixtures hum peacefully in the empty settled room`,
-        },
-        'scale-flip': {
-          p1: `Miniature overhead diorama view of uninhabited ${locationVisual} under ${atmosphere} with no people: crisp bird's-eye dollhouse perspective looking down across the entire layout as one corner begins glowing intensely.`,
-          p2: `Extreme ant-scale macro floor perspective inside empty ${locationVisual} with no humans: looking sharply upward past towering table legs and giant retro arcade tokens at the colossal cosmic creature rising like a skyscraper.`,
-          p3: `Architectural side-profile cutaway of uninhabited ${locationVisual}: showing glowing rafters, ceiling ducts, and lower aisles simultaneously as ${safeGadget1} releases a shimmering cascade of ${palette.energyFx} from above.`,
-          p4: `Crisp macro still-life close-up with no people: a single vintage glass snowglobe resting on a counter containing a tiny peaceful glowing miniature reflection of ${locationVisual}.`,
-          videoBeat1: `from an extreme ant-scale floor viewpoint inside empty ${locationVisual}, towering retro fixtures frame the skyscraper-sized cosmic creature surging overhead`,
-          videoBeat2: `from the rafters above, a shimmering prism cascade of ${palette.energyFx} drifts smoothly down, shrinking the distortion into calm equilibrium`,
-          outroBeat1: `the colossal cosmic creature folds gently down into a tiny warm spark floating into a glass curio jar`,
-          outroBeat2: `three crisp blank holographic trading cards lean neatly beside the glowing miniature glass dome`,
-          outroBeat3: `the macro camera glides slowly back across the peaceful settled tabletop`,
-        },
-        'season-warp': {
-          p1: `Sudden indoor winter snowstorm inside empty ${locationVisual} under ${atmosphere} with no humans: glowing frost crystals, hanging icicles, and gentle snowflakes swirl across the neon retro shelves as the cosmic creature appears.`,
-          p2: `Instant lush tropical bloom inside uninhabited ${locationVisual} with no people: giant luminescent emerald ferns, glowing vines, and warm golden pollen sprout wildly around vintage displays and the towering cosmic creature.`,
-          p3: `Dramatic indoor autumn-leaf cyclone inside empty ${locationVisual}: thousands of glowing amber maple leaves and vintage flyers spiral into a radiant vortex of ${palette.energyFx} circling the cosmic creature.`,
-          p4: `Fresh sunlit spring morning inside peaceful empty ${locationVisual} with no people: sparkling morning dew drops glisten across spotless retro counters beneath a soft indoor rainbow arc.`,
-          videoBeat1: `inside empty ${locationVisual}, indoor snow flurries transform seamlessly into blooming glowing tropical vines around the towering cosmic creature`,
-          videoBeat2: `a swirling indoor cyclone of golden autumn leaves and ${palette.energyFx} sweeps the room clean into fresh sunlit spring clarity`,
-          outroBeat1: `the seasonal whirlwind melts peacefully into warm golden sunbeams and drifting flower petals`,
-          outroBeat2: `three gleaming blank holographic cards rest dry and sparkling on a dew-kissed counter beneath a rainbow prism`,
-          outroBeat3: `quiet spring light fills empty ${locationVisual} in serene harmony`,
-        },
-        'classic-showdown': {
-          p1: `Wide exterior threshold view outside empty ${locationVisual} under ${atmosphere} with no humans: swinging entrance doors drift slightly ajar as iridescent shimmer spills out onto the quiet pavement.`,
-          p2: `Dramatic solo reveal deep inside uninhabited ${locationVisual}: tight atmospheric portrait of the towering cosmic creature rising out of swirling mist amid ${palette.energyFx}.`,
-          p3: `Widescreen resonance discharge inside empty ${locationVisual} with no people: ${safeGadget1} and ${safeGadget2} perched on a central console project a blazing arc of ${palette.energyFx} directly toward the glowing cosmic creature.`,
-          p4: `Clean 90-degree top-down overhead flat-lay still life on scuffed retro tiles inside empty ${locationVisual} showing cooled ${safeGadget1}, ${safeGadget2}, gleaming brass tokens, and three blank shimmering rainbow holographic foil trading cards.`,
-          videoBeat1: `inside empty ${locationVisual}, vintage ${safeGadget1} and ${safeGadget2} power up automatically on a counter facing the advancing cosmic creature`,
-          videoBeat2: `a blazing linear wave of ${palette.energyFx} streams cleanly across the room, gently calming the glowing creature`,
-          outroBeat1: `the cosmic creature shimmers and dissolves upward into ribbons of holographic light as empty ${locationVisual} snaps back to normal`,
-          outroBeat2: `those shimmering light ribbons condense onto the scuffed tiles into three gleaming blank rainbow holographic trading cards`,
-          outroBeat3: `quiet room lights flicker steadily back on over the sparkling cards on the floor`,
-        },
-      };
+    'field-guide': {
+      labels: [
+        '🔬 PANEL 01 // EXTREME MACRO TEXTURE',
+        '📖 PANEL 02 // ARCHIVAL SPECIMEN PLATE',
+        '🐾 PANEL 03 // PHYSICAL CLUE EVIDENCE',
+        '🔭 PANEL 04 // DISTANT ROOFTOP SIGHTING',
+      ],
+      p1: `Extreme macro close-up filling the entire frame with no room background: ultra-tight detailed study of the monster's glowing eyes, weird surface textures, scales, feathers, wax, or vintage chrome details glinting with ${palette.energyFx}.`,
+      p2: `Clean archival museum specimen plate: full-body portrait of the entire monster standing centered against a stark, empty cream archival studio paper backdrop with soft gallery shadow (no room, no clutter) showing every wild limb and detail clearly.`,
+      p3: `Overhead tabletop evidence photograph: crisp straight-down flat-lay on weathered wood showing bizarre physical clues left behind—glowing iridescent footprints, melted brass arcade tokens, strange translucent scales or wax droplets, and humming ${safeGadget1}.`,
+      p4: `Far-away telephoto neighborhood sighting: misty twilight view from across a quiet empty 1990s suburban street lined with parked station wagons and glowing streetlamps, spotting the monster's gigantic illuminated silhouette perched high atop the roof of ${locationVisual}.`,
+      videoBeat1: `starting from an extreme macro close-up of the monster's glowing eye and wild tactile textures, the camera pulls smoothly backward across a misty empty suburban rooftop`,
+      videoBeat2: `the monster unfurls to full dramatic silhouette atop the glowing roof sign amid ${palette.energyFx} as distant neighborhood lights twinkle below`,
+      outroBeat1: `high above the quiet street, the towering silhouette shimmers and rises gracefully into a stream of starry glowing clouds`,
+      outroBeat2: `down on a damp wooden park bench below, three gleaming blank rainbow holographic trading cards appear beside tiny glowing footprints`,
+      outroBeat3: `quiet misty evening air drifts peacefully over the empty suburban neighborhood`,
+    },
+    'late-night-news': {
+      labels: [
+        '🚗 PANEL 01 // PARKING LOT HEADLIGHTS',
+        '📹 PANEL 02 // CEILING SECURITY-CAM',
+        '🪟 PANEL 03 // FACE PRESSED ON GLASS',
+        '🚧 PANEL 04 // MORNING-AFTER SIDEWALK',
+      ],
+      p1: `Low road-level headlight view: wet empty 1990s parking lot outside ${locationVisual} lit only by twin warm car headlights cutting through rolling neon fog, with eerie mystery and the monster not yet visible.`,
+      p2: `High ceiling-corner security-camera angle: wide tilted fish-eye overhead view looking down from a dark corner ceiling mount catching the monster mid-raid sneaking playfully past rows of vintage displays.`,
+      p3: `Startling extreme close-up through rainy glass: the monster's giant bizarre expressive face pressed right up against a rain-streaked storefront window staring straight into the lens in dramatic flashes of ${palette.energyFx}.`,
+      p4: `Bright overcast daytime street shot: totally ordinary sunny morning exterior sidewalk outside ${locationVisual} with tipped bright orange traffic cones, fluttering yellow tape, and a single sparkling holographic souvenir card resting on dry concrete.`,
+      videoBeat1: `seen through rain-streaked storefront glass in dramatic stormy flashes, the monster leans playfully right up against the window making neon reflections ripple wildly`,
+      videoBeat2: `the monster zips backward down the misty aisles in a dazzling swirl of ${palette.energyFx} as overhead lights flicker wildly`,
+      outroBeat1: `the stormy midnight glow dissolves cleanly into bright peaceful pale-blue early morning light`,
+      outroBeat2: `out on the ordinary sunlit sidewalk beside a tipped orange cone, three gleaming blank holographic trading cards catch the sunrise`,
+      outroBeat3: `a calm empty suburban street wakes up softly with zero trace of the midnight visitor`,
+    },
+    'secret-lair': {
+      labels: [
+        '🏚️ PANEL 01 // SECRET ATTIC HOARD NEST',
+        '🍿 PANEL 02 // MACRO SNACKING & TINKERING',
+        '🪟 PANEL 03 // PEEKING THROUGH BLINDS',
+        '🌙 PANEL 04 // WATER-TOWER MOONLIGHT',
+      ],
+      p1: `Cozy cluttered secret underground lair: hidden crawlspace or warm dusty attic den packed floor-to-ceiling with the monster's collected 1990s treasure hoard—glowing lava lamps, stacked cassettes, bowling trophies, neon signs, and shiny trinkets.`,
+      p2: `Tight funny macro close-up: just the monster's bizarre paws, grippers, or tentacles clumsily examining and tinkering with glowing ${safeGadget1}, tangled cassette ribbons, and colorful retro snacks on a cluttered workbench.`,
+      p3: `Rear over-the-shoulder attic window perspective: looking from inside a dark attic past the monster's glowing silhouette peering curiously through wooden Venetian blinds down onto miniature twinkling suburban houses far below.`,
+      p4: `Epic wide moonlit silhouette: the monster perched joyfully atop a giant suburban water tower silhouetted against an enormous glowing golden harvest moon and drifting clouds streaked with ${palette.energyFx}.`,
+      videoBeat1: `inside a cozy cluttered attic treasure nest glowing with lava lamps and stacked cassettes, the monster playfully juggles shiny 1990s trinkets`,
+      videoBeat2: `bounding effortlessly up through an open roof hatch, the monster leaps across moonlit rooftops trailing sparkling ribbons of ${palette.energyFx}`,
+      outroBeat1: `perched atop a quiet town water tower against a giant bright moon, the monster shimmers into drifting golden stardust`,
+      outroBeat2: `back inside the quiet attic workbench, three gleaming blank rainbow holographic cards rest neatly beside a softly glowing lava lamp`,
+      outroBeat3: `moonlight pours peacefully through the dusty window panes`,
+    },
+    'cross-town-tour': {
+      labels: [
+        '🏪 PANEL 01 // BREAKOUT AT THE SHOP',
+        '🫧 PANEL 02 // NEON CAR-WASH TUNNEL',
+        '🏡 PANEL 03 // CUL-DE-SAC STREETLIGHTS',
+        '🎬 PANEL 04 // FOGGY DRIVE-IN SCREEN',
+      ],
+      p1: `Dramatic interior breakout: inside ${locationVisual} under ${atmosphere}, the monster bursts joyfully right through swinging glass doors in a shower of colorful sparks.`,
+      p2: `Soapy 24-hour automated car-wash tunnel: completely different location—the monster tumbling playfully amid giant spinning pastel foam brushes, cascading iridescent soap suds, and glowing red-and-cyan wash lights.`,
+      p3: `Quiet suburban cul-de-sac at night: wide outdoor street view—the colossal monster tiptoeing hilariously between tiny two-story suburban houses, mailboxes, white picket fences, and misting lawn sprinklers.`,
+      p4: `Foggy outdoor drive-in movie theater: breathtaking wide twilight vista of an empty grass field of vintage speaker posts as the monster stands dramatically silhouetted in front of an enormous glowing drive-in cinema screen under starry skies and ${palette.energyFx}.`,
+      videoBeat1: `bounding out of a soapy glowing car-wash tunnel, the monster splashes iridescent bubbles across a quiet moonlit suburban cul-de-sac`,
+      videoBeat2: `arriving before a colossal glowing outdoor drive-in cinema screen, the monster unleashes a joyful swirling aurora of ${palette.energyFx} across the night sky`,
+      outroBeat1: `the glowing drive-in cinema screen flickers warmly as the monster steps straight into the shimmering projector light and fades into stars`,
+      outroBeat2: `three gleaming blank holographic cards settle softly onto a vintage metal drive-in speaker post in the misty grass`,
+      outroBeat3: `crickets chirp softly beneath a calm starry sky over the empty drive-in field`,
+    },
+    'evolution-stages': {
+      labels: [
+        '🥚 PANEL 01 // TINY TABLETOP HATCHLING',
+        '🥣 PANEL 02 // COUNTERTOP MISCHIEF',
+        '🏢 PANEL 03 // FULL-SIZE MONSTER REVEAL',
+        '🌆 PANEL 04 // SUNSET HORIZON KAIJU',
+      ],
+      p1: `Extreme macro tabletop hatching: sunlit wooden kitchen table with a single cracked glowing soda can or fizzing retro plastic egg the size of a coffee mug—two tiny bright glowing eyes peeking out from the crack.`,
+      p2: `Cat-sized countertop mischief: lively close-up of a knee-high miniature version of the monster playfully knocking over vintage cereal boxes, colored pencils, and cassette tapes on a brightly lit checkered counter.`,
+      p3: `Full room-sized giant reveal: dramatic low-angle interior inside ${locationVisual} where the fully grown towering monster fills the room in blazing ${palette.energyFx}.`,
+      p4: `Epic hilltop town-skyline vista: wide cinematic sunset view from a grassy overlook far outside town looking down at tiny twinkling suburban rooftops as the colossal cloud-high monster towers over the distant golden horizon.`,
+      videoBeat1: `starting tiny beside a retro cereal box on a sunny counter, the small monster bursts with sparkling light and expands rapidly into full towering glory`,
+      videoBeat2: `rising straight past the roofline into golden sunset clouds, the colossal monster paints the horizon with breathtaking ribbons of ${palette.energyFx}`,
+      outroBeat1: `high above the quiet twilight town skyline, the colossal glowing clouds drift apart into calm violet evening air`,
+      outroBeat2: `back on the quiet wooden tabletop, three gleaming blank holographic trading cards sit neatly beside a cracked vintage soda can`,
+      outroBeat3: `warm sunset rays glide peacefully across the empty room`,
+    },
+    'reflections-only': {
+      labels: [
+        '🚗 PANEL 01 // REARVIEW MIRROR GLIMPSE',
+        '🧱 PANEL 02 // 30-FOOT ALLEY SHADOW',
+        '💧 PANEL 03 // RAIN-PUDDLE REFLECTION',
+        '👾 PANEL 04 // FACE-TO-FACE PORTRAIT',
+      ],
+      p1: `Station-wagon rearview mirror perspective: atmospheric interior shot of an empty 1990s car dashboard and windshield at dusk—inside the small rectangular rearview mirror glass, the monster's glowing eyes stare back from the fog behind.`,
+      p2: `Giant distorted brick-wall shadow: moody amber streetlamp lighting an empty red-brick alley wall—the monster itself is off-screen, yet its enormous wild 30-foot shadow looms dramatically across the brick and fire escape.`,
+      p3: `Straight-down rain-puddle reflection: looking directly down at a glossy black rain puddle on wet neon-lit asphalt—rippling upside-down inside the water's reflection is the monster hovering right overhead.`,
+      p4: `Sudden full-color face-to-face reveal: breathtaking crystal-clear close-up portrait filling the entire frame with the monster in full glorious detail surrounded by radiant ${palette.energyFx}.`,
+      videoBeat1: `a glossy rain puddle on neon asphalt ripples outward, revealing the monster's dazzling reflection before the camera tilts smoothly upward into real space`,
+      videoBeat2: `the monster appears in breathtaking full glory bathed in swirling ${palette.energyFx} reflecting across every nearby windowpane`,
+      outroBeat1: `the monster's dazzling silhouette folds back into shimmering mirror-light that drifts gently up into the clear evening sky`,
+      outroBeat2: `the rain puddle turns calm and glassy beside three gleaming blank rainbow holographic cards resting on dry pavement`,
+      outroBeat3: `warm amber streetlamps glow steadily down the quiet empty alley`,
+    },
+    'toy-commercial': {
+      labels: [
+        '🏪 PANEL 01 // COLLECTIBLE DISPLAY DOME',
+        '🚂 PANEL 02 // MINIATURE MODEL-TRAIN TOWN',
+        '🎒 PANEL 03 // NEON ACCESSORY FLAT-LAY',
+        '⚡ PANEL 04 // LIFE-SIZED REALITY BREAKOUT',
+      ],
+      p1: `Vintage collectible display case: glossy museum-lit glass dome on a retro retail shelf showcasing a crisp palm-sized sculpted figurine version of the monster sparkling with miniature glowing lights.`,
+      p2: `Tilt-shift model-train tabletop diorama: shallow-depth macro photo of a handcrafted miniature wooden model-train town with tiny plastic pine trees, miniature painted bridges, and glowing tiny streetlamps as the monster stomps across the tiny train tracks.`,
+      p3: `Bold studio flat-lay against a solid color backdrop: graphic overhead studio photo on a clean vibrant solid turquoise or coral background neatly arranging the monster's weirdest retro props—${safeGadget1}, glowing jelly swirls, colorful plastic gears, and shiny brass tokens.`,
+      p4: `Life-sized dramatic breakout: wide cinematic scene inside real ${locationVisual} where the full-sized towering monster is completely alive amid dazzling ${palette.energyFx}.`,
+      videoBeat1: `on a handcrafted model-train tabletop town with tiny glowing streetlamps, a miniature figurine version of the monster twitches to life and leaps off the miniature tracks`,
+      videoBeat2: `expanding instantaneously to life-sized glory inside ${locationVisual}, the monster ignites swirling ribbons of ${palette.energyFx}`,
+      outroBeat1: `the glowing whirlwind settles gracefully as the monster shrinks back into sparkling stardust drifting toward a glass display case`,
+      outroBeat2: `three gleaming blank holographic trading cards land neatly beside the tiny model-train station`,
+      outroBeat3: `soft warm hobby-shop lights shine calmly over the quiet miniature village`,
+    },
+    'four-seasons-day': {
+      labels: [
+        '🌅 PANEL 01 // BLAZING ORANGE DESERT DAWN',
+        '🏊 PANEL 02 // TURQUOISE SUMMER POOL NOON',
+        '🍁 PANEL 03 // VIOLET & GOLD AUTUMN DUSK',
+        '❄️ PANEL 04 // ICY COBALT BLIZZARD NIGHT',
+      ],
+      p1: `Blazing orange and coral desert sunrise: wide sunlit roadside diner parking lot with giant warm orange morning sunbeams, dusty pink desert sky, and long warm shadows as the monster stretches awake.`,
+      p2: `Bright turquoise midday swimming pool: dazzling high-noon sunlight sparkling on bright cyan water at an empty 1990s community pool or waterpark with striped beach umbrellas as the monster makes a giant glittery splash.`,
+      p3: `Crisp violet and burnt-gold autumn dusk: swirling crimson maple leaves blowing across a nostalgic small-town sidewalk past glowing autumn storefront windows as the monster strides joyfully through the leaf cyclone.`,
+      p4: `Icy arctic cobalt snowstorm midnight: deep freezing sapphire-blue blizzard outside ${locationVisual} with swirling glowing frost flakes, shimmering icicles, and radiant ${palette.energyFx} illuminating the snowdrifts.`,
+      videoBeat1: `whirling across a sunlit turquoise swimming pool into a swirling golden autumn leaf storm, the monster shifts seasons effortlessly with every stride`,
+      videoBeat2: `frost crystals bloom into an electric arctic snowstorm lit by dazzling aurora ribbons of ${palette.energyFx}`,
+      outroBeat1: `the swirling four-season vortex melts smoothly into a clear pastel morning sky with a crisp rainbow arc`,
+      outroBeat2: `three sparkling blank holographic cards rest dry and glowing on a sun-warmed stone step beside a single maple leaf and snowflake`,
+      outroBeat3: `peaceful morning light settles across the quiet neighborhood`,
+    },
+    'cutaway-dollhouse': {
+      labels: [
+        '🏠 PANEL 01 // 2-STORY DOLLHOUSE CUTAWAY',
+        '🌬️ PANEL 02 // INSIDE SILVER AIR-VENT DUCT',
+        '🐜 PANEL 03 // ANT-SCALE FLOOR PERSPECTIVE',
+        '🔮 PANEL 04 // TRAPPED IN GLASS SNOWGLOBE',
+      ],
+      p1: `Architectural cross-section dollhouse cutaway: entire retro two-story building sliced cleanly open from the front like an intricate miniature theater stage showing four colorful rooms at once—with the monster squeezed hilariously into one brightly glowing room.`,
+      p2: `Inside-the-air-vent perspective: dramatic metallic tunnel framing looking straight down a dusty silver sheet-metal heating duct toward two huge glowing eyes peering playfully in through the far slotted vent grate.`,
+      p3: `Extreme ant-scale floor tile view: camera resting completely flat on scuffed checkerboard tiles looking straight upward past skyscraper-tall table legs, giant fallen arcade tokens, and looming undersides of the gigantic monster amid ${palette.energyFx}.`,
+      p4: `Cozy macro glass snowglobe still-life: crisp warm close-up on a wooden shelf showing a vintage glass snowglobe with the miniature smiling monster floating peacefully inside swirling iridescent glitter.`,
+      videoBeat1: `gliding straight through an echoing silver air-vent tunnel past glowing sparks, the camera emerges into a towering ant-scale floor view beneath the colossal monster`,
+      videoBeat2: `surrounded by swirling ${palette.energyFx}, the giant room folds playfully inward like a magical origami dollhouse`,
+      outroBeat1: `all the glittering energy spirals smoothly down into a tiny vintage glass snowglobe resting on a wooden shelf`,
+      outroBeat2: `three crisp blank rainbow holographic trading cards fan out gently beside the glowing snowglobe base`,
+      outroBeat3: `tiny iridescent snowflakes drift slowly inside the glass dome in quiet calm`,
+    },
+    'found-camera-roll': {
+      labels: [
+        '👣 PANEL 01 // STREET-CORNER FOOTPRINTS',
+        '⚡ PANEL 02 // DIRECT-FLASH CAUGHT IN THE ACT',
+        '💫 PANEL 03 // NEON LIGHT-TRAIL BLUR',
+        '☕ PANEL 04 // SUNLIT DINER TABLE SOUVENIR',
+      ],
+      p1: `Crooked candid street-corner snapshot: slightly tilted off-center view of a foggy twilight suburban crosswalk where glowing iridescent footprints lead across wet pavement toward ${locationVisual}.`,
+      p2: `Harsh direct-flash caught-in-the-act close-up: bright sudden burst of frontal flash lighting catching the wide-eyed startled monster frozen mid-air surrounded by suspended retro toys and floating popcorn.`,
+      p3: `Dreamy long-exposure neon light-trails: hypnotic streaks of blazing cyan, magenta, and golden light ribbons curving wildly down a dark retro bowling lane or corridor as the monster zooms past at blur-speed with ${palette.energyFx}.`,
+      p4: `Quiet sunlit diner table still-life: warm golden morning sunlight across a red-and-white checkered booth table showing a vintage cassette tape, shiny brass tokens, an untouched milkshake, and three blank shimmering holographic foil cards.`,
+      videoBeat1: `a burst of bright flash light catches the startled monster mid-leap, launching it into dazzling long-exposure neon light trails across the dark corridor`,
+      videoBeat2: `swirling streaks of ${palette.energyFx} loop gracefully around retro fixtures like glowing sparklers in the dark`,
+      outroBeat1: `the blazing neon light trails slow down and fade smoothly into warm morning sunshine streaming through diner blinds`,
+      outroBeat2: `three gleaming blank holographic cards shimmer quietly on a checkered tabletop beside a vintage cassette`,
+      outroBeat3: `dust motes float lazily in peaceful golden morning sunbeams`,
+    },
+    'midnight-carnival': {
+      labels: [
+        '🎡 PANEL 01 // GLOWING FERRIS WHEEL RIDE',
+        '🪞 PANEL 02 // FUNHOUSE WAVY MIRRORS',
+        '🚗 PANEL 03 // SPARKING BUMPER-CAR ARENA',
+        '🎪 PANEL 04 // DAWN PRIZE-BOOTH PLUSHIE',
+      ],
+      p1: `Abandoned glowing Ferris wheel at midnight: sweeping low-angle foggy vista of a towering vintage neon Ferris wheel turning slowly against a starry sky—the monster sits joyfully inside the glowing top gondola waving sparks into the clouds.`,
+      p2: `Twisted funhouse hall of mirrors: dizzying surreal striped corridor of curved wavy carnival mirrors multiplying the monster into five hilariously stretched, tall, squished, colorful reflections at once.`,
+      p3: `Overhead sparking bumper-car arena: thrilling bird's-eye view looking down onto a gleaming metallic bumper-car floor as empty pastel vintage bumper cars zip around in showers of colorful sparks and ${palette.energyFx} while the monster surfs across them.`,
+      p4: `Quiet pink-dawn midway prize booth: soft pastel sunrise light falling across a quiet striped carnival game booth filled with ordinary prizes—except a tiny miniature version of the monster sits blinking mysteriously on the top shelf beside three gleaming foil cards.`,
+      videoBeat1: `high atop a turning neon carnival Ferris wheel, the monster leaps playfully down into a dazzling sparking bumper-car arena`,
+      videoBeat2: `empty pastel bumper cars spin in a synchronized carousel of sparks and ${palette.energyFx} illuminating the foggy midway`,
+      outroBeat1: `the carnival lights dim gently one by one as soft pastel pink morning light rises over the quiet empty midway`,
+      outroBeat2: `on the top shelf of a striped prize booth, three blank shimmering holographic trading cards appear beside a tiny winking plush keepsake`,
+      outroBeat3: `a gentle morning breeze sways the colorful striped carnival pennants in quiet calm`,
+    },
+    'dream-postcards': {
+      labels: [
+        '🏁 PANEL 01 // CHECKERBOARD RINGED DESERT',
+        '☁️ PANEL 02 // FLOATING SKY-TV WATERFALL',
+        '🐠 PANEL 03 // UNDERWATER NEON ARCADE REEF',
+        '💎 PANEL 04 // KALEIDOSCOPE CRYSTAL CAVE',
+      ],
+      p1: `Endless pastel checkerboard desert valley: surreal 1990s vaporwave horizon of glowing lavender sand dunes, tiled checkerboard mesas, and two giant ringed moons in a cotton-candy sky where the monster rises like an ancient wonder.`,
+      p2: `Floating cloud-island waterfall: breathtaking sky-high vista of sunlit cumulus cloud islands studded with mossy vintage CRT televisions pouring waterfalls of shimmering liquid starlight as the monster drifts across the sky.`,
+      p3: `Submerged underwater neon coral arcade: crystal-clear glowing turquoise ocean reef packed with coral-encrusted retro arcade cabinets, drifting jellyfish, and bright schooling fish surrounding the swimming monster.`,
+      p4: `Symmetrical kaleidoscope crystal cavern: dazzling cathedral-like cavern of towering faceted amethyst, emerald, and gold quartz crystals refracting the monster in endless sparkling beams of ${palette.energyFx}.`,
+      videoBeat1: `drifting effortlessly from floating starlight cloud islands straight down into a glowing turquoise underwater coral arcade reef`,
+      videoBeat2: `the monster glides into a breathtaking symmetrical crystal cavern erupting with rainbow prism rays of ${palette.energyFx}`,
+      outroBeat1: `the shimmering dreamworld facets fold gently inward like a closing kaleidoscope into a single warm point of golden starlight`,
+      outroBeat2: `three gleaming blank rainbow holographic trading cards float softly onto a sunlit crystal ledge`,
+      outroBeat3: `tranquil iridescent ripples fade calmly across a peaceful pastel horizon`,
+    },
+  };
 
-  const arc = storyArcScripts[activeArcMeta.id] || storyArcScripts['chase-trap'];
+  const arc = storyArcScripts[activeArcMeta.id] || storyArcScripts['field-guide'];
 
   // 8 DISTINCT CUTAWAY GIF #1 & #2 SCENES
   const gif1Cutaways = [
@@ -1458,13 +1553,13 @@ export function compile199xZinePrompts(
 - Weird Spooky Sign: ${distortion}
 STYLE RULES: Keep the vocabulary super fun, simple, and easy to read (like a classic 1990s spooky paperback — NO heavy technical jargon, NO big textbook sci-fi words, and NO human hero!). Tell what happens right after closing time when nobody is around and this monster takes over the whole place! Use short suspenseful sentences, creepy sound effects, a cliffhanger when the monster wakes up in Act 01, wild spooky-funny mayhem in Act 02, and a classic sneaky Goosebumps twist ending in Act 03 where a shiny holographic trading card left on the counter does one spooky little thing!`;
 
-  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL SHEET (16 Visual Mediums x 12 Bad-Guy Arcs x 10 Monster Vibes x 10 Atmospheres x 6 Camera Grammars!)
+  // 0A. MASTER 1-PROMPT 2x2 SEQUENTIAL SHEET (16 Visual Mediums x 12 Wildly Different 4-Panel Formats x 10 Monster Vibes!)
   const masterStoryboard2x2Prompt = sanitizeVisualPromptText(
-`${freshStoryLead}
+`${freshStoryLead} Each of the four panels shows a completely different camera distance, framing, lighting temperature, and environment so no two quadrants ever repeat the same room or angle.
 
 ${palette.gridIntro}, created strictly in ${flowArtStyle}, divided cleanly into two equal columns and two equal rows.
 
-Setting: ${locationVisual} with ${atmosphere}. ${castHeaderLine} Featured monster across panels: ${safeCreature}.
+Featured monster: ${safeCreature}. ${castHeaderLine}
 
 Top-left panel: ${arc.p1}
 Top-right panel: ${arc.p2}
@@ -1472,11 +1567,11 @@ Bottom-left panel: ${arc.p3}
 Bottom-right panel: ${arc.p4}`
   );
 
-  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (keeps chosen visual medium, monster vibe, zero humans & distinct arc!)
+  // 0A-SAFE. ULTRA-SAFE MINIMAL BACKUP (keeps chosen visual medium, monster vibe, zero humans & distinct format!)
   const backupArcMeta = STORYBOARD_STORY_ARCS[(resolvedArcIdx + 3) % STORYBOARD_STORY_ARCS.length];
   const backupArc = storyArcScripts[backupArcMeta.id] || arc;
   const masterStoryboardUltraSafePrompt = sanitizeVisualPromptText(
-`${freshStoryLead}
+`${freshStoryLead} Each of the four panels shows a completely different camera distance, framing, and environment.
 
 ${palette.gridIntro}, created strictly in ${flowArtStyle}.
 
@@ -1498,14 +1593,14 @@ Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm uninhabi
     `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
   );
 
-  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II MONSTER MAYHEM MATCHING THIS EXACT ARC, VIBE & VISUAL MEDIUM!)
+  // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II MONSTER MAYHEM MATCHING THIS EXACT FORMAT, VIBE & VISUAL MEDIUM!)
   const sameChatVideoFollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium}, ${palette.colors} lighting, and monster design from the bottom-left panel above (with no human characters anywhere, keeping ${monsterMood.stagingCue}), create an 8-second 16:9 ${palette.videoType} inside empty ${locationVisual} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and spooky retro ambient hum.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, and monster design from the four-panel sheet above (with no human characters anywhere, keeping ${monsterMood.stagingCue}), create an 8-second 16:9 ${palette.videoType} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and spooky retro ambient hum.`
   );
 
-  // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING MATCHING THIS EXACT ARC & VISUAL MEDIUM!)
+  // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING MATCHING THIS EXACT FORMAT & VISUAL MEDIUM!)
   const sameChatOutroVideoPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} lighting from the four-panel image above (with no human characters anywhere), create an 8-second 16:9 closing finale ${palette.videoType} inside empty ${locationVisual} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, gentle ambient warmth, soft ambience, and nostalgic 1990s synth pads fading out.`
+    `In the exact same ${palette.medium} and ${palette.colors} lighting from the four-panel sheet above (with no human characters anywhere), create an 8-second 16:9 closing finale ${palette.videoType} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, gentle ambient warmth, soft ambience, and nostalgic 1990s synth pads fading out.`
   );
 
   return {
@@ -1516,6 +1611,7 @@ Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm uninhabi
     resolvedHeroLookId: monsterMood.id,
     resolvedHeroLookLabel: `${monsterMood.emoji} ${monsterMood.shortLabel}`,
     resolvedAtmosphereLabel: atmosphereObj.label,
+    panelLabels: arc.labels,
     masterStoryboard2x2Prompt,
     masterStoryboardUltraSafePrompt,
     sameChatGif1FollowupPrompt,

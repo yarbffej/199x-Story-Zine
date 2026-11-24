@@ -1810,10 +1810,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     </button>
                   </div>
 
-                  {/* 12-Arc 4-Panel Storyboard Action Picker */}
+                  {/* 12 Re-Imagined 4-Panel Zine Format Picker (Field Guide, Carnival, Reflections, Dollhouse, Dreamworld, etc.) */}
                   <div className="flex items-center gap-1.5">
                     <select
-                      aria-label="4-scene storyboard action arc for this Zine"
+                      aria-label="4-panel visual concept format for this Zine"
                       value={liveIssue.prompts.resolvedStoryArcId}
                       onChange={(e) => {
                         playZineBlip(860);
@@ -1824,7 +1824,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="flex-1 min-w-0 px-2.5 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold cursor-pointer focus:outline-none"
-                      title="Auto-rotates across 12 completely different 4-panel story sequences (Chase & Trap, Zero-G Chaos, Scale Flip, Indoor Seasons, etc.)!"
+                      title="Auto-rotates across 12 completely different 4-panel Zine formats (Field-Guide Spread, Midnight Carnival, Reflections & Shadows, 4 Seasons, Dollhouse Cutaway, Dreamworld Postcards, etc.) so no two panels ever look the same!"
                     >
                       {STORYBOARD_STORY_ARCS.map((arc) => (
                         <option key={arc.id} value={arc.id}>
@@ -1850,9 +1850,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         color: uiTheme.ink,
                       }}
                       className="w-[74px] px-2 py-1.5 rounded-xl border-2 theme-border font-mono-zine text-[11px] font-bold shrink-0 cursor-pointer hover:brightness-105 text-center"
-                      title="Cycle to a completely different 4-panel scene sequence"
+                      title="Cycle to a completely different 4-panel Zine format"
                     >
-                      ↻ Scenes
+                      ↻ Format
                     </button>
                   </div>
 
