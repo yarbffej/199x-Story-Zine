@@ -244,6 +244,13 @@ const VISUAL_POLICY_SAFE_REPLACEMENTS: Array<[RegExp, string]> = [
   [/\bwrestling\s+gym\b/gi, 'retro suburban athletic gym'],
   [/\bwrestling\s+coach\b/gi, 'retro athletic coach'],
   [/\bsmoking\s+iron\b/gi, 'warm soldering tool'],
+
+  // Vibrancy guardrail: prevent muted/pastel/monochrome/sepia tokens from washing out generated art
+  [/\bred-monochrome\b/gi, 'blazing crimson-red'],
+  [/\bmonochrome\b/gi, 'vibrant full-color'],
+  [/\bpastel\b/gi, 'vivid electric-neon'],
+  [/\bcotton-candy\b/gi, 'blazing hot-magenta and electric-cyan spun-sugar'],
+  [/\bsepia\b/gi, 'blazing golden-amber'],
 ];
 
 export function sanitizeBrandFree(text: string): string {
@@ -618,8 +625,8 @@ export const STORYBOARD_MONSTER_MOODS: StoryboardHeroLook[] = [
     mode: 'pure-world',
     colorFamily: 'shadow',
     fullDescription:
-      'uninhabited 1990s location with no human figures anywhere; the sole star is the eerie backlit monster emerging out of deep moody fog with glowing eyes piercing the mist',
-    stagingCue: 'dramatic backlit mystery silhouette with glowing eyes shining through curling fog',
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the eerie backlit monster emerging out of deep midnight-indigo shadows with blazing neon eyes piercing dramatic beams of colored light',
+    stagingCue: 'dramatic backlit mystery silhouette with blazing neon eyes shining out of rich deep shadows',
   },
   {
     id: 'neon-disco-overdrive',
@@ -634,12 +641,12 @@ export const STORYBOARD_MONSTER_MOODS: StoryboardHeroLook[] = [
   {
     id: 'haunted-frost-fog',
     emoji: '❄️',
-    shortLabel: 'Haunted Frost & Fog Apparition',
+    shortLabel: 'Electric Frost & Aurora Apparition',
     mode: 'pure-world',
     colorFamily: 'frost',
     fullDescription:
-      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster trailing curling clouds of shimmering icy mist with sparkling frost creeping across glass and counters',
-    stagingCue: 'shimmering frost crystals, misty breath-like vapor clouds, and chilled glowing reflections',
+      'uninhabited 1990s location with no human figures anywhere; the sole star is the monster encrusted in blazing electric-sapphire ice crystals and glowing turquoise aurora light shimmering across frozen glossy glass and counters',
+    stagingCue: 'glittering sapphire frost crystals, vivid electric-turquoise aurora light, and crisp glossy icy reflections',
   },
   {
     id: 'poltergeist-vortex',
@@ -751,12 +758,12 @@ function toVisualSafeCreatureDescription(
   const seed = hashString(lower || 'cosmic-creature');
   const glowPalette = pickSeeded(
     [
-      'luminous cyan and hot-magenta neon highlights',
-      'shimmering ultraviolet-purple and electric-aqua prism glow',
-      'glowing amber-gold and neon-teal starlight accents',
-      'iridescent lime-green and coral-pink glowing contours',
-      'warm molten-orange and cobalt-blue luminous trim',
-      'pearlescent moonlight silver and ruby-crimson glow',
+      'blazing electric-cyan and scorching hot-magenta neon highlights',
+      'hyper-saturated ultraviolet-purple and radiant turquoise prism glow',
+      'blazing molten-gold and vivid emerald-teal jewel-toned accents',
+      'radiant electric-lime and blazing cherry-crimson glowing contours',
+      'intense blazing tangerine-orange and deep electric-cobalt luminous trim',
+      'dazzling ruby-crimson, blazing violet, and gleaming liquid-chrome highlights',
     ],
     seed,
     4
@@ -835,10 +842,10 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '35mm 90s Live-Action Film',
     gridIntro: 'A photorealistic 16:9 four-panel 2x2 35mm movie film-still contact sheet',
     medium:
-      'photorealistic 1990s live-action 35mm anamorphic cinema photography featuring real physical sets, tactile practical puppet and animatronic creature effects, authentic film grain, shallow cinematic depth of field, and zero cartoon or illustration look',
-    colors: 'warm tungsten highlights, misty emerald shadows, and wet neon halation glow',
-    energyFx: 'practical optical light rays, glowing volumetric prism haze, and warm anamorphic lens flares',
-    videoType: 'live-action 35mm anamorphic 1990s sci-fi movie clip with real-world lighting and film grain',
+      'photorealistic 1990s live-action 35mm anamorphic cinema photography featuring real physical sets, tactile practical puppet and animatronic creature effects, rich theatrical cinema color grading, deep velvety dark shadows, authentic film grain, shallow cinematic depth of field, and zero cartoon or illustration look',
+    colors: 'deep velvety midnight shadows, blazing electric neon magenta and emerald signage, radiant molten amber tungsten highlights, and richly saturated cinema color depth',
+    energyFx: 'blazing practical optical light rays, vivid prism flare streaks, and intense saturated anamorphic lens flares',
+    videoType: 'vibrant live-action 35mm anamorphic 1990s sci-fi movie clip with rich theatrical lighting, deep contrast, and authentic film grain',
   },
   {
     id: 'claymation-miniature',
@@ -846,10 +853,10 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: 'Stop-Motion Claymation',
     gridIntro: 'A tactile 16:9 four-panel 2x2 stop-motion claymation diorama contact sheet',
     medium:
-      'handcrafted 1990s stop-motion claymation photography with sculpted modeling-clay characters showing subtle fingerprint textures, intricate handmade miniature cardboard-and-wire sets, practical miniature LED lights, and macro tilt-shift lens blur',
-    colors: 'rich studio spotlight amber, cozy crimson velvet, turquoise plastic, and glowing miniature neon',
-    energyFx: 'hand-sculpted translucent glowing resin sparks and tiny practical fiber-optic light trails',
-    videoType: 'handcrafted 12fps stop-motion claymation miniature film clip with tangible handmade set textures',
+      'handcrafted 1990s stop-motion claymation photography with richly pigmented sculpted modeling-clay figures showing authentic fingerprint textures, intricate colorful handmade miniature cardboard-and-wire sets, bold theatrical miniature LED spotlights, deep shadows, and crisp macro tilt-shift focus',
+    colors: 'vivid cherry-crimson clay, blazing electric cobalt, radiant marigold gold, neon emerald plastic, and deep dramatic studio shadows',
+    energyFx: 'vivid hand-sculpted glowing neon-resin sparks and blazing practical fiber-optic light trails',
+    videoType: 'vibrant handcrafted 12fps stop-motion claymation miniature film clip with richly pigmented handmade set textures',
   },
   {
     id: '90s-flash-photo',
@@ -857,10 +864,10 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '1990s 35mm Flash Photo',
     gridIntro: 'An authentic 16:9 four-panel 2x2 candid 35mm snapshot collage',
     medium:
-      'candid 1990s disposable-camera 35mm direct-flash live-action photography of real physical sets, authentic suburban linoleum and plastic textures, crisp on-camera flash glare, natural analog film color shifts, and completely photographic realism (not drawn or animated)',
-    colors: 'raw direct-flash whites, nostalgic green-tinted shadows, and saturated fluorescent color pops',
-    energyFx: 'bright overexposed flash reflections, prismatic optical light leaks, and glowing lens bloom',
-    videoType: 'raw handheld 1990s live-action documentary film clip with candid natural motion',
+      'candid 1990s 35mm direct-flash live-action color photography of real physical sets, authentic glossy suburban linoleum and colorful plastic textures, punchy on-camera flash highlights, deep ink-dark background shadows, rich saturated analog color-film dyes, and pure photographic realism (not drawn or animated)',
+    colors: 'punchy high-contrast direct-flash highlights, deep pitch-black shadows, blazing electric cyan, hot neon pink, and ultra-saturated primary colors',
+    energyFx: 'blazing vivid flash reflections, electric prismatic optical light leaks, and intense glowing color bloom',
+    videoType: 'vibrant handheld 1990s live-action documentary film clip with punchy high-contrast lighting and bold analog color',
   },
   {
     id: 'oil-impasto',
@@ -868,54 +875,54 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: 'Heavy Impasto Oil Painting',
     gridIntro: 'A classical 16:9 four-panel 2x2 fine-art oil-on-canvas sequence',
     medium:
-      'rich classical impasto oil painting on coarsely woven linen canvas with thick visible palette-knife brushstrokes, dramatic gallery chiaroscuro lighting, layered luminous oil glazes, and rich painterly realism (no cartoon outlines)',
-    colors: 'burnished ochre gold, deep Prussian indigo, glowing cerulean, and molten vermilion highlights',
-    energyFx: 'luminous thick oil-painted sweeps of radiant golden and cyan light',
-    videoType: 'living oil-on-canvas animated painting clip with swirling impasto brushwork in motion',
+      'rich classical impasto oil painting on coarsely woven linen canvas with thick bold sculpted impasto brushstrokes, dramatic gallery chiaroscuro contrast, luminous layered jewel-toned oil glazes, and deeply pigmented painterly realism (no cartoon outlines)',
+    colors: 'deep ultramarine cobalt, blazing scarlet vermilion, radiant molten gold, vivid emerald turquoise, and rich velvety dark shadows',
+    energyFx: 'blazing thick oil-painted sweeps of radiant golden, hot-magenta, and electric-cyan light',
+    videoType: 'vibrant living oil-on-canvas animated painting clip with richly pigmented swirling impasto brushwork in motion',
   },
   {
     id: 'retro-97-cgi',
     emoji: '🕹️',
     shortLabel: '1997 Pre-Rendered 3D CGI',
-    gridIntro: 'A nostalgic 16:9 four-panel 2x2 late-1990s pre-rendered 3D CGI showcase',
+    gridIntro: 'A hyper-vibrant 16:9 four-panel 2x2 late-1990s pre-rendered 3D CGI showcase',
     medium:
-      'authentic 1997 ray-traced 3D computer graphics render with glossy specular chrome reflections, smooth early-CGI molded geometry, gleaming translucent plastic shaders, dramatic volumetric spotlight cones, and crisp retro 3D modeling',
-    colors: 'mirror chrome silver, glowing cobalt blue, neon teal, and iridescent purple plasma',
-    energyFx: 'glossy ray-traced volumetric light beams, floating 3D geometric prism orbs, and bright digital lens flares',
-    videoType: 'nostalgic 1997 pre-rendered 3D CGI cutscene clip with shiny ray-traced reflections and smooth camera glide',
+      'authentic 1997 ray-traced 3D computer graphics render with ultra-glossy specular chrome reflections, bold molded early-CGI geometry, blazing jewel-toned glossy plastic shaders, intense volumetric spotlight cones, deep high-contrast shadows, and crisp retro 3D modeling',
+    colors: 'mirror chrome silver, blazing electric cobalt, neon hot-magenta, glowing electric-lime, and deep iridescent violet plasma',
+    energyFx: 'blazing ray-traced volumetric light beams, vivid glowing 3D geometric prism orbs, and scorching digital lens flares',
+    videoType: 'hyper-vibrant 1997 pre-rendered 3D CGI cutscene clip with gleaming ray-traced reflections and bold saturated glow',
   },
   {
     id: 'risograph-zine',
     emoji: '📰',
-    shortLabel: 'Risograph Indie Print',
-    gridIntro: 'A tactile 16:9 four-panel 2x2 indie risograph printmaking sheet',
+    shortLabel: 'Neon Risograph Print',
+    gridIntro: 'A vibrant 16:9 four-panel 2x2 fluorescent risograph printmaking sheet',
     medium:
-      'authentic 1990s underground risograph soy-ink printmaking on fibrous off-white recycled stock featuring coarse tactile halftone dot screens, bold organic ink grain, subtle two-plate color misregistration, and raw screenprint texture',
-    colors: 'fluorescent coral-pink, deep teal ink, acid-marigold yellow, and rich charcoal overprint',
-    energyFx: 'bold textured halftone ink bursts, stippled neon aura rings, and gritty print speckles',
-    videoType: 'tactile animated risograph print clip with shifting paper grain and halftone ink layers',
+      'bold 1990s underground fluorescent risograph ink printmaking featuring heavy high-density halftone dot screens, blazing neon ink overprints, punchy graphic color layering, crisp tactile ink grain, and deep jet-black shadow contrast',
+    colors: 'blazing fluorescent hot-pink, electric cobalt-cyan, scorching canary-yellow, vivid emerald-teal, and dense jet-black overprint',
+    energyFx: 'bold electric halftone ink starbursts, blazing stippled neon aura rings, and vibrant high-contrast print bursts',
+    videoType: 'vibrant animated fluorescent risograph print clip with pulsing high-contrast halftone ink layers',
   },
   {
     id: 'analog-camcorder',
     emoji: '📺',
-    shortLabel: '1990s Analog Camcorder',
-    gridIntro: 'A candid 16:9 four-panel 2x2 1990s home-video camcorder freeze-frame sheet',
+    shortLabel: '1990s Neon Camcorder',
+    gridIntro: 'A vivid 16:9 four-panel 2x2 late-night 1990s camcorder freeze-frame sheet',
     medium:
-      'authentic lo-fi 1990s handheld home-video tape footage of real physical locations and practical monster effects with soft analog magnetic-tape texture, subtle chromatic color fringe around bright lights, warm indoor video bloom, and grounded documentary realism',
-    colors: 'warm fluorescent cream, soft cyan-magenta highlight bloom, and slightly faded analog tape shadows',
-    energyFx: 'glowing analog tape light-bleed, dazzling phosphor glare, and shimmering video tracking ripples',
-    videoType: 'authentic 1990s handheld analog camcorder live-action clip with gentle natural camera shake and warm tape bloom',
+      'authentic late-night 1990s handheld analog video-tape footage of real physical locations and practical monster effects with bold high-chroma video color saturation, deep glossy midnight shadows, vivid neon color bleed around bright lights, crisp glowing phosphor intensity, and grounded documentary realism',
+    colors: 'electric neon cyan, blazing hot-magenta highlight bloom, vivid arcade amber, and deep rich midnight shadows',
+    energyFx: 'intense glowing analog light-bleed, dazzling neon phosphor flares, and shimmering electric chroma tracking streaks',
+    videoType: 'vibrant late-night 1990s handheld analog camcorder live-action clip with rich neon chroma glow and natural camera motion',
   },
   {
     id: 'watercolor-storybook',
     emoji: '🖌️',
-    shortLabel: 'Delicate Watercolor Paper',
-    gridIntro: 'A painterly 16:9 four-panel 2x2 fine-art watercolor sequence',
+    shortLabel: 'Vivid Jewel Watercolor',
+    gridIntro: 'A richly saturated 16:9 four-panel 2x2 liquid-watercolor and ink sequence',
     medium:
-      'expressive wet-on-wet fine-art watercolor washes on heavy textured cold-press cotton paper featuring delicate translucent pigment bleeds, airy sunlit paper highlights, organic water blooms, and whisper-fine fountain pen accents',
-    colors: 'soft sunset peach, cerulean sky wash, lavender mist, and luminous warm gold pigment',
-    energyFx: 'delicate glowing watercolor blooms of iridescent turquoise and golden light washes',
-    videoType: 'fluid hand-painted watercolor motion clip with organic blooming pigments on textured cotton paper',
+      'bold deeply saturated liquid-watercolor and vibrant ink illustration on heavy textured cotton paper featuring intensely pigmented jewel-toned washes, dramatic deep indigo darks, blazing radiant color bleeds, rich splatter highlights, and crisp dark fountain-pen linework',
+    colors: 'deep royal cobalt, blazing scarlet-tangerine, radiant hot-magenta, vivid emerald turquoise, and glowing molten gold pigment',
+    energyFx: 'blazing jewel-toned liquid-watercolor starbursts of electric turquoise, hot magenta, and molten gold washes',
+    videoType: 'vibrant hand-painted liquid-watercolor motion clip with intensely saturated jewel pigments blooming on textured paper',
   },
   {
     id: 'airbrush-paperback',
@@ -923,32 +930,32 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '90s Sci-Fi Airbrush Cover',
     gridIntro: 'A dramatic 16:9 four-panel 2x2 retro sci-fi airbrush cover-art sequence',
     medium:
-      'hyper-detailed 1990s traditional acrylic airbrush painting on smooth illustration board with seamless velvety atmospheric gradients, gleaming liquid-chrome specular reflections, crisp painted realism, and luminous starburst highlights (no flat cartoon lines)',
-    colors: 'deep cosmic amethyst, polished liquid chrome, blazing sunset orange, and electric starlight cyan',
-    energyFx: 'airbrushed aurora light ribbons, gleaming chrome specular glints, and soft neon stardust clouds',
-    videoType: 'lush painted retro sci-fi airbrush motion clip with gleaming chrome light shifts and drifting nebula glow',
+      'hyper-detailed 1990s traditional acrylic airbrush cover-art painting on smooth illustration board with blazing ultra-saturated atmospheric gradients, gleaming mirror-chrome specular reflections, crisp painted realism, deep velvety cosmic blacks, and radiant starburst highlights (no flat cartoon lines)',
+    colors: 'deep blazing ultraviolet amethyst, mirror liquid-chrome, scorching sunset crimson-orange, hot magenta, and electric starlight cyan',
+    energyFx: 'blazing airbrushed neon aurora ribbons, gleaming chrome specular starbursts, and hyper-vivid glowing cosmic sparks',
+    videoType: 'hyper-vibrant painted retro sci-fi airbrush motion clip with gleaming chrome light shifts and blazing neon nebula glow',
   },
   {
     id: 'woodblock-linocut',
     emoji: '🪵',
-    shortLabel: 'Carved Woodblock Print',
-    gridIntro: 'A striking 16:9 four-panel 2x2 hand-carved woodblock relief print sheet',
+    shortLabel: 'Vivid Color Woodblock',
+    gridIntro: 'A striking 16:9 four-panel 2x2 hand-carved color woodblock relief print sheet',
     medium:
-      'bold handcrafted woodblock and linocut relief printmaking pressed onto warm fibrous handmade mulberry paper with crisp carved gouge marks, dramatic high-contrast ink shapes, and rich artisanal printmaking texture',
-    colors: 'deep velvety charcoal black, luminous burnt vermilion, antique gold leaf, and Prussian slate blue',
-    energyFx: 'radiating hand-carved woodcut light rays and shimmering printed gold-ink wave patterns',
-    videoType: 'bold animated woodblock relief print clip with shifting hand-carved ink textures and dramatic shadows',
+      'bold handcrafted multi-color woodblock and linocut relief printmaking featuring crisp deeply carved gouge lines, dramatic pitch-black ink blocks, blazing richly saturated relief-ink colors, and crisp artisanal printmaking contrast',
+    colors: 'deep jet-black ink, blazing crimson vermilion, electric turquoise, radiant metallic gold, and deep midnight indigo',
+    energyFx: 'blazing hand-carved woodcut sunburst rays and gleaming printed electric-gold and crimson wave patterns',
+    videoType: 'bold high-contrast animated color woodblock relief print clip with blazing crimson, turquoise, and gold carved ink patterns',
   },
   {
     id: 'mixed-media-collage',
     emoji: '💎',
-    shortLabel: 'Mixed-Media Foil Collage',
-    gridIntro: 'An editorial 16:9 four-panel 2x2 surrealist mixed-media collage sheet',
+    shortLabel: 'Neon Foil Mixed-Media',
+    gridIntro: 'A vivid editorial 16:9 four-panel 2x2 surrealist mixed-media foil collage sheet',
     medium:
-      'artful 1990s editorial mixed-media photomontage blending real clipped 35mm photographs, torn textured magazine stock, iridescent metallic foil cutouts, subtle paper drop shadows, and expressive dark charcoal brushwork',
-    colors: 'high-contrast monochrome photo tones accented by holographic prism foil, hot magenta, and electric gold',
-    energyFx: 'cut-out shimmering metallic foil rays, prismatic paper-prism shards, and glowing photographic light leaks',
-    videoType: 'kinetic stop-motion mixed-media paper-and-photo collage clip with fluttering foil light streaks',
+      'dynamic 1990s editorial mixed-media photomontage blending hyper-saturated glossy full-color 35mm photographs, bold vibrant magazine clippings, blazing iridescent metallic foil cutouts, crisp drop shadows, and expressive pitch-black ink brushwork',
+    colors: 'hyper-saturated glossy crimson and cobalt photography electrified by blazing holographic prism foil, hot magenta, electric yellow, and vivid emerald',
+    energyFx: 'blazing cut-out holographic metallic foil rays, dazzling prism shards, and vibrant photographic neon light streaks',
+    videoType: 'vibrant kinetic stop-motion mixed-media full-color photo and holographic foil collage clip with blazing neon light streaks',
   },
   {
     id: 'indie-graphic-novel',
@@ -956,54 +963,54 @@ export const STORYBOARD_VISUAL_STYLES: StoryboardVisualStyle[] = [
     shortLabel: '1990s Indie Graphic Novel',
     gridIntro: 'A bold 16:9 four-panel 2x2 1990s indie graphic novel storyboard grid',
     medium:
-      'gritty hand-inked 1990s underground indie graphic novel artwork with heavy brush-ink shadows, expressive dry-brush crosshatching, and rich opaque gouache color washes',
-    colors: 'electric cyan, vibrant magenta, deep ink blacks, and warm sodium-amber rim light',
-    energyFx: 'crackling hand-inked energy arcs and vivid neon gouache light flares',
-    videoType: 'bold hand-inked 1990s indie graphic novel animated clip with expressive brushwork and crisp linework',
+      'bold hand-inked 1990s underground indie graphic novel artwork with heavy pitch-black brush-ink shadows, expressive dry-brush crosshatching, and hyper-saturated opaque gouache comic coloring',
+    colors: 'blazing electric cyan, scorching hot magenta, vivid molten-gold, deep pitch-black inks, and intense neon rim light',
+    energyFx: 'crackling hand-inked electric energy arcs and blazing hyper-saturated neon gouache light flares',
+    videoType: 'bold high-contrast hand-inked 1990s indie graphic novel animated clip with vivid saturated comic colors and crisp linework',
   },
   {
     id: 'papercut-shadowbox',
     emoji: '✂️',
-    shortLabel: 'Papercut Layered Shadowbox',
-    gridIntro: 'A handcrafted 16:9 four-panel 2x2 layered 3D papercut shadowbox diorama sheet',
+    shortLabel: 'Jewel Papercut Shadowbox',
+    gridIntro: 'A handcrafted 16:9 four-panel 2x2 layered jewel-toned papercut shadowbox diorama sheet',
     medium:
-      'handcrafted multi-layered 3D cut-paper shadowbox diorama made from crisp stacked colored cardstock layers, warm backlit paper glow, delicate physical scissor-cut depth shadows, and miniature theater-stage lighting',
-    colors: 'warm backlit cream paper, deep midnight teal cardstock, tangerine orange, and luminous turquoise',
-    energyFx: 'backlit glowing paper-cut sunburst layers and delicate glittering translucent vellum rays',
-    videoType: 'tactile stop-motion layered papercut shadowbox theater clip with sliding depth-of-field cardstock',
+      'handcrafted multi-layered 3D cut-paper shadowbox diorama made from richly colored jewel-toned cardstock layers, dramatic glowing backlit color gels, crisp deep shadow-box depth, and vivid miniature theater-stage lighting',
+    colors: 'deep royal indigo cardstock, blazing scarlet red, electric turquoise, glowing marigold gold, and vivid neon-orange backlit highlights',
+    energyFx: 'blazing backlit jewel-toned paper-cut sunburst layers and gleaming iridescent prism light beams',
+    videoType: 'vibrant tactile stop-motion layered jewel-toned papercut shadowbox theater clip with dramatic glowing depth lighting',
   },
   {
     id: 'faded-70s-instant',
     emoji: '🎞️',
-    shortLabel: 'Faded Vintage Instant-Film',
-    gridIntro: 'A nostalgic 16:9 four-panel 2x2 vintage instant-film photograph contact sheet',
+    shortLabel: 'Vibrant 90s Slide-Film Photo',
+    gridIntro: 'A hyper-vibrant 16:9 four-panel 2x2 1990s color slide-film photograph contact sheet',
     medium:
-      'authentic faded 1970s and 1980s vintage instant-film analog photography featuring real-world tactile locations and physical sets, creamy yellowed highlights, soft dreamy optical lens vignette, muted pastel teal-and-ochre chemical film tints, and pure photographic realism (not illustrated)',
-    colors: 'creamy warm sepia ivory, faded pastel turquoise, muted rust-orange, and gentle golden lens flare',
-    energyFx: 'dreamy overexposed analog chemical light leaks and soft rainbow prism lens halos',
-    videoType: 'vintage faded instant-film live-action home-movie clip with soft organic grain and sunlit chemical glow',
+      'authentic ultra-saturated 1990s color reversal slide-film analog photography featuring real-world tactile locations and physical sets, crisp bold deep shadows, intensely vivid primary colors, glowing emerald-and-crimson film dyes, rich optical contrast, and pure photographic realism (not illustrated)',
+    colors: 'blazing ruby crimson, ultra-deep cobalt blue, radiant electric emerald, vivid golden sunlight, and glossy pitch-black shadows',
+    energyFx: 'intense vivid optical rainbow prism flares and blazing saturated analog light streaks',
+    videoType: 'ultra-saturated 1990s color slide-film live-action cinema clip with crisp bold contrast and blazing vivid natural colors',
   },
   {
     id: 'stained-glass-mosaic',
     emoji: '🪟',
     shortLabel: 'Illuminated Stained Glass',
-    gridIntro: 'A luminous 16:9 four-panel 2x2 handcrafted stained-glass mosaic panel sheet',
+    gridIntro: 'A blazing luminous 16:9 four-panel 2x2 handcrafted stained-glass mosaic panel sheet',
     medium:
-      'handcrafted leaded stained-glass art panels glowing from behind with jewel-toned cathedral glass panes, dark soldered lead outlines, shimmering translucent glass bubbles, and radiant prism caustics',
-    colors: 'backlit ruby crimson, sapphire cobalt, sunlit amber gold, emerald green, and radiant opal white',
-    energyFx: 'dazzling backlit mosaic starbursts and refracted rainbow glass-prism rays',
-    videoType: 'luminous animated stained-glass mosaic clip with shifting sunlit glass caustics and glowing jewel colors',
+      'handcrafted leaded stained-glass art panels blazing from behind with intensely saturated cathedral jewel-glass panes, bold jet-black soldered lead outlines, gleaming faceted glass textures, and dazzling prism caustics',
+    colors: 'blazing ruby crimson, electric sapphire cobalt, radiant molten amber-gold, hyper-vivid emerald green, and scorching ultraviolet violet',
+    energyFx: 'dazzling backlit jewel-glass starbursts and blazing refracted rainbow glass-prism rays',
+    videoType: 'blazing luminous animated stained-glass mosaic clip with hyper-vivid jewel colors and dancing sunlit glass caustics',
   },
   {
     id: 'pixel-16bit-diorama',
     emoji: '👾',
     shortLabel: '16-Bit Pixel-Art Diorama',
-    gridIntro: 'A crisp 16:9 four-panel 2x2 retro 16-bit pixel-art scene showcase',
+    gridIntro: 'A crisp hyper-vibrant 16:9 four-panel 2x2 retro 16-bit pixel-art scene showcase',
     medium:
-      'crisp handcrafted 1990s 16-bit retro console pixel-art illustration featuring distinct chunky square pixels, lush dithered twilight gradients, carefully hand-pixeled retro architecture, and rich arcade-era pixel craftsmanship',
-    colors: 'vibrant royal indigo, glowing arcade cyan, coral sunset pink, and warm pixel-gold highlights',
-    energyFx: 'sparkling 16-bit dithered light sprites, glowing pixel-wave rings, and bright arcade star flashes',
-    videoType: 'crisp 16-bit retro pixel-art animated cutscene clip with parallax scrolling layers and glowing pixel sparks',
+      'crisp handcrafted 1990s 16-bit arcade pixel-art illustration featuring distinct chunky square pixels, hyper-saturated jewel-toned pixel shading, dramatic dark-indigo contrast, carefully hand-pixeled retro architecture, and vibrant arcade-era color craftsmanship',
+    colors: 'deep blazing royal indigo, electric arcade cyan, scorching hot magenta, vivid emerald, and bright golden pixel highlights',
+    energyFx: 'blazing 16-bit glowing light sprites, electric pixel-wave rings, and dazzling arcade rainbow star flashes',
+    videoType: 'hyper-vibrant crisp 16-bit arcade pixel-art animated cutscene clip with parallax scrolling layers and blazing neon pixel sparks',
   },
 ];
 
@@ -1016,44 +1023,44 @@ interface StoryboardAtmosphere {
 
 const STORYBOARD_ATMOSPHERES: StoryboardAtmosphere[] = [
   {
-    label: 'Golden Afternoon Sun',
-    desc: 'warm golden-hour late-afternoon sunlight slanting dramatically through dust motes and retro fixtures',
+    label: 'Golden-Hour Molten Sun',
+    desc: 'blazing molten-gold and deep crimson late-afternoon sunbeams cutting sharply across glossy retro fixtures and deep dramatic shadows',
   },
   {
-    label: 'Crisp Bright Midday',
-    desc: 'bright clear midday sunbeams pouring through tall storefront glass onto colorful vintage surfaces',
+    label: 'Vivid Cobalt High Noon',
+    desc: 'crisp high-contrast vivid sunlight pouring from a deep electric-cobalt sky onto bold primary-colored vintage surfaces',
   },
   {
-    label: 'Winter Blizzard Blue',
-    desc: 'icy winter blizzard twilight with drifting frost crystals, pale sapphire snowfall outside, and warm amber indoor lamps',
+    label: 'Electric Arctic Aurora',
+    desc: 'deep midnight-sapphire winter snowstorm illuminated by blazing neon-emerald and hot-magenta northern-lights aurora ribbons and vivid amber indoor lamps',
   },
   {
-    label: 'Misty Pink Dawn',
-    desc: 'quiet pastel rose-and-silver early morning dawn fog drifting across damp quiet streets and storefronts',
+    label: 'Blazing Crimson & Violet Dawn',
+    desc: 'dramatic high-contrast blazing scarlet, tangerine, and deep royal-violet sunrise light gleaming brightly off crisp wet streets and glossy glass',
   },
   {
-    label: 'Emerald Storm Twilight',
-    desc: 'dramatic stormy emerald-and-indigo thunderhead twilight with glowing distant cloud-lightning illumination',
+    label: 'Emerald & Violet Storm',
+    desc: 'dramatic electric-emerald and deep indigo thunderhead night lit by blazing high-voltage violet lightning flashes',
   },
   {
-    label: 'Starry Cosmic Midnight',
-    desc: 'clear starry deep-cobalt night sky with swirling aurora-like cosmic ribbons shimmering overhead',
+    label: 'Starry Hyper-Cobalt Midnight',
+    desc: 'crisp starry deep-cobalt midnight sky ablaze with vibrant glowing cyan and magenta cosmic aurora ribbons shimmering overhead',
   },
   {
-    label: 'Desert Peach Sunset',
-    desc: 'hazy burnt-peach and magenta desert sunset glow casting long dramatic geometric shadows',
+    label: 'Blazing Neon Desert Sunset',
+    desc: 'intense blazing crimson-orange, electric magenta, and deep ultraviolet desert sunset casting crisp bold dramatic geometric shadows',
   },
   {
-    label: 'Rain-Slicked Neon Night',
-    desc: 'misty post-rain midnight air with vivid neon signage gleaming across damp glass and wet pavement',
+    label: 'Rain-Slicked Electric Neon Night',
+    desc: 'glossy rain-drenched midnight air with scorching neon pink, cyan, and gold signage reflecting sharply across wet obsidian pavement and glass',
   },
   {
-    label: 'Autumn Sepia Glow',
-    desc: 'cozy late-autumn amber dusk with swirling fallen leaves outside and warm tungsten interior glow',
+    label: 'Blazing Scarlet Autumn Dusk',
+    desc: 'rich high-contrast autumn twilight ablaze with fiery scarlet maple leaves, deep indigo shadows, and glowing amber-gold interior spotlights',
   },
   {
-    label: 'Ultraviolet Blacklight',
-    desc: 'electric ultraviolet blacklight glow making fluorescent retro trims, signs, and cosmic prisms radiate vividly',
+    label: 'High-Voltage Ultraviolet Blacklight',
+    desc: 'scorching electric ultraviolet blacklight glow making fluorescent lime, hot-pink, cyan, and gold trims radiate with blazing neon brilliance against deep black shadows',
   },
 ];
 
@@ -1097,7 +1104,7 @@ interface StoryboardPlan {
   gif2Idx: number;
 }
 
-const VARIETY_STORAGE_KEY = '199x_zine_badguy_variety_v4';
+const VARIETY_STORAGE_KEY = '199x_zine_badguy_variety_v5';
 const storyboardPlanCache = new Map<string, StoryboardPlan>();
 
 function loadPersistedStoryboardHistory(): StoryboardPlan[] {
@@ -1262,7 +1269,10 @@ export function compile199xZinePrompts(
   const monsterMood =
     overrideMood || STORYBOARD_MONSTER_MOODS[plan.heroLookIdx % STORYBOARD_MONSTER_MOODS.length];
 
-  const flowArtStyle = `${palette.medium}, color palette of ${palette.colors}, ${cameraGrammar}, borderless edge-to-edge full-bleed visuals, and blank surfaces with no words or lettering`;
+  const vibrancyLock =
+    'hyper-vibrant deeply saturated colors, rich punchy contrast, deep velvety dark shadows, luminous jewel-toned and electric neon pigment intensity';
+
+  const flowArtStyle = `${palette.medium}, color palette of ${palette.colors}, ${vibrancyLock}, ${cameraGrammar}, borderless edge-to-edge full-bleed visuals, and blank surfaces with no words or lettering`;
 
   // 12 RE-IMAGINED 4-PANEL ZINE FORMATS — every quadrant uses a COMPLETELY DIFFERENT camera distance, setting, lighting mood & subject!
   interface StoryArcScript {
@@ -1286,15 +1296,15 @@ export function compile199xZinePrompts(
         '🐾 PANEL 03 // PHYSICAL CLUE EVIDENCE',
         '🔭 PANEL 04 // DISTANT ROOFTOP SIGHTING',
       ],
-      p1: `Extreme macro close-up filling the entire frame with no room background: ultra-tight detailed study of the monster's glowing eyes, weird surface textures, scales, feathers, wax, or vintage chrome details glinting with ${palette.energyFx}.`,
-      p2: `Clean archival museum specimen plate: full-body portrait of the entire monster standing centered against a stark, empty cream archival studio paper backdrop with soft gallery shadow (no room, no clutter) showing every wild limb and detail clearly.`,
-      p3: `Overhead tabletop evidence photograph: crisp straight-down flat-lay on weathered wood showing bizarre physical clues left behind—glowing iridescent footprints, melted brass arcade tokens, strange translucent scales or wax droplets, and humming ${safeGadget1}.`,
-      p4: `Far-away telephoto neighborhood sighting: misty twilight view from across a quiet empty 1990s suburban street lined with parked station wagons and glowing streetlamps, spotting the monster's gigantic illuminated silhouette perched high atop the roof of ${locationVisual}.`,
-      videoBeat1: `starting from an extreme macro close-up of the monster's glowing eye and wild tactile textures, the camera pulls smoothly backward across a misty empty suburban rooftop`,
-      videoBeat2: `the monster unfurls to full dramatic silhouette atop the glowing roof sign amid ${palette.energyFx} as distant neighborhood lights twinkle below`,
-      outroBeat1: `high above the quiet street, the towering silhouette shimmers and rises gracefully into a stream of starry glowing clouds`,
-      outroBeat2: `down on a damp wooden park bench below, three gleaming blank rainbow holographic trading cards appear beside tiny glowing footprints`,
-      outroBeat3: `quiet misty evening air drifts peacefully over the empty suburban neighborhood`,
+      p1: `Extreme macro close-up filling the entire frame with no room background: ultra-tight detailed study of the monster's blazing glowing eyes, rich surface textures, scales, feathers, wax, or vintage chrome details glinting with ${palette.energyFx}.`,
+      p2: `Clean archival museum specimen plate: full-body portrait of the entire monster standing centered against a deep rich midnight-indigo museum velvet backdrop with dramatic vivid gallery spotlighting (no room, no clutter) showing every wild limb and vivid detail clearly.`,
+      p3: `Overhead tabletop evidence photograph: crisp straight-down flat-lay on dark lacquered wood showing bizarre physical clues left behind—glowing electric-cyan footprints, melted brass arcade tokens, vibrant jewel-toned scales or wax droplets, and humming ${safeGadget1}.`,
+      p4: `Far-away telephoto neighborhood sighting: crisp high-contrast twilight view from across an empty 1990s suburban street lined with parked station wagons and glowing amber streetlamps, spotting the monster's gigantic illuminated silhouette perched high atop the roof of ${locationVisual}.`,
+      videoBeat1: `starting from an extreme macro close-up of the monster's blazing eye and vivid tactile textures, the camera pulls smoothly backward across a dramatic twilight empty suburban rooftop`,
+      videoBeat2: `the monster unfurls to full dramatic silhouette atop the glowing roof sign amid ${palette.energyFx} as bright neighborhood lights twinkle below`,
+      outroBeat1: `high above the quiet street, the towering silhouette shimmers and rises gracefully into a stream of blazing starry clouds`,
+      outroBeat2: `down on a rain-slicked wooden park bench below, three gleaming blank rainbow holographic trading cards appear beside glowing neon footprints`,
+      outroBeat3: `crisp starry midnight air glows brightly over the empty suburban neighborhood`,
     },
     'late-night-news': {
       labels: [
@@ -1303,15 +1313,15 @@ export function compile199xZinePrompts(
         '🪟 PANEL 03 // FACE PRESSED ON GLASS',
         '🚧 PANEL 04 // MORNING-AFTER SIDEWALK',
       ],
-      p1: `Low road-level headlight view: wet empty 1990s parking lot outside ${locationVisual} lit only by twin warm car headlights cutting through rolling neon fog, with eerie mystery and the monster not yet visible.`,
-      p2: `High ceiling-corner security-camera angle: wide tilted fish-eye overhead view looking down from a dark corner ceiling mount catching the monster mid-raid sneaking playfully past rows of vintage displays.`,
-      p3: `Startling extreme close-up through rainy glass: the monster's giant bizarre expressive face pressed right up against a rain-streaked storefront window staring straight into the lens in dramatic flashes of ${palette.energyFx}.`,
-      p4: `Bright overcast daytime street shot: totally ordinary sunny morning exterior sidewalk outside ${locationVisual} with tipped bright orange traffic cones, fluttering yellow tape, and a single sparkling holographic souvenir card resting on dry concrete.`,
-      videoBeat1: `seen through rain-streaked storefront glass in dramatic stormy flashes, the monster leans playfully right up against the window making neon reflections ripple wildly`,
-      videoBeat2: `the monster zips backward down the misty aisles in a dazzling swirl of ${palette.energyFx} as overhead lights flicker wildly`,
-      outroBeat1: `the stormy midnight glow dissolves cleanly into bright peaceful pale-blue early morning light`,
-      outroBeat2: `out on the ordinary sunlit sidewalk beside a tipped orange cone, three gleaming blank holographic trading cards catch the sunrise`,
-      outroBeat3: `a calm empty suburban street wakes up softly with zero trace of the midnight visitor`,
+      p1: `Low road-level headlight view: glossy rain-wet empty 1990s parking lot outside ${locationVisual} lit by twin blazing golden car headlights and scorching electric-cyan and magenta neon reflections, with eerie mystery and the monster not yet visible.`,
+      p2: `High ceiling-corner security-camera angle: wide tilted fish-eye overhead view looking down from a dark corner ceiling mount catching the vividly glowing monster mid-raid sneaking playfully past colorful rows of vintage displays.`,
+      p3: `Startling extreme close-up through rainy glass: the monster's giant bizarre expressive face pressed right up against a rain-streaked storefront window staring straight into the lens in dramatic blazing flashes of ${palette.energyFx}.`,
+      p4: `Crisp high-contrast sunlit morning street shot: bold cobalt-blue sunny morning exterior sidewalk outside ${locationVisual} with tipped blazing-orange traffic cones, bright canary-yellow tape, and a single sparkling rainbow holographic souvenir card resting on sunlit concrete.`,
+      videoBeat1: `seen through rain-streaked storefront glass in dramatic stormy flashes, the monster leans playfully right up against the window making vivid neon reflections ripple wildly`,
+      videoBeat2: `the monster zips backward down the neon-lit aisles in a dazzling swirl of ${palette.energyFx} as colorful lights flash dramatically`,
+      outroBeat1: `the stormy midnight glow dissolves cleanly into a vivid deep-cobalt sunlit early morning sky`,
+      outroBeat2: `out on the sunlit sidewalk beside a bright orange cone, three gleaming blank rainbow holographic trading cards catch blazing golden sunrise rays`,
+      outroBeat3: `a vivid sunlit suburban street wakes up crisply with zero trace of the midnight visitor`,
     },
     'secret-lair': {
       labels: [
@@ -1320,32 +1330,32 @@ export function compile199xZinePrompts(
         '🪟 PANEL 03 // PEEKING THROUGH BLINDS',
         '🌙 PANEL 04 // WATER-TOWER MOONLIGHT',
       ],
-      p1: `Cozy cluttered secret underground lair: hidden crawlspace or warm dusty attic den packed floor-to-ceiling with the monster's collected 1990s treasure hoard—glowing lava lamps, stacked cassettes, bowling trophies, neon signs, and shiny trinkets.`,
-      p2: `Tight funny macro close-up: just the monster's bizarre paws, grippers, or tentacles clumsily examining and tinkering with glowing ${safeGadget1}, tangled cassette ribbons, and colorful retro snacks on a cluttered workbench.`,
-      p3: `Rear over-the-shoulder attic window perspective: looking from inside a dark attic past the monster's glowing silhouette peering curiously through wooden Venetian blinds down onto miniature twinkling suburban houses far below.`,
-      p4: `Epic wide moonlit silhouette: the monster perched joyfully atop a giant suburban water tower silhouetted against an enormous glowing golden harvest moon and drifting clouds streaked with ${palette.energyFx}.`,
-      videoBeat1: `inside a cozy cluttered attic treasure nest glowing with lava lamps and stacked cassettes, the monster playfully juggles shiny 1990s trinkets`,
-      videoBeat2: `bounding effortlessly up through an open roof hatch, the monster leaps across moonlit rooftops trailing sparkling ribbons of ${palette.energyFx}`,
-      outroBeat1: `perched atop a quiet town water tower against a giant bright moon, the monster shimmers into drifting golden stardust`,
-      outroBeat2: `back inside the quiet attic workbench, three gleaming blank rainbow holographic cards rest neatly beside a softly glowing lava lamp`,
-      outroBeat3: `moonlight pours peacefully through the dusty window panes`,
+      p1: `Cozy cluttered secret underground lair: hidden crawlspace or jewel-lit attic den packed floor-to-ceiling with the monster's collected 1990s treasure hoard—blazing lava lamps, stacked colorful cassettes, gleaming gold bowling trophies, glowing neon signs, and vivid shiny trinkets.`,
+      p2: `Tight funny macro close-up: just the monster's bizarre paws, grippers, or tentacles clumsily examining and tinkering with glowing ${safeGadget1}, tangled glossy cassette ribbons, and brightly wrapped retro snacks on a rich wooden workbench.`,
+      p3: `Rear over-the-shoulder attic window perspective: looking from inside a dark indigo attic past the monster's blazing silhouette peering curiously through wooden Venetian blinds down onto vivid twinkling suburban houses far below.`,
+      p4: `Epic wide moonlit silhouette: the monster perched joyfully atop a giant suburban water tower silhouetted against an enormous blazing molten-gold harvest moon and deep-indigo clouds streaked with ${palette.energyFx}.`,
+      videoBeat1: `inside a vivid jewel-lit attic treasure nest blazing with neon lava lamps and stacked cassettes, the monster playfully juggles shiny 1990s trinkets`,
+      videoBeat2: `bounding effortlessly up through an open roof hatch, the monster leaps across moonlit rooftops trailing blazing ribbons of ${palette.energyFx}`,
+      outroBeat1: `perched atop a quiet town water tower against a giant blazing golden moon, the monster shimmers into drifting golden stardust`,
+      outroBeat2: `back inside the quiet attic workbench, three gleaming blank rainbow holographic cards rest neatly beside a vividly glowing neon lava lamp`,
+      outroBeat3: `bright cobalt moonlight pours crisply through the gleaming attic window panes`,
     },
     'cross-town-tour': {
       labels: [
         '🏪 PANEL 01 // BREAKOUT AT THE SHOP',
         '🫧 PANEL 02 // NEON CAR-WASH TUNNEL',
         '🏡 PANEL 03 // CUL-DE-SAC STREETLIGHTS',
-        '🎬 PANEL 04 // FOGGY DRIVE-IN SCREEN',
+        '🎬 PANEL 04 // STARLIT DRIVE-IN SCREEN',
       ],
-      p1: `Dramatic interior breakout: inside ${locationVisual} under ${atmosphere}, the monster bursts joyfully right through swinging glass doors in a shower of colorful sparks.`,
-      p2: `Soapy 24-hour automated car-wash tunnel: completely different location—the monster tumbling playfully amid giant spinning pastel foam brushes, cascading iridescent soap suds, and glowing red-and-cyan wash lights.`,
-      p3: `Quiet suburban cul-de-sac at night: wide outdoor street view—the colossal monster tiptoeing hilariously between tiny two-story suburban houses, mailboxes, white picket fences, and misting lawn sprinklers.`,
-      p4: `Foggy outdoor drive-in movie theater: breathtaking wide twilight vista of an empty grass field of vintage speaker posts as the monster stands dramatically silhouetted in front of an enormous glowing drive-in cinema screen under starry skies and ${palette.energyFx}.`,
-      videoBeat1: `bounding out of a soapy glowing car-wash tunnel, the monster splashes iridescent bubbles across a quiet moonlit suburban cul-de-sac`,
-      videoBeat2: `arriving before a colossal glowing outdoor drive-in cinema screen, the monster unleashes a joyful swirling aurora of ${palette.energyFx} across the night sky`,
-      outroBeat1: `the glowing drive-in cinema screen flickers warmly as the monster steps straight into the shimmering projector light and fades into stars`,
-      outroBeat2: `three gleaming blank holographic cards settle softly onto a vintage metal drive-in speaker post in the misty grass`,
-      outroBeat3: `crickets chirp softly beneath a calm starry sky over the empty drive-in field`,
+      p1: `Dramatic interior breakout: inside ${locationVisual} under ${atmosphere}, the monster bursts joyfully right through swinging glass doors in a blazing shower of electric sparks.`,
+      p2: `Soapy 24-hour automated car-wash tunnel: completely different location—the monster tumbling playfully amid giant spinning electric-magenta, blazing-cyan, and bright-yellow foam brushes, cascading iridescent rainbow soap suds, and intense ruby-red and cyan wash lights.`,
+      p3: `Vivid suburban cul-de-sac at midnight: wide outdoor street view—the colossal glowing monster tiptoeing hilariously between tiny two-story suburban houses, mailboxes, white picket fences, and sparkling lawn sprinklers under deep cobalt skies.`,
+      p4: `Starlit outdoor drive-in movie theater: breathtaking wide midnight vista of an empty grass field of vintage speaker posts as the monster stands dramatically silhouetted in front of an enormous blazing drive-in cinema screen under deep starry skies and ${palette.energyFx}.`,
+      videoBeat1: `bounding out of a glowing neon car-wash tunnel, the monster splashes vibrant iridescent bubbles across a moonlit suburban cul-de-sac`,
+      videoBeat2: `arriving before a colossal blazing outdoor drive-in cinema screen, the monster unleashes a joyful swirling aurora of ${palette.energyFx} across the starry indigo sky`,
+      outroBeat1: `the blazing drive-in cinema screen flickers richly as the monster steps straight into the shimmering projector beam and dissolves into bright stars`,
+      outroBeat2: `three gleaming blank rainbow holographic cards settle onto a vintage metal drive-in speaker post in dewy starlit grass`,
+      outroBeat3: `crisp starlight gleams over the deep-cobalt sky above the quiet empty drive-in field`,
     },
     'evolution-stages': {
       labels: [
@@ -1354,15 +1364,15 @@ export function compile199xZinePrompts(
         '🏢 PANEL 03 // FULL-SIZE MONSTER REVEAL',
         '🌆 PANEL 04 // SUNSET HORIZON KAIJU',
       ],
-      p1: `Extreme macro tabletop hatching: sunlit wooden kitchen table with a single cracked glowing soda can or fizzing retro plastic egg the size of a coffee mug—two tiny bright glowing eyes peeking out from the crack.`,
-      p2: `Cat-sized countertop mischief: lively close-up of a knee-high miniature version of the monster playfully knocking over vintage cereal boxes, colored pencils, and cassette tapes on a brightly lit checkered counter.`,
+      p1: `Extreme macro tabletop hatching: vividly sunlit dark-wood kitchen table with a single cracked glowing neon soda can or fizzing bright-turquoise retro plastic egg the size of a coffee mug—two tiny blazing glowing eyes peeking out from the crack.`,
+      p2: `Cat-sized countertop mischief: lively close-up of a knee-high miniature version of the monster playfully knocking over brightly colored vintage cereal boxes, vivid markers, and glossy cassette tapes on a high-contrast red-and-black checkered counter.`,
       p3: `Full room-sized giant reveal: dramatic low-angle interior inside ${locationVisual} where the fully grown towering monster fills the room in blazing ${palette.energyFx}.`,
-      p4: `Epic hilltop town-skyline vista: wide cinematic sunset view from a grassy overlook far outside town looking down at tiny twinkling suburban rooftops as the colossal cloud-high monster towers over the distant golden horizon.`,
-      videoBeat1: `starting tiny beside a retro cereal box on a sunny counter, the small monster bursts with sparkling light and expands rapidly into full towering glory`,
-      videoBeat2: `rising straight past the roofline into golden sunset clouds, the colossal monster paints the horizon with breathtaking ribbons of ${palette.energyFx}`,
-      outroBeat1: `high above the quiet twilight town skyline, the colossal glowing clouds drift apart into calm violet evening air`,
-      outroBeat2: `back on the quiet wooden tabletop, three gleaming blank holographic trading cards sit neatly beside a cracked vintage soda can`,
-      outroBeat3: `warm sunset rays glide peacefully across the empty room`,
+      p4: `Epic hilltop town-skyline vista: wide cinematic blazing crimson-and-gold sunset view from a hilltop overlook far outside town looking down at tiny twinkling suburban rooftops as the colossal cloud-high monster towers over the scorching fiery horizon.`,
+      videoBeat1: `starting tiny beside a brightly colored retro cereal box on a sunlit counter, the small monster bursts with blazing light and expands rapidly into full towering glory`,
+      videoBeat2: `rising straight past the roofline into blazing crimson-and-gold sunset clouds, the colossal monster paints the horizon with breathtaking ribbons of ${palette.energyFx}`,
+      outroBeat1: `high above the twilight town skyline, the colossal glowing clouds drift apart into rich deep-violet starlit evening sky`,
+      outroBeat2: `back on the sunlit wooden tabletop, three gleaming blank rainbow holographic trading cards sit neatly beside a cracked bright-colored vintage soda can`,
+      outroBeat3: `rich molten-gold sunset rays glide crisply across the empty room`,
     },
     'reflections-only': {
       labels: [
@@ -1371,15 +1381,15 @@ export function compile199xZinePrompts(
         '💧 PANEL 03 // RAIN-PUDDLE REFLECTION',
         '👾 PANEL 04 // FACE-TO-FACE PORTRAIT',
       ],
-      p1: `Station-wagon rearview mirror perspective: atmospheric interior shot of an empty 1990s car dashboard and windshield at dusk—inside the small rectangular rearview mirror glass, the monster's glowing eyes stare back from the fog behind.`,
-      p2: `Giant distorted brick-wall shadow: moody amber streetlamp lighting an empty red-brick alley wall—the monster itself is off-screen, yet its enormous wild 30-foot shadow looms dramatically across the brick and fire escape.`,
-      p3: `Straight-down rain-puddle reflection: looking directly down at a glossy black rain puddle on wet neon-lit asphalt—rippling upside-down inside the water's reflection is the monster hovering right overhead.`,
-      p4: `Sudden full-color face-to-face reveal: breathtaking crystal-clear close-up portrait filling the entire frame with the monster in full glorious detail surrounded by radiant ${palette.energyFx}.`,
-      videoBeat1: `a glossy rain puddle on neon asphalt ripples outward, revealing the monster's dazzling reflection before the camera tilts smoothly upward into real space`,
-      videoBeat2: `the monster appears in breathtaking full glory bathed in swirling ${palette.energyFx} reflecting across every nearby windowpane`,
-      outroBeat1: `the monster's dazzling silhouette folds back into shimmering mirror-light that drifts gently up into the clear evening sky`,
-      outroBeat2: `the rain puddle turns calm and glassy beside three gleaming blank rainbow holographic cards resting on dry pavement`,
-      outroBeat3: `warm amber streetlamps glow steadily down the quiet empty alley`,
+      p1: `Station-wagon rearview mirror perspective: atmospheric interior shot of an empty 1990s car dashboard glowing with vivid emerald-and-red dashboard dials at night—inside the small rectangular rearview mirror glass, the monster's blazing neon eyes stare back from the dark street behind.`,
+      p2: `Giant distorted brick-wall shadow: blazing golden-amber streetlamp and electric-cyan alley neon lighting an empty deep-crimson brick wall—the monster itself is off-screen, yet its enormous wild 30-foot shadow looms dramatically across the brick and fire escape.`,
+      p3: `Straight-down rain-puddle reflection: looking directly down at a glossy jet-black rain puddle on wet neon-lit asphalt—rippling vividly upside-down inside the water's reflection is the brightly glowing monster hovering right overhead.`,
+      p4: `Sudden full-color face-to-face reveal: breathtaking hyper-vibrant close-up portrait filling the entire frame with the monster in crisp blazing detail surrounded by radiant ${palette.energyFx}.`,
+      videoBeat1: `a glossy jet-black rain puddle on neon asphalt ripples outward, revealing the monster's dazzling hyper-vibrant reflection before the camera tilts smoothly upward into real space`,
+      videoBeat2: `the monster appears in breathtaking full glory bathed in blazing swirling ${palette.energyFx} reflecting sharply across every nearby windowpane`,
+      outroBeat1: `the monster's dazzling silhouette folds back into shimmering rainbow mirror-light that rises cleanly into the deep starry sky`,
+      outroBeat2: `the rain puddle turns calm and glossy beside three gleaming blank rainbow holographic cards resting on dark wet pavement`,
+      outroBeat3: `blazing amber streetlamps and crisp neon signs glow steadily down the empty alley`,
     },
     'toy-commercial': {
       labels: [
@@ -1388,15 +1398,15 @@ export function compile199xZinePrompts(
         '🎒 PANEL 03 // NEON ACCESSORY FLAT-LAY',
         '⚡ PANEL 04 // LIFE-SIZED REALITY BREAKOUT',
       ],
-      p1: `Vintage collectible display case: glossy museum-lit glass dome on a retro retail shelf showcasing a crisp palm-sized sculpted figurine version of the monster sparkling with miniature glowing lights.`,
-      p2: `Tilt-shift model-train tabletop diorama: shallow-depth macro photo of a handcrafted miniature wooden model-train town with tiny plastic pine trees, miniature painted bridges, and glowing tiny streetlamps as the monster stomps across the tiny train tracks.`,
-      p3: `Bold studio flat-lay against a solid color backdrop: graphic overhead studio photo on a clean vibrant solid turquoise or coral background neatly arranging the monster's weirdest retro props—${safeGadget1}, glowing jelly swirls, colorful plastic gears, and shiny brass tokens.`,
+      p1: `Vintage collectible display case: glossy museum-lit glass dome on a dark-indigo velvet shelf showcasing a crisp palm-sized hyper-vivid sculpted figurine version of the monster sparkling with blazing miniature spotlights.`,
+      p2: `Tilt-shift model-train tabletop diorama: shallow-depth macro photo of a handcrafted richly colored miniature wooden model-train town with vibrant emerald pine trees, bright crimson painted bridges, and glowing golden tiny streetlamps as the monster stomps across the tiny train tracks.`,
+      p3: `Bold studio flat-lay against a vivid solid color backdrop: graphic overhead studio photo on a hyper-saturated electric-turquoise and blazing-magenta studio background neatly arranging the monster's weirdest retro props—${safeGadget1}, glowing neon jelly swirls, brightly colored plastic gears, and gleaming gold tokens.`,
       p4: `Life-sized dramatic breakout: wide cinematic scene inside real ${locationVisual} where the full-sized towering monster is completely alive amid dazzling ${palette.energyFx}.`,
-      videoBeat1: `on a handcrafted model-train tabletop town with tiny glowing streetlamps, a miniature figurine version of the monster twitches to life and leaps off the miniature tracks`,
-      videoBeat2: `expanding instantaneously to life-sized glory inside ${locationVisual}, the monster ignites swirling ribbons of ${palette.energyFx}`,
-      outroBeat1: `the glowing whirlwind settles gracefully as the monster shrinks back into sparkling stardust drifting toward a glass display case`,
-      outroBeat2: `three gleaming blank holographic trading cards land neatly beside the tiny model-train station`,
-      outroBeat3: `soft warm hobby-shop lights shine calmly over the quiet miniature village`,
+      videoBeat1: `on a brightly colored model-train tabletop town with glowing golden streetlamps, a vivid miniature figurine version of the monster twitches to life and leaps off the miniature tracks`,
+      videoBeat2: `expanding instantaneously to life-sized glory inside ${locationVisual}, the monster ignites blazing swirling ribbons of ${palette.energyFx}`,
+      outroBeat1: `the glowing whirlwind settles cleanly as the monster shrinks back into dazzling golden stardust drifting toward a lit glass display case`,
+      outroBeat2: `three gleaming blank rainbow holographic trading cards land neatly beside the tiny brightly painted model-train station`,
+      outroBeat3: `rich golden hobby-shop spotlights shine crisply over the miniature village`,
     },
     'four-seasons-day': {
       labels: [
@@ -1405,15 +1415,15 @@ export function compile199xZinePrompts(
         '🍁 PANEL 03 // VIOLET & GOLD AUTUMN DUSK',
         '❄️ PANEL 04 // ICY COBALT BLIZZARD NIGHT',
       ],
-      p1: `Blazing orange and coral desert sunrise: wide sunlit roadside diner parking lot with giant warm orange morning sunbeams, dusty pink desert sky, and long warm shadows as the monster stretches awake.`,
-      p2: `Bright turquoise midday swimming pool: dazzling high-noon sunlight sparkling on bright cyan water at an empty 1990s community pool or waterpark with striped beach umbrellas as the monster makes a giant glittery splash.`,
-      p3: `Crisp violet and burnt-gold autumn dusk: swirling crimson maple leaves blowing across a nostalgic small-town sidewalk past glowing autumn storefront windows as the monster strides joyfully through the leaf cyclone.`,
-      p4: `Icy arctic cobalt snowstorm midnight: deep freezing sapphire-blue blizzard outside ${locationVisual} with swirling glowing frost flakes, shimmering icicles, and radiant ${palette.energyFx} illuminating the snowdrifts.`,
-      videoBeat1: `whirling across a sunlit turquoise swimming pool into a swirling golden autumn leaf storm, the monster shifts seasons effortlessly with every stride`,
-      videoBeat2: `frost crystals bloom into an electric arctic snowstorm lit by dazzling aurora ribbons of ${palette.energyFx}`,
-      outroBeat1: `the swirling four-season vortex melts smoothly into a clear pastel morning sky with a crisp rainbow arc`,
-      outroBeat2: `three sparkling blank holographic cards rest dry and glowing on a sun-warmed stone step beside a single maple leaf and snowflake`,
-      outroBeat3: `peaceful morning light settles across the quiet neighborhood`,
+      p1: `Blazing crimson and tangerine desert sunrise: wide sunlit roadside diner parking lot with scorching golden-orange morning sunbeams, vivid scarlet-and-magenta desert sky, and deep crisp shadows as the monster stretches awake.`,
+      p2: `Hyper-vivid turquoise midday swimming pool: dazzling high-noon sunlight sparkling on intensely saturated electric-cyan water at an empty 1990s community pool or waterpark with bold crimson-and-yellow striped umbrellas as the monster makes a giant glittery splash.`,
+      p3: `Blazing royal-violet and molten-gold autumn dusk: swirling fiery-crimson maple leaves blowing across a small-town sidewalk past glowing amber storefront windows as the monster strides joyfully through the vivid leaf cyclone.`,
+      p4: `Electric arctic cobalt snowstorm midnight: deep freezing sapphire-blue blizzard outside ${locationVisual} with swirling glowing frost crystals, glittering icicles, and radiant ${palette.energyFx} illuminating the snowdrifts.`,
+      videoBeat1: `whirling across a hyper-vivid electric-turquoise swimming pool into a fiery crimson-and-gold autumn leaf storm, the monster shifts seasons effortlessly with every stride`,
+      videoBeat2: `sapphire frost crystals bloom into an electric arctic snowstorm lit by blazing aurora ribbons of ${palette.energyFx}`,
+      outroBeat1: `the swirling four-season vortex melts smoothly into a vivid deep-cobalt morning sky with a blazing saturated rainbow arc`,
+      outroBeat2: `three sparkling blank rainbow holographic cards rest dry and glowing on a sun-warmed stone step beside a fiery scarlet maple leaf and crystal snowflake`,
+      outroBeat3: `crisp bright morning sunlight shines vividly across the neighborhood`,
     },
     'cutaway-dollhouse': {
       labels: [
@@ -1422,15 +1432,15 @@ export function compile199xZinePrompts(
         '🐜 PANEL 03 // ANT-SCALE FLOOR PERSPECTIVE',
         '🔮 PANEL 04 // TRAPPED IN GLASS SNOWGLOBE',
       ],
-      p1: `Architectural cross-section dollhouse cutaway: entire retro two-story building sliced cleanly open from the front like an intricate miniature theater stage showing four colorful rooms at once—with the monster squeezed hilariously into one brightly glowing room.`,
-      p2: `Inside-the-air-vent perspective: dramatic metallic tunnel framing looking straight down a dusty silver sheet-metal heating duct toward two huge glowing eyes peering playfully in through the far slotted vent grate.`,
-      p3: `Extreme ant-scale floor tile view: camera resting completely flat on scuffed checkerboard tiles looking straight upward past skyscraper-tall table legs, giant fallen arcade tokens, and looming undersides of the gigantic monster amid ${palette.energyFx}.`,
-      p4: `Cozy macro glass snowglobe still-life: crisp warm close-up on a wooden shelf showing a vintage glass snowglobe with the miniature smiling monster floating peacefully inside swirling iridescent glitter.`,
-      videoBeat1: `gliding straight through an echoing silver air-vent tunnel past glowing sparks, the camera emerges into a towering ant-scale floor view beneath the colossal monster`,
-      videoBeat2: `surrounded by swirling ${palette.energyFx}, the giant room folds playfully inward like a magical origami dollhouse`,
-      outroBeat1: `all the glittering energy spirals smoothly down into a tiny vintage glass snowglobe resting on a wooden shelf`,
-      outroBeat2: `three crisp blank rainbow holographic trading cards fan out gently beside the glowing snowglobe base`,
-      outroBeat3: `tiny iridescent snowflakes drift slowly inside the glass dome in quiet calm`,
+      p1: `Architectural cross-section dollhouse cutaway: entire retro two-story building sliced cleanly open from the front like a vibrant miniature theater stage showing four richly colored jewel-toned rooms at once—with the monster squeezed hilariously into one blazing neon-lit room.`,
+      p2: `Inside-the-air-vent perspective: dramatic gleaming chrome tunnel framing looking straight down a reflective sheet-metal heating duct lit by vivid neon reflections toward two huge blazing glowing eyes peering playfully in through the far slotted vent grate.`,
+      p3: `Extreme ant-scale floor tile view: camera resting completely flat on high-contrast black-and-white glossy checkerboard tiles looking straight upward past skyscraper-tall table legs, giant fallen gold arcade tokens, and looming undersides of the gigantic monster amid ${palette.energyFx}.`,
+      p4: `Rich macro glass snowglobe still-life: crisp high-contrast close-up on a dark wooden shelf showing a glowing vintage glass snowglobe with the miniature smiling monster floating inside swirling vibrant rainbow glitter.`,
+      videoBeat1: `gliding straight through a gleaming chrome air-vent tunnel past blazing neon sparks, the camera emerges into a towering ant-scale floor view beneath the colossal monster`,
+      videoBeat2: `surrounded by swirling ${palette.energyFx}, the giant colorful room folds playfully inward like a vivid magical origami dollhouse`,
+      outroBeat1: `all the glittering jewel-toned energy spirals smoothly down into a glowing vintage glass snowglobe resting on a dark wooden shelf`,
+      outroBeat2: `three crisp blank rainbow holographic trading cards fan out beside the glowing snowglobe base`,
+      outroBeat3: `vibrant iridescent snowflakes sparkle crisply inside the illuminated glass dome`,
     },
     'found-camera-roll': {
       labels: [
@@ -1439,32 +1449,32 @@ export function compile199xZinePrompts(
         '💫 PANEL 03 // NEON LIGHT-TRAIL BLUR',
         '☕ PANEL 04 // SUNLIT DINER TABLE SOUVENIR',
       ],
-      p1: `Crooked candid street-corner snapshot: slightly tilted off-center view of a foggy twilight suburban crosswalk where glowing iridescent footprints lead across wet pavement toward ${locationVisual}.`,
-      p2: `Harsh direct-flash caught-in-the-act close-up: bright sudden burst of frontal flash lighting catching the wide-eyed startled monster frozen mid-air surrounded by suspended retro toys and floating popcorn.`,
-      p3: `Dreamy long-exposure neon light-trails: hypnotic streaks of blazing cyan, magenta, and golden light ribbons curving wildly down a dark retro bowling lane or corridor as the monster zooms past at blur-speed with ${palette.energyFx}.`,
-      p4: `Quiet sunlit diner table still-life: warm golden morning sunlight across a red-and-white checkered booth table showing a vintage cassette tape, shiny brass tokens, an untouched milkshake, and three blank shimmering holographic foil cards.`,
-      videoBeat1: `a burst of bright flash light catches the startled monster mid-leap, launching it into dazzling long-exposure neon light trails across the dark corridor`,
-      videoBeat2: `swirling streaks of ${palette.energyFx} loop gracefully around retro fixtures like glowing sparklers in the dark`,
-      outroBeat1: `the blazing neon light trails slow down and fade smoothly into warm morning sunshine streaming through diner blinds`,
-      outroBeat2: `three gleaming blank holographic cards shimmer quietly on a checkered tabletop beside a vintage cassette`,
-      outroBeat3: `dust motes float lazily in peaceful golden morning sunbeams`,
+      p1: `Crooked candid street-corner snapshot: slightly tilted off-center view of a rain-slicked neon twilight suburban crosswalk where blazing electric-cyan footprints glow across dark wet pavement toward ${locationVisual}.`,
+      p2: `Harsh direct-flash caught-in-the-act close-up: punchy sudden burst of frontal flash lighting against deep black shadows catching the wide-eyed startled monster frozen mid-air surrounded by brightly colored suspended retro toys and flying popcorn.`,
+      p3: `Blazing long-exposure neon light-trails: hypnotic high-contrast streaks of scorching cyan, hot magenta, and molten-gold light ribbons curving wildly down a dark glossy retro bowling lane or corridor as the monster zooms past at blur-speed with ${palette.energyFx}.`,
+      p4: `Crisp sunlit diner table still-life: rich golden morning sunlight across a vivid crimson-and-white checkered booth table showing a bright vintage cassette tape, gleaming gold tokens, a cherry-red milkshake, and three blank shimmering rainbow holographic foil cards.`,
+      videoBeat1: `a punchy burst of bright flash light catches the startled monster mid-leap, launching it into dazzling long-exposure neon light trails across the dark glossy corridor`,
+      videoBeat2: `blazing streaks of ${palette.energyFx} loop crisply around retro fixtures like electric sparklers against deep dark shadows`,
+      outroBeat1: `the blazing neon light trails slow down and transition cleanly into rich golden morning sunshine streaming through crisp diner blinds`,
+      outroBeat2: `three gleaming blank rainbow holographic cards shimmer vividly on a crimson checkered tabletop beside a colorful vintage cassette`,
+      outroBeat3: `vivid prism sunbeams gleam brightly across the glossy diner tabletop`,
     },
     'midnight-carnival': {
       labels: [
         '🎡 PANEL 01 // GLOWING FERRIS WHEEL RIDE',
         '🪞 PANEL 02 // FUNHOUSE WAVY MIRRORS',
         '🚗 PANEL 03 // SPARKING BUMPER-CAR ARENA',
-        '🎪 PANEL 04 // DAWN PRIZE-BOOTH PLUSHIE',
+        '🎪 PANEL 04 // SUNRISE PRIZE-BOOTH PLUSHIE',
       ],
-      p1: `Abandoned glowing Ferris wheel at midnight: sweeping low-angle foggy vista of a towering vintage neon Ferris wheel turning slowly against a starry sky—the monster sits joyfully inside the glowing top gondola waving sparks into the clouds.`,
-      p2: `Twisted funhouse hall of mirrors: dizzying surreal striped corridor of curved wavy carnival mirrors multiplying the monster into five hilariously stretched, tall, squished, colorful reflections at once.`,
-      p3: `Overhead sparking bumper-car arena: thrilling bird's-eye view looking down onto a gleaming metallic bumper-car floor as empty pastel vintage bumper cars zip around in showers of colorful sparks and ${palette.energyFx} while the monster surfs across them.`,
-      p4: `Quiet pink-dawn midway prize booth: soft pastel sunrise light falling across a quiet striped carnival game booth filled with ordinary prizes—except a tiny miniature version of the monster sits blinking mysteriously on the top shelf beside three gleaming foil cards.`,
-      videoBeat1: `high atop a turning neon carnival Ferris wheel, the monster leaps playfully down into a dazzling sparking bumper-car arena`,
-      videoBeat2: `empty pastel bumper cars spin in a synchronized carousel of sparks and ${palette.energyFx} illuminating the foggy midway`,
-      outroBeat1: `the carnival lights dim gently one by one as soft pastel pink morning light rises over the quiet empty midway`,
-      outroBeat2: `on the top shelf of a striped prize booth, three blank shimmering holographic trading cards appear beside a tiny winking plush keepsake`,
-      outroBeat3: `a gentle morning breeze sways the colorful striped carnival pennants in quiet calm`,
+      p1: `Abandoned blazing Ferris wheel at midnight: sweeping low-angle starry midnight vista of a towering vintage neon Ferris wheel ablaze with ruby-red, electric-cyan, and gold bulbs turning against a deep indigo sky—the monster sits joyfully inside the glowing top gondola waving bright sparks into the night.`,
+      p2: `Twisted funhouse hall of mirrors: dizzying surreal crimson-and-gold striped corridor of curved wavy carnival mirrors multiplying the monster into five hilariously stretched, tall, squished, hyper-vibrant reflections at once.`,
+      p3: `Overhead sparking bumper-car arena: thrilling bird's-eye view looking down onto a glossy metallic bumper-car floor as empty candy-red, electric-turquoise, and blazing-yellow vintage bumper cars zip around in showers of bright sparks and ${palette.energyFx} while the monster surfs across them.`,
+      p4: `Blazing crimson-and-gold dawn midway prize booth: rich golden-scarlet sunrise light falling across a bold red-and-white striped carnival game booth filled with brightly colored prizes—except a tiny miniature version of the monster sits blinking mysteriously on the top shelf beside three gleaming foil cards.`,
+      videoBeat1: `high atop a turning neon carnival Ferris wheel blazing with colorful bulbs, the monster leaps playfully down into a dazzling sparking bumper-car arena`,
+      videoBeat2: `empty candy-red and electric-turquoise bumper cars spin in a synchronized carousel of blazing sparks and ${palette.energyFx} illuminating the glossy midnight midway`,
+      outroBeat1: `the carnival lights dim one by one as blazing crimson-and-gold morning sunlight rises over the crisp empty midway`,
+      outroBeat2: `on the top shelf of a bold striped prize booth, three blank shimmering rainbow holographic trading cards appear beside a tiny winking colorful keepsake`,
+      outroBeat3: `crisp morning sunlight shines brightly across the vivid striped carnival pennants`,
     },
     'dream-postcards': {
       labels: [
@@ -1473,15 +1483,15 @@ export function compile199xZinePrompts(
         '🐠 PANEL 03 // UNDERWATER NEON ARCADE REEF',
         '💎 PANEL 04 // KALEIDOSCOPE CRYSTAL CAVE',
       ],
-      p1: `Endless pastel checkerboard desert valley: surreal 1990s vaporwave horizon of glowing lavender sand dunes, tiled checkerboard mesas, and two giant ringed moons in a cotton-candy sky where the monster rises like an ancient wonder.`,
-      p2: `Floating cloud-island waterfall: breathtaking sky-high vista of sunlit cumulus cloud islands studded with mossy vintage CRT televisions pouring waterfalls of shimmering liquid starlight as the monster drifts across the sky.`,
-      p3: `Submerged underwater neon coral arcade: crystal-clear glowing turquoise ocean reef packed with coral-encrusted retro arcade cabinets, drifting jellyfish, and bright schooling fish surrounding the swimming monster.`,
-      p4: `Symmetrical kaleidoscope crystal cavern: dazzling cathedral-like cavern of towering faceted amethyst, emerald, and gold quartz crystals refracting the monster in endless sparkling beams of ${palette.energyFx}.`,
-      videoBeat1: `drifting effortlessly from floating starlight cloud islands straight down into a glowing turquoise underwater coral arcade reef`,
-      videoBeat2: `the monster glides into a breathtaking symmetrical crystal cavern erupting with rainbow prism rays of ${palette.energyFx}`,
-      outroBeat1: `the shimmering dreamworld facets fold gently inward like a closing kaleidoscope into a single warm point of golden starlight`,
-      outroBeat2: `three gleaming blank rainbow holographic trading cards float softly onto a sunlit crystal ledge`,
-      outroBeat3: `tranquil iridescent ripples fade calmly across a peaceful pastel horizon`,
+      p1: `Hyper-vibrant electric checkerboard desert valley: surreal 1990s dream horizon of blazing royal-violet sand dunes, glossy obsidian-and-emerald checkerboard mesas, and two giant glowing cobalt-and-gold ringed moons under a scorching crimson-magenta sky where the monster rises like an ancient wonder.`,
+      p2: `Floating cloud-island waterfall: breathtaking sky-high vista of vividly lit cumulus cloud islands against a deep cobalt sky studded with emerald mossy vintage CRT televisions pouring waterfalls of blazing electric starlight as the monster drifts across the sky.`,
+      p3: `Submerged underwater neon coral arcade: hyper-vivid glowing electric-turquoise ocean reef packed with vibrant coral-encrusted retro arcade cabinets, blazing neon jellyfish, and bright schooling tropical fish surrounding the swimming monster.`,
+      p4: `Symmetrical kaleidoscope crystal cavern: dazzling cathedral-like cavern of towering faceted deep-amethyst, blazing emerald, ruby, and molten-gold quartz crystals refracting the monster in endless sparkling beams of ${palette.energyFx}.`,
+      videoBeat1: `drifting effortlessly from blazing starlight cloud islands straight down into a hyper-vivid electric-turquoise underwater coral arcade reef`,
+      videoBeat2: `the monster glides into a breathtaking symmetrical jewel-toned crystal cavern erupting with rainbow prism rays of ${palette.energyFx}`,
+      outroBeat1: `the shimmering dreamworld facets fold cleanly inward like a closing kaleidoscope into a single blazing point of molten-gold starlight`,
+      outroBeat2: `three gleaming blank rainbow holographic trading cards settle onto a sunlit amethyst crystal ledge`,
+      outroBeat3: `vivid jewel-toned iridescent ripples gleam brightly across a deep royal-violet starry horizon`,
     },
   };
 
@@ -1489,25 +1499,25 @@ export function compile199xZinePrompts(
 
   // 8 DISTINCT CUTAWAY GIF #1 & #2 SCENES
   const gif1Cutaways = [
-    `a glowing vintage 1990s CRT monitor beside ${safeGadget1} on a shelf as colorful radar waveforms ripple across the glass screen and ${palette.energyFx} shimmer along the chrome edges`,
-    `an extreme macro view of ${safeGadget1}'s translucent plastic casing and analog indicator dials lighting up in rhythmic pulses while colorful reflections sweep across the polished counter`,
-    `a row of vintage 1990s neon wall lamps and hanging plastic tags inside ${locationVisual} gently swaying and shimmering in slow-motion anti-gravity ripples`,
-    `a glossy puddle or waxed floor reflection inside ${locationVisual} rippling outward in concentric glowing rings beneath flickering retro fixtures`,
-    `a row of vintage analog gauges, cassette reels, and indicator bulbs inside ${locationVisual} spinning rapidly and glowing in hypnotic alternating rhythms`,
-    `a dusty skylight ceiling fan inside ${locationVisual} spinning slowly backward as glowing iridescent prism motes drift upward past hanging retro banners`,
-    `a row of vintage vending-machine glass buttons and glowing coin slots inside ${locationVisual} flickering in musical wave patterns with shimmering ${palette.energyFx}`,
-    `a spinning translucent vinyl record or glowing cassette deck reel on a countertop inside ${locationVisual} radiating concentric rings of ${palette.energyFx}`,
+    `a glowing vintage 1990s CRT monitor beside ${safeGadget1} on a dark counter as electric-cyan and magenta radar waveforms ripple across the glass screen and ${palette.energyFx} shimmer along the chrome edges`,
+    `an extreme macro view of ${safeGadget1}'s jewel-toned translucent plastic casing and glowing neon analog indicator dials pulsing in vivid rhythm while colorful reflections sweep across the glossy counter`,
+    `a row of blazing vintage 1990s neon wall lamps and brightly colored hanging plastic tags inside ${locationVisual} swaying and shimmering in slow-motion anti-gravity ripples`,
+    `a glossy jet-black puddle or waxed floor reflection inside ${locationVisual} rippling outward in concentric blazing neon rings beneath vivid flickering retro fixtures`,
+    `a row of vintage analog gauges, colorful cassette reels, and bright ruby-and-emerald indicator bulbs inside ${locationVisual} spinning rapidly and glowing in hypnotic alternating rhythms`,
+    `a gleaming chrome skylight ceiling fan inside ${locationVisual} spinning backward against a deep indigo skylight as blazing iridescent prism sparks drift upward past vivid retro banners`,
+    `a row of backlit vending-machine glass buttons and glowing coin slots inside ${locationVisual} flashing in vibrant musical wave patterns with blazing ${palette.energyFx}`,
+    `a spinning jewel-colored translucent vinyl record or glowing cassette deck reel on a countertop inside ${locationVisual} radiating concentric blazing rings of ${palette.energyFx}`,
   ];
 
   const gif2Cutaways = [
-    `looking straight up at the glowing ceiling lights of ${locationVisual} as a shimmering violet skylight portal softly closes overhead, drifting slow sparkling motes downward through mist`,
-    `a peaceful wide close-up of three gleaming blank rainbow holographic trading cards glinting gently in a soft halo of floating light atop a retro counter`,
-    `an atmospheric low pan across settling iridescent stardust and drifting wisps of warm amber and cyan mist swirling slowly past retro fixtures inside ${locationVisual}`,
-    `a calm window view looking out from ${locationVisual} as colorful cosmic aurora ribbons fade smoothly into a peaceful sky`,
-    `a quiet outdoor neon sign humming steadily outside ${locationVisual} as gentle mist drifts past gleaming damp pavement`,
-    `a vintage analog desk clock inside ${locationVisual} gently ticking forward again as frost and iridescent sparkles melt softly away`,
-    `a row of clean glass marbles and brass tokens rolling gently to a peaceful stop across sunlit retro tiles inside ${locationVisual}`,
-    `a warm tabletop still-life of a glowing glass snowglobe and three blank shimmering foil cards resting quietly by a bright window`,
+    `looking straight up at the glowing ceiling lights of ${locationVisual} as a blazing royal-violet skylight portal closes overhead, drifting vivid sparkling stardust downward against deep shadows`,
+    `a crisp close-up of three gleaming blank rainbow holographic trading cards flashing vividly in a radiant halo of jewel-toned light atop a dark glossy retro counter`,
+    `an atmospheric low pan across glittering jewel-toned stardust and vivid ribbons of molten-amber and electric-cyan light swirling past retro fixtures inside ${locationVisual}`,
+    `a crisp window view looking out from ${locationVisual} as blazing emerald and hot-magenta cosmic aurora ribbons glide across a deep cobalt starry sky`,
+    `a blazing outdoor neon sign humming vividly outside ${locationVisual} as rich electric colors reflect sharply across rain-slicked obsidian pavement`,
+    `a vintage analog desk clock inside ${locationVisual} ticking crisply forward again as gleaming sapphire frost crystals and golden sparkles shimmer across its chrome rim`,
+    `a row of jewel-toned glass marbles and gleaming gold arcade tokens rolling across high-contrast glossy checkerboard tiles inside ${locationVisual}`,
+    `a rich high-contrast tabletop still-life of a glowing glass snowglobe and three blank shimmering rainbow foil cards gleaming vividly by a bright window`,
   ];
 
   const castHeaderLine = `Monster staging: ${monsterMood.fullDescription}, emphasizing ${monsterMood.stagingCue}.`;
@@ -1585,22 +1595,22 @@ Bottom-right panel: ${backupArc.p4.replaceAll(locationVisual, 'the calm uninhabi
 
   // 0B. SAME-CHAT GIF #1 FOLLOW-UP (MATCHES EXACT VISUAL MEDIUM!)
   const sameChatGif1FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
+    `In the exact same ${palette.medium}, ${palette.colors}, and hyper-vibrant deeply saturated high-contrast look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new close-up cutaway scene: ${gif1Cutaways[plan.gif1Idx % gif1Cutaways.length]} in a smooth continuous loop.`
   );
 
   // 0C. SAME-CHAT GIF #2 FOLLOW-UP (MATCHES EXACT VISUAL MEDIUM!)
   const sameChatGif2FollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
+    `In the exact same ${palette.medium}, ${palette.colors}, and hyper-vibrant deeply saturated high-contrast look as the four-panel image above (with no human figures anywhere), create a 4-second seamless 16:9 looping ${palette.videoType} showing a brand-new atmospheric cutaway scene: ${gif2Cutaways[plan.gif2Idx % gif2Cutaways.length]} in a calm continuous loop.`
   );
 
   // 0D. SAME-CHAT LEAD VIDEO #1 (8-SECOND ACT II MONSTER MAYHEM MATCHING THIS EXACT FORMAT, VIBE & VISUAL MEDIUM!)
   const sameChatVideoFollowupPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium}, ${palette.colors} lighting, and monster design from the four-panel sheet above (with no human characters anywhere, keeping ${monsterMood.stagingCue}), create an 8-second 16:9 ${palette.videoType} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and spooky retro ambient hum.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, hyper-vibrant saturated colors, rich deep contrast, and monster design from the four-panel sheet above (with no human characters anywhere, keeping ${monsterMood.stagingCue}), create an 8-second 16:9 ${palette.videoType} with no dialogue. First three seconds: ${arc.videoBeat1}. Middle three seconds: ${arc.videoBeat2}. Final two seconds: the glowing effects settle cleanly into a steady grounded finish. Audio: vibrant 1990s synthwave swells, crystalline energy chimes, and spooky retro ambient hum.`
   );
 
   // 0E. SAME-CHAT FINALE VIDEO #2 (8-SECOND ACT III ENDING MATCHING THIS EXACT FORMAT & VISUAL MEDIUM!)
   const sameChatOutroVideoPrompt = sanitizeVisualPromptText(
-    `In the exact same ${palette.medium} and ${palette.colors} lighting from the four-panel sheet above (with no human characters anywhere), create an 8-second 16:9 closing finale ${palette.videoType} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, gentle ambient warmth, soft ambience, and nostalgic 1990s synth pads fading out.`
+    `In the exact same ${palette.medium}, ${palette.colors} lighting, hyper-vibrant saturated colors, and rich deep contrast from the four-panel sheet above (with no human characters anywhere), create an 8-second 16:9 closing finale ${palette.videoType} with no dialogue. First three seconds: ${arc.outroBeat1}. Middle three seconds: ${arc.outroBeat2}. Final two seconds: ${arc.outroBeat3}. Audio: sweeping crystalline chimes, warm ambient glow, and nostalgic 1990s synth pads fading out.`
   );
 
   return {

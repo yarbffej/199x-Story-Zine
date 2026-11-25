@@ -86,7 +86,7 @@ export const ENVIRONMENT_META: Record<EnvironmentProfileId, EnvironmentMeta> = {
     id: 'aquatic_humid',
     badge: 'HYDRO BASIN / MIST ZONE',
     icon: '🌊',
-    lightingCue: 'rippling caustic water reflections and dense purple fog',
+    lightingCue: 'rippling caustic water reflections and blazing ultraviolet neon highlights',
     ambientAudio: 'echoing tile splashes, pressurized pump valves, and subterranean hydro-hum',
     propAnchor: 'tiled basin retaining wall'
   },

@@ -120,7 +120,7 @@ export const SUBURBAN_ANOMALIES: string[] = [
   "Rewind Reggie — Sentient VHS Tape Rewinder of Endless Doom",
   "Page-Flipper Percy — Paperback Horror Book Poltergeist",
   "Volt-King Vern — Battery Club Grandmaster from the Electronics Bench",
-  "The Pastel Prowlers — Mall Walker Cabal in Pastel Windbreakers",
+  "The Neon Prowlers — Mall Walker Cabal in Electric Neon Windbreakers",
   "Beep-Blob Binky — Virtual Keychain Pet Gravitational Singularity",
   "Velcro Vic — Cursed 3-Ring Binder with Infinite Velcro Teeth",
   "Squish-Blob Stu — Slime Gak Chemical Elemental",
