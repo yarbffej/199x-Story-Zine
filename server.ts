@@ -358,13 +358,13 @@ app.post("/api/zine-story", async (req, res) => {
 - Creepy Warning Sign: ${encounter.cosmic_distortion}
 
 WRITING STYLE (VERY IMPORTANT):
-Write like a classic 1990s Goosebumps monster feature! Use simple, fun, everyday words — ZERO heavy sci-fi jargon, ZERO big technical words, and ZERO Good Guy vs. Bad Guy battle! Tell the spooky-funny story of what happens after closing time when nobody is around and THIS Bad Guy takes over the whole place. Use short suspenseful sentences, creepy sound effects (like *CLICK*, *THUMP*, *ZAP!*), and fast page-turner energy.
+Write like the creepiest classic 1990s Goosebumps midnight monster paperback! Use simple, punchy, everyday words — ZERO heavy sci-fi jargon, ZERO big technical words, and ZERO Good Guy vs. Bad Guy battle! Make the monster genuinely spooky, eerie, and spine-tingling after closing time when nobody is around. Use short suspenseful sentences, creepy sound effects (like *CLICK*, *SCRAAAPE*, *THUMP*, *HISSSS*), flickering lights, looming shadows, unblinking glowing eyes, and fast page-turner chills.
 
 Return valid JSON with three fields: "sceneSetup", "intervention", and "aftermath".
-Each field MUST contain EXACTLY 3 lively, punchy paragraphs separated by "\\n\\n" (~220-280 words per Act):
-1. "sceneSetup" (Act 01): Right after closing time in the empty 1990s hangout, spooky signs start happening by themselves, ending on a classic cliffhanger as the Bad Guy monster wakes up and steps out into the glow!
-2. "intervention" (Act 02): Pure goofy-spooky monster mayhem! The Bad Guy takes over the entire empty room, sets off the retro 90s gadgets on the shelves, unleashes its wild signature trick in a huge neon burst, and vanishes in a sparkling pop right before sunrise!
-3. "aftermath" (Act 03): Everything looks completely normal again by morning—except for a brand-new shiny holographic trading card of the Bad Guy left behind on the counter, ending on a classic sneaky Goosebumps twist on the very last sentence!`;
+Each field MUST contain EXACTLY 3 gripping, punchy paragraphs separated by "\\n\\n" (~220-280 words per Act):
+1. "sceneSetup" (Act 01): Right after closing time in the locked empty 1990s hangout, bone-chilling signs start happening by themselves, ending on a scary cliffhanger as the Bad Guy monster wakes up and looms out of the dark!
+2. "intervention" (Act 02): Spine-tingling midnight monster takeover! The Bad Guy stalks the entire empty building, rattles shelves and glass cases, triggers the retro 90s gadgets into a blinding surge of its wild signature trick, and melts back into the shadows right before sunrise!
+3. "aftermath" (Act 03): Everything looks eerily quiet by morning—except for a freezing-cold holographic trading card of the Bad Guy left behind on the counter, ending on a genuinely chilling Goosebumps twist on the very last sentence!`;
 
       const CANDIDATE_MODELS = [
         "gemini-3-flash-preview",

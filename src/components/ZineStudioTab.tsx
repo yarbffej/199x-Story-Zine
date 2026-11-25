@@ -20,6 +20,7 @@ import {
   RefreshCw,
   Package,
   X,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { CombatEncounter } from '../types';
 import {
@@ -55,6 +56,11 @@ import {
 } from '../utils/zineFolderSync';
 import { exportStandaloneZineHtml } from '../utils/zineHtmlExporter';
 import { slice2x2StoryboardInto4Shots } from '../utils/storyboardSlicer';
+import {
+  planUnifiedMediaRouting,
+  probeVideoDurationSec,
+  MediaFileMeta,
+} from '../utils/zineMediaRouter';
 import {
   render199x3ActSynthTrackWav,
   SYNTH_STYLE_PRESETS,
@@ -108,9 +114,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [isSavingShelf, setIsSavingShelf] = useState(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [isSheetDragOver, setIsSheetDragOver] = useState(false);
-  const [isStep2GifDragOver, setIsStep2GifDragOver] = useState(false);
-  const [isStep3DragOver, setIsStep3DragOver] = useState(false);
+  const [isAllInOneDragOver, setIsAllInOneDragOver] = useState(false);
   const [isShelfDragOver, setIsShelfDragOver] = useState(false);
   const [isExportingShelf, setIsExportingShelf] = useState(false);
 
@@ -169,11 +173,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [audioBlob, setAudioBlob] = useState<Blob | undefined>();
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
 
-  // Hidden file inputs for batch drop & individual slot swaps
+  // Hidden file inputs for unified 6-file batch drop & individual slot swaps
   const batchInputRef = useRef<HTMLInputElement>(null);
-  const storyboardInputRef = useRef<HTMLInputElement>(null);
-  const step2GifsInputRef = useRef<HTMLInputElement>(null);
-  const step3MediaInputRef = useRef<HTMLInputElement>(null);
+  const storyboardSheetOnlyInputRef = useRef<HTMLInputElement>(null);
   const drivePackInputRef = useRef<HTMLInputElement>(null);
   const leadVideoInputRef = useRef<HTMLInputElement>(null);
   const outroVideoInputRef = useRef<HTMLInputElement>(null);
@@ -338,117 +340,85 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     });
   };
 
-  // Smart 8-File Batch Router
-  const handleBatchFilesDrop = useCallback(
-    (fileList: FileList | File[]) => {
-      const files = Array.from(fileList);
-      if (!files.length) return;
-      playZineResonanceChime();
+  // Instant Swap Helpers (handy if Flow clips were downloaded out of Step 2 -> Step 3 order)
+  const handleSwapGifsAndVideos = () => {
+    playZineBlip(880);
+    const oldG1 = gif1Blob;
+    const oldG2 = gif2Blob;
+    const oldV1 = videoBlob;
+    const oldV2 = outroVideoBlob;
 
-      const audios: File[] = [];
-      const gifs: File[] = [];
-      const videos: File[] = [];
-      const stills: File[] = [];
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
+    if (outroVideoUrl) URL.revokeObjectURL(outroVideoUrl);
+    if (gif1Url) URL.revokeObjectURL(gif1Url.split('#')[0]);
+    if (gif2Url) URL.revokeObjectURL(gif2Url.split('#')[0]);
 
-      for (const f of files) {
-        const lower = f.name.toLowerCase();
-        if (
-          f.type.startsWith('audio/') ||
-          /\.(mp3|wav|m4a|ogg|flac|aac)$/i.test(lower)
-        ) {
-          audios.push(f);
-        } else if (f.type === 'image/gif' || /\.gif$/i.test(lower)) {
-          gifs.push(f);
-        } else if (
-          f.type.startsWith('video/') ||
-          /\.(mp4|webm|mov|m4v)$/i.test(lower)
-        ) {
-          if (/(gif|loop)/i.test(lower)) {
-            gifs.push(f);
-          } else {
-            videos.push(f);
-          }
-        } else if (
-          f.type.startsWith('image/') ||
-          /\.(png|jpg|jpeg|webp|avif)$/i.test(lower)
-        ) {
-          stills.push(f);
-        }
-      }
+    setVideoBlob(oldG1);
+    setVideoUrl(oldG1 ? URL.createObjectURL(oldG1) : undefined);
+    setOutroVideoBlob(oldG2);
+    setOutroVideoUrl(oldG2 ? URL.createObjectURL(oldG2) : undefined);
 
-      // Natural filename sort so shot1..shot4 and gif1..gif2 land in exact slots
-      const natSort = (a: File, b: File) =>
-        a.name.localeCompare(b.name, undefined, {
-          numeric: true,
-          sensitivity: 'base',
-        });
-      gifs.sort(natSort);
-      stills.sort(natSort);
+    if (oldV1) {
+      const raw1 = URL.createObjectURL(oldV1);
+      setGif1Blob(oldV1);
+      setGif1IsVideo(true);
+      setGif1Url(`${raw1}#video`);
+    } else {
+      setGif1Blob(undefined);
+      setGif1IsVideo(false);
+      setGif1Url(undefined);
+    }
 
-      let assignedCount = 0;
+    if (oldV2) {
+      const raw2 = URL.createObjectURL(oldV2);
+      setGif2Blob(oldV2);
+      setGif2IsVideo(true);
+      setGif2Url(`${raw2}#video`);
+    } else {
+      setGif2Blob(undefined);
+      setGif2IsVideo(false);
+      setGif2Url(undefined);
+    }
 
-      if (audios[0]) {
-        assignSong(audios[0], audios[0].name);
-        assignedCount++;
-      }
+    flashBanner('⇄ Swapped GIF Loops ↔ Full Videos!');
+  };
 
-      if (videos.length > 0) {
-        for (const vid of videos) {
-          const isOutroName = /(outro|finale|end|ending|act3|part2|video2)/i.test(vid.name);
-          if (isOutroName || (videoUrl && !outroVideoUrl)) {
-            assignOutroVideo(vid);
-          } else if (!videoUrl) {
-            assignLeadVideo(vid);
-          } else {
-            assignOutroVideo(vid);
-          }
-          assignedCount++;
-        }
-      }
+  const handleSwapGif1AndGif2 = () => {
+    if (!gif1Blob && !gif2Blob) return;
+    playZineBlip(880);
+    const b1 = gif1Blob;
+    const b2 = gif2Blob;
+    const isV1 = gif1IsVideo;
+    const isV2 = gif2IsVideo;
+    if (gif1Url) URL.revokeObjectURL(gif1Url.split('#')[0]);
+    if (gif2Url) URL.revokeObjectURL(gif2Url.split('#')[0]);
 
-      if (gifs.length === 1) {
-        if (!gif1Blob) assignGif1(gifs[0], gifs[0].name);
-        else assignGif2(gifs[0], gifs[0].name);
-        assignedCount++;
-      } else if (gifs.length >= 2) {
-        assignGif1(gifs[0], gifs[0].name);
-        assignGif2(gifs[1], gifs[1].name);
-        assignedCount += 2;
-      }
+    setGif1Blob(b2);
+    setGif1IsVideo(isV2);
+    setGif1Url(b2 ? (isV2 ? `${URL.createObjectURL(b2)}#video` : URL.createObjectURL(b2)) : undefined);
 
-      if (stills.length > 0) {
-        if (stills.length >= 4) {
-          for (let i = 0; i < 4; i++) {
-            assignShotSlot(i, stills[i]);
-            assignedCount++;
-          }
-        } else {
-          // Fill explicit numbered slots if named shot1..shot4, else fill empty slots first
-          const nextBlobs = [...shotBlobs];
-          const nextUrls = [...shotUrls];
-          let cursor = 0;
-          for (const imgFile of stills) {
-            const explicitMatch = imgFile.name.match(/(?:shot|img|print)[_-]?0?([1-4])/i);
-            let targetIdx = explicitMatch ? Number(explicitMatch[1]) - 1 : -1;
-            if (targetIdx < 0 || targetIdx > 3) {
-              const emptyIdx = nextBlobs.findIndex((b) => !b);
-              targetIdx = emptyIdx >= 0 ? emptyIdx : cursor % 4;
-              cursor++;
-            }
-            if (nextUrls[targetIdx]) URL.revokeObjectURL(nextUrls[targetIdx]!);
-            nextBlobs[targetIdx] = imgFile;
-            nextUrls[targetIdx] = URL.createObjectURL(imgFile);
-            assignedCount++;
-          }
-          setShotBlobs(nextBlobs);
-          setShotUrls(nextUrls);
-        }
-      }
+    setGif2Blob(b1);
+    setGif2IsVideo(isV1);
+    setGif2Url(b1 ? (isV1 ? `${URL.createObjectURL(b1)}#video` : URL.createObjectURL(b1)) : undefined);
 
-      flashBanner(`✓ Auto-routed ${assignedCount} media file(s) into Zine slots!`);
-    },
-    [gif1Blob, shotBlobs, shotUrls, videoUrl, gif1Url, gif2Url, audioUrl]
-  );
+    flashBanner('⇄ Swapped GIF #1 (Act I) ↔ GIF #2 (Act III)!');
+  };
+
+  const handleSwapVideo1AndVideo2 = () => {
+    if (!videoBlob && !outroVideoBlob) return;
+    playZineBlip(880);
+    const b1 = videoBlob;
+    const b2 = outroVideoBlob;
+    if (videoUrl) URL.revokeObjectURL(videoUrl);
+    if (outroVideoUrl) URL.revokeObjectURL(outroVideoUrl);
+
+    setVideoBlob(b2);
+    setVideoUrl(b2 ? URL.createObjectURL(b2) : undefined);
+    setOutroVideoBlob(b1);
+    setOutroVideoUrl(b1 ? URL.createObjectURL(b1) : undefined);
+
+    flashBanner('⇄ Swapped Video 1 (Mayhem) ↔ Video 2 (Ending)!');
+  };
 
   const handleCopyPrompt = async (key: string, text: string) => {
     playZineBlip(900);
@@ -797,77 +767,119 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     }
   };
 
-  const handleStoryboardSheetDrop = async (files: FileList | File[]) => {
-    const arr = Array.from(files);
-    if (!arr.length) return;
+  // Unified All-in-One 6-File Smart Drop Router (auto-slices 2x2 sheet + routes GIFs, Videos & Audio!)
+  const handleBatchFilesDrop = async (fileList: FileList | File[]) => {
+    const files = Array.from(fileList);
+    if (!files.length) return;
 
-    const images = arr.filter(
-      (f) => f.type.startsWith('image/') && !f.name.toLowerCase().endsWith('.gif')
+    const metas: MediaFileMeta<File>[] = await Promise.all(
+      files.map(async (f) => {
+        const lower = f.name.toLowerCase();
+        const isVid =
+          f.type.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/i.test(lower);
+        const durationSec = isVid ? await probeVideoDurationSec(f) : null;
+        return {
+          file: f,
+          name: f.name,
+          type: f.type,
+          lastModified: f.lastModified || 0,
+          durationSec,
+        };
+      })
     );
-    const videos = arr.filter((f) => f.type.startsWith('video/'));
-    const audios = arr.filter((f) => f.type.startsWith('audio/'));
 
-    // Also route any video/audio dropped alongside the storyboard sheet!
-    if (videos[0]) assignLeadVideo(videos[0]);
-    if (audios[0]) assignSong(audios[0], audios[0].name);
+    const plan = planUnifiedMediaRouting(metas, {
+      hasGif1: Boolean(gif1Blob),
+      hasGif2: Boolean(gif2Blob),
+      hasVideo1: Boolean(videoBlob),
+      hasVideo2: Boolean(outroVideoBlob),
+    });
 
-    // If user dropped 2+ individual images, assign them individually
-    if (images.length >= 2) {
-      handleBatchFilesDrop(arr);
-      return;
+    if (plan.zineJsonFiles.length > 0) {
+      await handleImportDriveFiles(plan.zineJsonFiles);
     }
 
-    // If user dropped 1 Master 2x2 Storyboard Sheet, auto-slice into all 4 shots!
-    const sheet = images[0];
-    if (!sheet) {
-      if (videos[0] || audios[0]) {
+    const loadedSummary: string[] = [];
+
+    if (plan.audio) {
+      assignSong(plan.audio, plan.audio.name);
+      loadedSummary.push('🎵 Audio');
+    }
+    if (plan.gif1) {
+      assignGif1(plan.gif1, plan.gif1.name);
+      loadedSummary.push('🎞️ GIF #1');
+    }
+    if (plan.gif2) {
+      assignGif2(plan.gif2, plan.gif2.name);
+      loadedSummary.push('🎞️ GIF #2');
+    }
+    if (plan.video1) {
+      assignLeadVideo(plan.video1);
+      loadedSummary.push('🎬 Video 1');
+    }
+    if (plan.video2) {
+      assignOutroVideo(plan.video2);
+      loadedSummary.push('🎬 Video 2');
+    }
+
+    if (plan.storyboardSheet) {
+      setIsSlicingSheet(true);
+      try {
         playZineResonanceChime();
-        flashBanner('✓ Loaded video/audio into your Zine!');
+        flashBanner('✂️ Slicing 2×2 Storyboard & loading all media...');
+        const [b0, b1, b2, b3] = await slice2x2StoryboardInto4Shots(
+          plan.storyboardSheet
+        );
+        setShotBlobs([b0, b1, b2, b3]);
+        setShotUrls((prev) => {
+          prev.forEach((u) => u && URL.revokeObjectURL(u));
+          return [
+            URL.createObjectURL(b0),
+            URL.createObjectURL(b1),
+            URL.createObjectURL(b2),
+            URL.createObjectURL(b3),
+          ];
+        });
+        loadedSummary.unshift('🖼️ 4-Panel Sheet (sliced)');
+      } catch {
+        assignShotSlot(0, plan.storyboardSheet);
+        loadedSummary.unshift('🖼️ Shot 01');
+      } finally {
+        setIsSlicingSheet(false);
       }
-      return;
+    } else if (plan.individualStills.length > 0) {
+      if (plan.individualStills.length >= 4) {
+        for (let i = 0; i < 4; i++) {
+          assignShotSlot(i, plan.individualStills[i]);
+        }
+        loadedSummary.unshift('🖼️ 4 Story Shots');
+      } else {
+        const nextBlobs = [...shotBlobs];
+        const nextUrls = [...shotUrls];
+        let cursor = 0;
+        for (const imgFile of plan.individualStills) {
+          const explicitMatch = imgFile.name.match(
+            /(?:shot|img|print)[_-]?0?([1-4])/i
+          );
+          let targetIdx = explicitMatch ? Number(explicitMatch[1]) - 1 : -1;
+          if (targetIdx < 0 || targetIdx > 3) {
+            const emptyIdx = nextBlobs.findIndex((b) => !b);
+            targetIdx = emptyIdx >= 0 ? emptyIdx : cursor % 4;
+            cursor++;
+          }
+          if (nextUrls[targetIdx]) URL.revokeObjectURL(nextUrls[targetIdx]!);
+          nextBlobs[targetIdx] = imgFile;
+          nextUrls[targetIdx] = URL.createObjectURL(imgFile);
+        }
+        setShotBlobs(nextBlobs);
+        setShotUrls(nextUrls);
+        loadedSummary.unshift(`🖼️ ${plan.individualStills.length} Shot(s)`);
+      }
     }
 
-    setIsSlicingSheet(true);
-    try {
+    if (loadedSummary.length > 0) {
       playZineResonanceChime();
-      flashBanner('✂️ Auto-slicing 2×2 Storyboard into all 4 story shots...');
-      const [b0, b1, b2, b3] = await slice2x2StoryboardInto4Shots(sheet);
-      setShotBlobs([b0, b1, b2, b3]);
-      setShotUrls((prev) => {
-        prev.forEach((u) => u && URL.revokeObjectURL(u));
-        return [
-          URL.createObjectURL(b0),
-          URL.createObjectURL(b1),
-          URL.createObjectURL(b2),
-          URL.createObjectURL(b3),
-        ];
-      });
-      flashBanner('✓ Sliced all 4 distinct story shots (Act I → Villain → Clash → Aftermath)!');
-    } catch {
-      // Fallback: put image in Shot 01 if slicing failed
-      assignShotSlot(0, sheet);
-      flashBanner('✓ Loaded image into Shot 01!');
-    } finally {
-      setIsSlicingSheet(false);
-    }
-  };
-
-  const handleStep2GifsDrop = (files: FileList | File[]) => {
-    const arr = Array.from(files).filter(
-      (f) => f.type === 'image/gif' || f.type.startsWith('video/') || f.name.toLowerCase().endsWith('.gif')
-    );
-    if (!arr.length) return;
-    playZineResonanceChime();
-    if (arr.length >= 2) {
-      assignGif1(arr[0], arr[0].name);
-      assignGif2(arr[1], arr[1].name);
-      flashBanner('✓ Loaded both GIF #1 (Act I) and GIF #2 (Act III)!');
-    } else if (!gif1Url) {
-      assignGif1(arr[0], arr[0].name);
-      flashBanner('✓ Loaded Story GIF #1 (Act I)!');
-    } else {
-      assignGif2(arr[0], arr[0].name);
-      flashBanner('✓ Loaded Story GIF #2 (Act III)!');
+      flashBanner(`✓ Loaded ${loadedSummary.join(' + ')}!`);
     }
   };
 
@@ -1085,10 +1097,20 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
         ref={batchInputRef}
         type="file"
         multiple
-        accept="video/*,image/*,audio/*,.mp4,.webm,.gif,.png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a"
+        accept="video/*,image/*,audio/*,.mp4,.webm,.mov,.gif,.png,.jpg,.jpeg,.webp,.mp3,.wav,.m4a,.ogg,.zine.json,.zineshelf.json"
         className="hidden"
         onChange={(e) => {
-          if (e.target.files?.length) handleBatchFilesDrop(e.target.files);
+          if (e.target.files?.length) void handleBatchFilesDrop(e.target.files);
+          e.target.value = '';
+        }}
+      />
+      <input
+        ref={storyboardSheetOnlyInputRef}
+        type="file"
+        accept="image/*,.png,.jpg,.jpeg,.webp"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.length) void handleBatchFilesDrop(e.target.files);
           e.target.value = '';
         }}
       />
@@ -1100,39 +1122,6 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
         className="hidden"
         onChange={(e) => {
           if (e.target.files?.length) void handleImportDriveFiles(e.target.files);
-          e.target.value = '';
-        }}
-      />
-      <input
-        ref={storyboardInputRef}
-        type="file"
-        multiple
-        accept="image/*,video/*,audio/*,.png,.jpg,.jpeg,.webp,.mp4,.mp3,.wav,.m4a"
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files?.length) void handleStoryboardSheetDrop(e.target.files);
-          e.target.value = '';
-        }}
-      />
-      <input
-        ref={step2GifsInputRef}
-        type="file"
-        multiple
-        accept="image/gif,video/*,.gif,.mp4,.webm"
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files?.length) handleStep2GifsDrop(e.target.files);
-          e.target.value = '';
-        }}
-      />
-      <input
-        ref={step3MediaInputRef}
-        type="file"
-        multiple
-        accept="video/*,audio/*,.mp4,.webm,.mov,.mp3,.wav,.m4a,.ogg"
-        className="hidden"
-        onChange={(e) => {
-          if (e.target.files?.length) handleBatchFilesDrop(e.target.files);
           e.target.value = '';
         }}
       />
@@ -1759,7 +1748,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Copy <strong>1 Flow-safe Bad-Guy-only prompt</strong> into a <strong>fresh Flow chat (click +)</strong> so Flow never reuses your last monster, then drop the 4-panel sheet here. <em>(Set Flow to 1 output if you don&apos;t need 2 copies.)</em>
+                    Copy <strong>1 Flow-safe scary Bad-Guy prompt</strong> into a <strong>fresh Flow chat (click +)</strong> so Flow never repeats your last monster, then generate Steps 2 &amp; 3 and drop all 6 files together below! <em>(Set Flow to 1 output if you don&apos;t need 2 copies.)</em>
                   </p>
                 </div>
 
@@ -1955,53 +1944,6 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                       </>
                     )}
                   </button>
-
-                  <div
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsSheetDragOver(true);
-                    }}
-                    onDragLeave={() => setIsSheetDragOver(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsSheetDragOver(false);
-                      if (e.dataTransfer.files?.length) {
-                        void handleStoryboardSheetDrop(e.dataTransfer.files);
-                      }
-                    }}
-                    onClick={() => storyboardInputRef.current?.click()}
-                    style={{
-                      backgroundColor: isSheetDragOver
-                        ? uiTheme.tile2
-                        : uiTheme.inputBg,
-                    }}
-                    className="p-3 rounded-xl border-2 border-dashed theme-border cursor-pointer text-center space-y-1 transition-all hover:brightness-105"
-                  >
-                    <div className="font-mono-zine text-xs font-black uppercase flex items-center justify-center gap-1.5">
-                      <Upload className="w-4 h-4" />
-                      <span>
-                        {isSlicingSheet
-                          ? '✂️ Slicing 4 Panels...'
-                          : shotUrls.filter(Boolean).length === 4
-                          ? '✓ All 4 Distinct Shots Loaded!'
-                          : 'Drop Your 1 Storyboard Image Here'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-center gap-1 text-[10px] font-mono-zine opacity-80 whitespace-nowrap overflow-hidden">
-                      {['Act I', 'Villain', 'Clash', 'End'].map((lbl, i) => (
-                        <span
-                          key={lbl}
-                          className={`px-1.5 py-0.5 rounded border ${
-                            shotUrls[i]
-                              ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold'
-                              : 'border-current opacity-60'
-                          }`}
-                        >
-                          {shotUrls[i] ? `✓${lbl}` : lbl}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -2032,7 +1974,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Paste right below your storyboard in that <strong>same Gemini chat</strong> so the loops match your exact art style &amp; lighting! (Optional — never repeats still shots.)
+                    Paste right below your storyboard in that <strong>same Flow / Gemini chat</strong> so the loops match your exact art style &amp; lighting!
                   </p>
                 </div>
 
@@ -2056,7 +1998,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                             ? '#04130D'
                             : uiTheme.accent2Ink,
                       }}
-                      className="pop-btn px-2.5 py-2.5 font-mono-zine text-[11px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
+                      className="pop-btn px-2.5 py-3 font-mono-zine text-[11px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
                     >
                       {copiedKey === 'same-chat-gif1' ? (
                         <>
@@ -2087,7 +2029,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                             ? '#04130D'
                             : uiTheme.accent3Ink,
                       }}
-                      className="pop-btn px-2.5 py-2.5 font-mono-zine text-[11px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
+                      className="pop-btn px-2.5 py-3 font-mono-zine text-[11px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
                     >
                       {copiedKey === 'same-chat-gif2' ? (
                         <>
@@ -2100,57 +2042,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                       )}
                     </button>
                   </div>
-
-                  <div
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsStep2GifDragOver(true);
-                    }}
-                    onDragLeave={() => setIsStep2GifDragOver(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsStep2GifDragOver(false);
-                      if (e.dataTransfer.files?.length) {
-                        handleStep2GifsDrop(e.dataTransfer.files);
-                      }
-                    }}
-                    onClick={() => step2GifsInputRef.current?.click()}
-                    style={{
-                      backgroundColor: isStep2GifDragOver
-                        ? uiTheme.tile2
-                        : uiTheme.inputBg,
-                    }}
-                    className="p-3 rounded-xl border-2 border-dashed theme-border cursor-pointer text-center space-y-1 transition-all hover:brightness-105"
-                  >
-                    <div className="font-mono-zine text-xs font-black uppercase flex items-center justify-center gap-1.5">
-                      <Upload className="w-4 h-4" />
-                      <span>Drop GIF #1 &amp; GIF #2 (.gif / .mp4)</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 text-[10px] font-mono-zine">
-                      <span
-                        className={`px-2 py-0.5 rounded border ${
-                          gif1Url
-                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold'
-                            : 'border-current opacity-60'
-                        }`}
-                      >
-                        {gif1Url ? '✓ GIF #1 Act I' : 'GIF #1 Act I'}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded border ${
-                          gif2Url
-                            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold'
-                            : 'border-current opacity-60'
-                        }`}
-                      >
-                        {gif2Url ? '✓ GIF #2 Act III' : 'GIF #2 Act III'}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
 
-              {/* STEP 3: AUDIO (5 BUILT-IN STYLES OR PROMPT) + LEAD VIDEO */}
+              {/* STEP 3: AUDIO (5 BUILT-IN STYLES OR PROMPT) + 2 VIDEOS */}
               <div
                 style={{ backgroundColor: uiTheme.surfaceBg }}
                 className="p-4 rounded-2xl border-[3px] theme-border flex flex-col justify-between gap-3"
@@ -2164,20 +2059,20 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                       }}
                       className="px-2.5 py-0.5 rounded-full border-2 theme-border font-mono-zine text-[11px] font-black uppercase"
                     >
-                      STEP 3 • AUDIO &amp; LEAD VIDEO
+                      STEP 3 • AUDIO &amp; 2 VIDEOS
                     </span>
                     <span className="font-mono-zine text-[11px] font-bold">
-                      {audioUrl ? '🎵✓' : '🎵'} {videoUrl ? '🎬✓' : '🎬'}
+                      {audioUrl ? '🎵✓' : '🎵'} {(videoUrl ? 1 : 0) + (outroVideoUrl ? 1 : 0)}/2🎬
                     </span>
                   </div>
                   <h4 className="font-display text-lg font-extrabold uppercase leading-tight">
-                    5-Style Synth Audio + Hero Video
+                    5-Style Synth Audio + 2 Videos
                   </h4>
                   <p
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Try all <strong>5 built-in 1990s styles</strong> (zero tabs!) or copy the audio/video prompts for that same Gemini chat!
+                    Auto-compose a <strong>built-in 90s soundtrack</strong> (or copy the audio prompt) and grab both monster video prompts for that same chat!
                   </p>
                 </div>
 
@@ -2242,7 +2137,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                             ? '#04130D'
                             : uiTheme.accent3Ink,
                       }}
-                      className="pop-btn px-2 py-2 font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
+                      className="pop-btn px-2 py-2.5 font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
                       title="8-second Act II Peak Monster Mayhem video (paste in same Gemini/Flow chat)"
                     >
                       {copiedKey === 'same-chat-vid' ? (
@@ -2274,8 +2169,8 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                             ? '#04130D'
                             : uiTheme.accent2Ink,
                       }}
-                      className="pop-btn px-2 py-2 font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
-                      title="8-second Act III Finale Ending video where anomaly crystallizes into the 3 Holo Cards (paste in same Gemini chat)"
+                      className="pop-btn px-2 py-2.5 font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1 cursor-pointer"
+                      title="8-second Act III Finale Ending video where the monster vanishes leaving 3 Holo Cards (paste in same Gemini/Flow chat)"
                     >
                       {copiedKey === 'same-chat-outro' ? (
                         <>
@@ -2288,40 +2183,204 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                       )}
                     </button>
                   </div>
-
-                  <div
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsStep3DragOver(true);
-                    }}
-                    onDragLeave={() => setIsStep3DragOver(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsStep3DragOver(false);
-                      if (e.dataTransfer.files?.length) {
-                        handleBatchFilesDrop(e.dataTransfer.files);
-                      }
-                    }}
-                    onClick={() => step3MediaInputRef.current?.click()}
-                    style={{
-                      backgroundColor: isStep3DragOver
-                        ? uiTheme.tile2
-                        : uiTheme.inputBg,
-                    }}
-                    className="p-2.5 rounded-xl border-2 border-dashed theme-border cursor-pointer font-mono-zine text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden hover:brightness-105"
-                    title="Drop Video 1 (.mp4), Finale Video 2 (.mp4), or custom .mp3 here"
-                  >
-                    <Upload className="w-3.5 h-3.5 shrink-0" />
-                    <span>Drop MP4 / MP3</span>
-                    <span className={videoUrl ? 'text-emerald-400' : 'opacity-60'}>
-                      {videoUrl ? '✓V1' : 'V1'}
-                    </span>
-                    <span className={outroVideoUrl ? 'text-emerald-400' : 'opacity-60'}>
-                      {outroVideoUrl ? '✓V2' : 'V2'}
-                    </span>
-                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* UNIFIED ALL-IN-ONE 6-FILE DROP ZONE AT THE END */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsAllInOneDragOver(true);
+              }}
+              onDragLeave={() => setIsAllInOneDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsAllInOneDragOver(false);
+                if (e.dataTransfer.files?.length) {
+                  void handleBatchFilesDrop(e.dataTransfer.files);
+                }
+              }}
+              onClick={() => batchInputRef.current?.click()}
+              style={{
+                backgroundColor: isAllInOneDragOver
+                  ? uiTheme.tile2
+                  : uiTheme.surfaceBg,
+              }}
+              className="p-4 sm:p-5 rounded-2xl border-[3px] border-dashed theme-border cursor-pointer text-center space-y-3 transition-all hover:brightness-105"
+            >
+              <div className="space-y-1">
+                <div className="font-display text-base sm:text-lg font-extrabold uppercase flex items-center justify-center gap-2">
+                  <Upload className="w-5 h-5 shrink-0" />
+                  <span>
+                    {isSlicingSheet
+                      ? '✂️ Slicing 4-Panel Sheet & Routing All Files...'
+                      : '⚡ Drop All 6 Files Here At Once (Or Click to Select)'}
+                  </span>
+                </div>
+                <p
+                  style={{ color: uiTheme.mutedInk }}
+                  className="text-xs font-semibold"
+                >
+                  Drop your <strong>1 Storyboard Sheet</strong> + <strong>2 GIF Loops</strong> + <strong>2 Videos</strong> + <strong>1 Audio Track</strong> together — auto-slices all 4 panels &amp; smart-routes every clip! <em>(Click any badge below to swap a single slot.)</em>
+                </p>
+              </div>
+
+              {/* Live 6-Slot Status Pills (individually clickable to replace a single slot!) */}
+              <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-mono-zine">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    storyboardSheetOnlyInputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    shotUrls.filter(Boolean).length === 4
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace your 1 Master 2×2 Storyboard Image"
+                >
+                  🖼️ {shotUrls.filter(Boolean).length === 4 ? '✓ 4-Panel Sheet (4/4)' : `4-Panel Sheet (${shotUrls.filter(Boolean).length}/4)`}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    gif1InputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    gif1Url
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace GIF #1 (Act I Loop)"
+                >
+                  🎞️ {gif1Url ? '✓ GIF #1 (Act I)' : 'GIF #1 (Act I)'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    gif2InputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    gif2Url
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace GIF #2 (Act III Loop)"
+                >
+                  🎞️ {gif2Url ? '✓ GIF #2 (Act III)' : 'GIF #2 (Act III)'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    leadVideoInputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    videoUrl
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace Video 1 (Act II Mayhem)"
+                >
+                  🎬 {videoUrl ? '✓ Video 1 (Mayhem)' : 'Video 1 (Mayhem)'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    outroVideoInputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    outroVideoUrl
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace Video 2 (Act III Ending)"
+                >
+                  🎬 {outroVideoUrl ? '✓ Video 2 (Ending)' : 'Video 2 (Ending)'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    songInputRef.current?.click();
+                  }}
+                  className={`px-2.5 py-1 rounded-xl border-2 cursor-pointer transition-all hover:brightness-110 ${
+                    audioUrl
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 font-black'
+                      : 'border-current opacity-75 font-bold'
+                  }`}
+                  title="Click to pick/replace Soundtrack Audio (.mp3 / .wav)"
+                >
+                  🎵 {audioUrl ? '✓ Soundtrack' : 'Soundtrack'}
+                </button>
+              </div>
+
+              {/* Quick 1-click clip swap buttons if Flow downloaded clips in reverse order */}
+              {((gif1Url && gif2Url) ||
+                (videoUrl && outroVideoUrl) ||
+                ((gif1Url || gif2Url) && (videoUrl || outroVideoUrl))) && (
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  {(gif1Url || gif2Url) && (videoUrl || outroVideoUrl) && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSwapGifsAndVideos();
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="px-2.5 py-1 rounded-lg border-2 theme-border font-mono-zine text-[10px] font-bold uppercase flex items-center gap-1 cursor-pointer hover:brightness-110"
+                      title="Swap GIF #1/#2 with Video 1/2 if your videos downloaded before your GIF loops"
+                    >
+                      <ArrowLeftRight className="w-3 h-3" /> Swap GIFs ↔ Videos
+                    </button>
+                  )}
+                  {gif1Url && gif2Url && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSwapGif1AndGif2();
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="px-2.5 py-1 rounded-lg border-2 theme-border font-mono-zine text-[10px] font-bold uppercase flex items-center gap-1 cursor-pointer hover:brightness-110"
+                    >
+                      <ArrowLeftRight className="w-3 h-3" /> Swap GIF 1 ↔ 2
+                    </button>
+                  )}
+                  {videoUrl && outroVideoUrl && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSwapVideo1AndVideo2();
+                      }}
+                      style={{
+                        backgroundColor: uiTheme.surfaceElevated,
+                        color: uiTheme.ink,
+                      }}
+                      className="px-2.5 py-1 rounded-lg border-2 theme-border font-mono-zine text-[10px] font-bold uppercase flex items-center gap-1 cursor-pointer hover:brightness-110"
+                    >
+                      <ArrowLeftRight className="w-3 h-3" /> Swap Vid 1 ↔ 2
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Optional Paste Story Box */}
