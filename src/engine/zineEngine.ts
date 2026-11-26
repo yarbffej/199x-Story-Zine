@@ -1550,9 +1550,41 @@ export function compile199xZinePrompts(
     `A 4-second 16:9 ${palette.videoType} at 24fps in ${flowArtStyle}. Inside empty ${locationVisual} under ${lightingClean} with no human figures anywhere, showcasing ${safeCreature} (${monsterMood.stagingCue}): ${arc.videoBeat1}; then ${arc.videoBeat2} as the scene hits a dramatic grounded finish. Audio: ${leadAudioClean}`
   );
 
-  // 8. Story-Synced 3-Act Synth Soundtrack Prompt
+  // 8. Story-Synced 2-Option Google Flow Soundtrack Prompt (explicitly directs Flow to generate 2 contrasting tracks!)
+  const { shortName: songMonsterName } = splitNamedBadGuy(rawAnomaly);
+  const songOptionPairs: Array<{ opt1: string; opt2: string }> = [
+    {
+      opt1: `Track 1 (Creepy Midnight Analog Synth, 106 BPM): eerie 1990s creature-feature synth score with a ticking clock pulse, creeping analog bassline, ominous pipe-organ chords, and chiming music-box notes building into dramatic dark synth swells for "${synergy}" and a spine-tingling quiet twist ending`,
+      opt2: `Track 2 (High-Energy 90s Monster-Chase Synth-Rock, 126 BPM): driving retro 1990s synth-rock and arcade chase featuring punchy slap-bass grooves, crunchy 90s electric guitar riffs, gated snare drums, blazing brassy synth leads erupting for "${synergy}", and a sleek echoing midnight outro`,
+    },
+    {
+      opt1: `Track 1 (Eerie 90s Tape-Loop Mystery, 100 BPM): hypnotic vintage analog cassette-pad atmosphere with hollow metallic chimes, deep brooding sub-bass, eerie warbling theremin melody, and sudden dramatic synth-brass stings before a hushed cliffhanger fade`,
+      opt2: `Track 2 (16-Bit Boss-Arena Electro-Synth, 130 BPM): relentless 1990s 16-bit console boss instrumental with driving FM synth bass, crisp breakbeat drums, rapid-fire neon arpeggios, dramatic minor-key organ stabs for "${synergy}", and an eerie echoing finale`,
+    },
+    {
+      opt1: `Track 1 (Midnight Carnival Organ & Strings, 112 BPM): uncanny twilight carousel waltz with slightly detuned calliope organ, plucked pizzicato strings, booming timpani hits, and chiming celesta bells swelling into a dramatic minor-key climax`,
+      opt2: `Track 2 (90s Dark Surf-Rock Monster Groove, 134 BPM): punchy reverb-drenched 1990s dark surf-rock and garage chase with twangy tremolo electric guitar, thundering tom drums, buzzing vintage combo organ, and a sneaky suspenseful final chord`,
+    },
+    {
+      opt1: `Track 1 (Deep-Dark Midnight Chimes & Drone, 96 BPM): bone-chilling midnight sci-fi mystery score with cavernous dark synth drones, glassy bell arpeggios, slow heartbeat percussion, swelling dramatic low strings, and a cold quiet wind resolution`,
+      opt2: `Track 2 (90s Spooky Boom-Bap Instrumental, 98 BPM): crisp 1990s instrumental hip-hop mystery beat with vintage vinyl crackle, heavy head-nodding boom-bap drums, deep creeping upright bassline, eerie electric-piano chords, and subtle turntable scratches`,
+    },
+    {
+      opt1: `Track 1 (90s Creature-Feature Cinema Score, 114 BPM): sweeping dramatic 1990s fantasy-mystery orchestral score with creeping cello ostinato, eerie low woodwinds, chiming tubular bells, thundering orchestral percussion for "${synergy}", and an unsettling solo piano twist ending`,
+      opt2: `Track 2 (High-Voltage Dark Arcade Synthwave, 124 BPM): electrifying turbo 1990s dark synthwave with pulsing arpeggiated analog bass, soaring dramatic synth lead melody, punchy gated retro drums, thrilling key-change climax, and glowing midnight synth pads`,
+    },
+    {
+      opt1: `Track 1 (Creeping Attic Music-Box & Dark Synth, 102 BPM): spine-tingling spooky toy-box thriller starting with an off-kilter wind-up music box echoed by ominous deep analog bass, creaking percussive clicks, a dramatic heavy synth-guitar surge, and one eerie final music-box note`,
+      opt2: `Track 2 (Late-90s Dark Breakbeat Electro Chase, 132 BPM): adrenaline-pumping late-1990s dark arcade breakbeat instrumental with rolling energetic drums, squelchy resonant analog synth lines, dramatic echoing stabs for "${synergy}", and a cool suspenseful wind-down`,
+    },
+  ];
+  const songPair = pickSeeded(
+    songOptionPairs,
+    hashString(`${rawLocation}|${rawAnomaly}|${synergy}`),
+    plan.paletteIdx + plan.arcIdx
+  );
   const synthSongPrompt = sanitizeVisualPromptText(
-    `1990s suburban spooky monster story soundtrack (118 BPM, 45-60s instrumental) structured to follow the 3-Act Zine story in "${location}": [0:00-0:15 Act I After Closing] mysterious analog cassette synth drone, buzzing fluorescent hum, and creeping bass pulse; [0:15-0:42 Act II Monster Mayhem] punchy FM synthwave bassline, gated 16-bit snare drums, and electric guitar power chords erupting for "${synergy}"; [0:42-0:60 Act III Twist Ending] warm, nostalgic midnight synth pads and shimmering bell arpeggios fading into spooky quiet resolution. Strictly instrumental, no vocals.`
+    `Generate 2 separate instrumental soundtrack options (2 distinct audio tracks so I can choose my favorite) for a spooky 1990s monster story starring ${songMonsterName} inside "${location}". ${songPair.opt1}. ${songPair.opt2}. Please output both Track 1 and Track 2 as two separate 45-60 second strictly instrumental audio tracks with no vocals, no lyrics, and no spoken dialogue.`
   );
 
   // 9. External 3-Act Long-Form Story Prompt (100% Bad-Guy-Only 1990s Goosebumps paperback style!)

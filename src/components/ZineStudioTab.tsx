@@ -2072,7 +2072,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                     style={{ color: uiTheme.mutedInk }}
                     className="text-xs font-semibold leading-relaxed"
                   >
-                    Auto-compose a <strong>built-in 90s soundtrack</strong> (or copy the audio prompt) and grab both monster video prompts for that same chat!
+                    Auto-compose a <strong>built-in 90s soundtrack</strong> (or copy the <strong>2-song Flow prompt</strong> for 2 track options) and grab both monster video prompts for that same chat!
                   </p>
                 </div>
 
@@ -2112,9 +2112,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                           copiedKey === 'song-prompt' ? '#04130D' : uiTheme.ink,
                       }}
                       className="px-2.5 py-2 rounded-xl border-2 theme-border font-mono-zine text-[10px] font-bold uppercase shrink-0 cursor-pointer"
-                      title="Copy text prompt if you prefer generating audio externally"
+                      title="Copy Google Flow music prompt that requests 2 contrasting instrumental song options (Track 1 & Track 2)"
                     >
-                      {copiedKey === 'song-prompt' ? '✓' : 'Prompt'}
+                      {copiedKey === 'song-prompt' ? '✓ Copied!' : '2-Song Prompt'}
                     </button>
                   </div>
 
