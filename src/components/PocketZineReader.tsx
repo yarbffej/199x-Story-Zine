@@ -90,7 +90,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
               </button>
 
               <span className="font-display font-extrabold text-xs sm:text-sm uppercase truncate">
-                Issue #{String(activeIssue.issueNumber).padStart(2, '0')}
+                Issue #{activeIssue.issueNumber}
               </span>
 
               <div className="flex items-center gap-1.5">
@@ -290,7 +290,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
                       }}
                       className="px-4 py-2 border-b-[3px] theme-border flex items-center justify-between font-mono-zine text-xs font-bold uppercase"
                     >
-                      <span>ISSUE #{String(iss.issueNumber).padStart(2, '0')}</span>
+                      <span>ISSUE #{iss.issueNumber}</span>
                       <span>{iss.sectorTag}</span>
                     </div>
 
@@ -354,7 +354,7 @@ export const PocketZineReader: React.FC<PocketZineReaderProps> = ({
                         }}
                         className="pop-btn mt-2 py-2 text-center font-display font-extrabold text-xs uppercase"
                       >
-                        Read Issue #{String(iss.issueNumber).padStart(2, '0')} →
+                        Read Issue #{iss.issueNumber} →
                       </div>
                     </div>
                   </div>

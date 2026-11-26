@@ -1732,7 +1732,7 @@ export function buildZineIssueFromEncounter(
 
   return {
     id: `zine-${seedNum}-${issueNumber}`,
-    issueNumber: encounter.card_number || issueNumber,
+    issueNumber,
     hexSeed,
     title: anomalyName,
     classification: encounter.critical_smash

@@ -1410,7 +1410,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
                   boxShadow: '3px 3px 0 var(--ui-border)',
                 }}
               >
-                ★ ZINE ISSUE #{String(issue.issueNumber).padStart(2, '0')} //{' '}
+                ★ ZINE ISSUE #{issue.issueNumber} //{' '}
                 {issue.classification}
               </span>
 
@@ -1891,7 +1891,7 @@ export const ZineIssueView: React.FC<ZineIssueViewProps> = ({
           >
             <div className="space-y-0.5">
               <div className="font-mono-zine text-xs font-black uppercase opacity-80">
-                ★ ISSUE #{String(issue.issueNumber).padStart(2, '0')} READY TO PUBLISH
+                ★ ISSUE #{issue.issueNumber} READY TO PUBLISH
               </div>
               <h3 className="font-display text-xl sm:text-2xl font-extrabold uppercase">
                 Save This Zine to Your Shelf or Google Drive

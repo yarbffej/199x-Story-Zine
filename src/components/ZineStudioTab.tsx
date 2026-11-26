@@ -42,6 +42,7 @@ import {
   exportZineIssueForDrive,
   exportEntireZineShelfForDrive,
   importZineFilesFromDrive,
+  getZineContentSignature,
 } from '../utils/zineStorage';
 import {
   SyncDirHandle,
@@ -129,9 +130,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   const [editingRecordId, setEditingRecordId] = useState<string | undefined>(undefined);
   const editingRecordIdRef = useRef<string | undefined>(undefined);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const autoSaveTimerRef = useRef<number | null>(null);
   const skipNextAutoSaveRef = useRef<boolean>(false);
   const [issueNumber, setIssueNumber] = useState<number>(
-    encounter.card_number || shelfRecords.length + 1
+    shelfRecords.length + 1
   );
   const [zinePaletteId, setZinePaletteId] = useState<ZinePaletteId>(
     getZinePalette(encounter.card_theme).finishId
@@ -229,6 +231,35 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     setAudioBlob(undefined);
     setAudioUrl(undefined);
   }, [encounter]);
+
+  // Keep draft issueNumber synced to shelf (#1 when empty, or matched record's exact # after remount/delete!)
+  useEffect(() => {
+    const activeSig = getZineContentSignature(encounter.entity_name, encounter);
+    const matched =
+      (editingRecordIdRef.current
+        ? shelfRecords.find((r) => r.id === editingRecordIdRef.current)
+        : undefined) ||
+      shelfRecords.find(
+        (r) =>
+          getZineContentSignature(r.title, r.encounter) === activeSig &&
+          Boolean((r.encounter?.location || '').trim())
+      );
+
+    if (matched) {
+      if (editingRecordIdRef.current !== matched.id) {
+        editingRecordIdRef.current = matched.id;
+        setEditingRecordId(matched.id);
+      }
+      if (issueNumber !== matched.issueNumber) {
+        setIssueNumber(matched.issueNumber);
+      }
+    } else if (!editingRecordIdRef.current) {
+      const nextNum = shelfRecords.length + 1;
+      if (issueNumber !== nextNum) {
+        setIssueNumber(nextNum);
+      }
+    }
+  }, [shelfRecords, encounter, issueNumber]);
 
   const bannerTimerRef = useRef<number | null>(null);
   const flashBanner = useCallback((msg: string) => {
@@ -497,8 +528,14 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
   };
 
   const persistCurrentDraftToShelf = useCallback(
-    (opts?: { silent?: boolean }) => {
-      const task = saveQueueRef.current.then(async () => {
+    (opts?: { silent?: boolean }): Promise<ZineShelfRecord | undefined> => {
+      // Cancel any pending debounced auto-save whenever a save runs so we never double-fire
+      if (autoSaveTimerRef.current !== null) {
+        window.clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+
+      const task = saveQueueRef.current.then(async (): Promise<ZineShelfRecord | undefined> => {
         if (!opts?.silent) setIsSavingShelf(true);
         try {
           const saved = await saveZineIssueToShelf({
@@ -526,24 +563,29 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
           if (opts?.silent) {
             flashBanner(
               pushedToFolder
-                ? `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Shelf & Sync Folder`
-                : `✓ Auto-saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf`
+                ? `✓ Auto-saved Issue #${saved.issueNumber} to Shelf & Sync Folder`
+                : `✓ Auto-saved Issue #${saved.issueNumber} to Zine Shelf`
             );
           } else {
             flashBanner(
               pushedToFolder
-                ? `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Shelf & Sync Folder!`
-                : `✓ Saved Issue #${String(saved.issueNumber).padStart(2, '0')} to Zine Shelf!`
+                ? `✓ Saved Issue #${saved.issueNumber} to Shelf & Sync Folder!`
+                : `✓ Saved Issue #${saved.issueNumber} to Zine Shelf!`
             );
           }
+          return saved;
         } catch (err) {
           console.error('Zine Shelf save failed:', err);
           flashBanner('⚠ Browser storage full or blocked — use Save for Drive (.zine.json)!');
+          return undefined;
         } finally {
           if (!opts?.silent) setIsSavingShelf(false);
         }
       });
-      saveQueueRef.current = task.catch(() => {});
+      saveQueueRef.current = task.then(
+        () => undefined,
+        () => undefined
+      );
       return task;
     },
     [
@@ -564,6 +606,10 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     ]
   );
 
+  // Keep a ref to latest persist function so changing issueNumber doesn't re-trigger auto-save loop!
+  const persistDraftRef = useRef(persistCurrentDraftToShelf);
+  persistDraftRef.current = persistCurrentDraftToShelf;
+
   // Auto-save to Zine Shelf automatically whenever user drops/generates any media!
   const hasAnyMediaLoaded = Boolean(
     videoBlob ||
@@ -580,10 +626,19 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
       skipNextAutoSaveRef.current = false;
       return;
     }
-    const timer = window.setTimeout(() => {
-      void persistCurrentDraftToShelf({ silent: true });
-    }, 650);
-    return () => window.clearTimeout(timer);
+    if (autoSaveTimerRef.current !== null) {
+      window.clearTimeout(autoSaveTimerRef.current);
+    }
+    autoSaveTimerRef.current = window.setTimeout(() => {
+      autoSaveTimerRef.current = null;
+      void persistDraftRef.current({ silent: true });
+    }, 850);
+    return () => {
+      if (autoSaveTimerRef.current !== null) {
+        window.clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+    };
   }, [
     hasAnyMediaLoaded,
     videoBlob,
@@ -594,20 +649,22 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
     audioBlob,
     acts,
     zinePaletteId,
-    persistCurrentDraftToShelf,
   ]);
 
-  const handleSaveIssueToShelf = async () => {
-    if (isSavingShelf) return;
+  const handleSaveIssueToShelf = async (): Promise<ZineShelfRecord | undefined> => {
+    if (isSavingShelf) return undefined;
     playZineResonanceChime();
-    await persistCurrentDraftToShelf({ silent: false });
+    return await persistCurrentDraftToShelf({ silent: false });
   };
 
   const handleExportForDrive = async () => {
     playZineBlip(880);
-    await handleSaveIssueToShelf();
+    const saved = await handleSaveIssueToShelf();
     flashBanner('Packing Zine for Google Drive...');
-    await exportZineIssueForDrive(liveIssue, {
+    const canonicalIssue: ZineIssueData = saved
+      ? { ...liveIssue, id: saved.id, issueNumber: saved.issueNumber }
+      : liveIssue;
+    await exportZineIssueForDrive(canonicalIssue, {
       videoBlob,
       outroVideoBlob,
       shotBlobs,
@@ -1211,7 +1268,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             className="pop-btn px-4 py-2 font-display font-extrabold text-xs sm:text-sm uppercase flex items-center gap-2 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Live Zine Issue (#{String(issueNumber).padStart(2, '0')})</span>
+            <span>Live Zine Issue (#{issueNumber})</span>
           </button>
 
           <button
@@ -1536,7 +1593,7 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
                         className="px-4 py-2 border-b-[3px] theme-border flex items-center justify-between font-mono-zine text-xs font-bold uppercase"
                       >
                         <span>
-                          ISSUE #{String(rec.issueNumber).padStart(2, '0')}
+                          ISSUE #{rec.issueNumber}
                         </span>
                         <span>
                           {rec.encounter.theme_set_badge || 'SERIES 2'}
@@ -2692,7 +2749,9 @@ export const ZineStudioTab: React.FC<ZineStudioTabProps> = ({
             onUpdatePalette={(pid) => setZinePaletteId(pid)}
             onDropSlotFile={handleInlineSlotDrop}
             onClickUploadSlot={handleInlineSlotUploadClick}
-            onSaveToShelf={handleSaveIssueToShelf}
+            onSaveToShelf={async () => {
+              await handleSaveIssueToShelf();
+            }}
             isSavingShelf={isSavingShelf}
             isSavedOnShelf={Boolean(editingRecordId)}
             onExportForDrive={handleExportForDrive}

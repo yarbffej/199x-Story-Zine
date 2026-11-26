@@ -18,6 +18,7 @@ import {
   HydratedZineShelfIssue,
   getAllZineShelfRecords,
   hydrateZineRecord,
+  getZineContentSignature,
 } from './utils/zineStorage';
 import { WheelSlice } from './components/EncounterWheel';
 import { 
@@ -569,7 +570,12 @@ export default function App() {
   const pocketReaderIssues: ZineIssueData[] = React.useMemo(() => {
     const activeDraft =
       liveZineDraft || buildZineIssueFromEncounter(currentEncounter, shelfRecords.length + 1);
-    const alreadySaved = hydratedShelfIssues.some((s) => s.id === activeDraft.id);
+    const activeSig = getZineContentSignature(activeDraft.title, activeDraft.encounter);
+    const alreadySaved = hydratedShelfIssues.some(
+      (s) =>
+        s.id === activeDraft.id ||
+        getZineContentSignature(s.title, s.encounter) === activeSig
+    );
     return alreadySaved
       ? hydratedShelfIssues
       : [activeDraft, ...hydratedShelfIssues];
